@@ -1,0 +1,12 @@
+packages:
+  # Core packages
+  - 'packages/core'
+  - 'packages/animations'
+  - 'packages/components'
+  
+  # Applications
+  - 'apps/*'
+  
+  # Development tools
+  - 'tools/*'
+

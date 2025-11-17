@@ -1,0 +1,14 @@
+{
+	"extends": "@fleet-ui/typescript-config/react.json",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"outDir": "./dist",
+		"rootDir": "./",
+		"baseUrl": ".",
+		"paths": {
+			"@my-sdk/*": ["../../packages/*/src"]
+		}
+	},
+	"include": [".storybook", "stories", "../../packages/*/src/**/*.stories.tsx"],
+	"exclude": ["node_modules", "dist", "storybook-static", "build"]
+}

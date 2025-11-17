@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version bump type"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+jobs:
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Create changeset
+        run: |
+          echo "---" > .changeset/release.md
+          echo "\"@my-sdk/components\": ${{ github.event.inputs.version }}" >> .changeset/release.md
+          echo "\"@my-sdk/animations\": ${{ github.event.inputs.version }}" >> .changeset/release.md
+          echo "\"@my-sdk/tokens\": ${{ github.event.inputs.version }}" >> .changeset/release.md
+          echo "\"@my-sdk/shared\": ${{ github.event.inputs.version }}" >> .changeset/release.md
+          echo "---" >> .changeset/release.md
+          echo "" >> .changeset/release.md
+          echo "Release ${{ github.event.inputs.version }} version" >> .changeset/release.md
+
+      - name: Version packages
+        run: pnpm changeset version
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          commit-message: "chore: version packages for ${{ github.event.inputs.version }} release"
+          branch: release/${{ github.event.inputs.version }}
+          title: "Release ${{ github.event.inputs.version }} version"
+          body: |
+            This PR bumps package versions for a ${{ github.event.inputs.version }} release.
+
+            Review the changes and merge to trigger the publish workflow.

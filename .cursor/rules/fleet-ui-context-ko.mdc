@@ -1,0 +1,65 @@
+---
+alwaysApply: true
+---
+
+# Fleet UI 프로젝트 컨텍스트 (KR)
+
+## Monorepo 개요
+
+- 루트 경로: `/Volumes/Samsung T5/documents`. PNPM/Turborepo 기반이며 `pnpm-workspace.yaml` 이 `packages/*`, `apps/*`, `tools/*` 를 워크스페이스로 묶는다.
+- 루트 `package.json` 스크립트는 `turbo run build|dev|test|typecheck` 등을 래핑한다. Biome(`pnpm lint`)이 단일 린터/포매터.
+- Node ≥ 18, pnpm ≥ 9 요구. 루트 `tsconfig.json` 은 RN/Expo 환경에 맞춘 ESNext + `jsx: react-native`.
+
+## 디자인 시스템 문서 레이어 (design-system/)
+
+- `design-system-layer-architecture.md`: Layer 0~3 전체 개념과 상호 참조 규칙 정의.
+- Layer 0 `layer0/principle.md`: WHY/WHAT 원칙. 모든 결정의 상위 기준.
+- Layer 1 `layer1/design-system-spec-template.md`: 조직·제품 맥락, 기술 스택, R&R을 선언.
+- Layer 2 `layer2/token-system-spec-template.md`, `layer2/component-spec-template.md` 및 실제 컴포넌트 스펙(예: `layer2/components/button.md`): 구체 토큰·컴포넌트 정의.
+- Layer 3 `layer3/*-implementation-guide-rn-unistyles.md`: Layer2 스펙을 React Native + Unistyles 코드로 투영하는 절차/패턴, 파일 구조, 변환 로직을 명세. 실제 코드 작성 시 항상 레퍼런스로 삼는다.
+
+## 패키지 구조
+
+- `packages/core`: 실제 런타임 코드가 존재하는 유일 패키지.
+  - `src/tokens/raw → primitive → semantic` 파이프라인과 `atoms.ts` (원자적 스타일 preset).
+  - `src/theme/{lightTheme,darkTheme,breakpoints}` 와 `src/unistyles.ts` 로 Unistyles 설정.
+  - `src/hooks` (`useDimensions`, `usePlatform`) & `src/utils` (`platform`, `styles`) 등 범용 유틸.
+  - 루트 `src/index.ts`가 tokens/theme/hooks/utils 를 전부 export.
+- `packages/components`: README 기반 스캐폴드만 존재. 새 컴포넌트 추가 시
+  1. `src/ComponentName/` 생성,
+  2. `ComponentName.tsx`, `.native.tsx`, `.web.tsx`, `.test.tsx`, `.stories.tsx`, `index.ts`,
+  3. 패키지 `src/index.ts`에 재노출.
+- `packages/animations`: Reanimated 기반 preset/hook/component scaffold. `src/components|hooks|presets|utils` 폴더만 있고 실제 구현은 없음.
+
+## 앱
+
+- `apps/playground` (Expo Router):
+  - `app/_layout.tsx` 에서 `@fleet-ui/core/unistyles` 를 import 하여 테마 등록하고 Stack 라우터를 구축한다. `/components`, `/animations`, `/theme-demo` 등 라우트는 각자 `_layout.tsx` 와 `[slug].tsx` 로 구성.
+  - 토큰 데모는 `app/theme-demo.tsx` 에서 Unistyles `StyleSheet.create` 를 사용해 색상/타이포/spacing 등을 시각화.
+- `apps/storybook`:
+  - React Native Web Storybook 8.x 설정. `stories/DesignTokens.stories.tsx` 등에서 `@fleet-ui/core` (혹은 `@fleet-ui/tokens` 별칭) 을 불러 토큰을 전개.
+  - `package.json` 스크립트: `storybook`, `build-storybook`, `serve`.
+
+## 토큰 & 테마 파이프라인 (packages/core/src/tokens)
+
+1. `raw/colors.ts`: HSL 기반 10단계 팔레트 생성기. 중립/상태/액션 컬러의 light/dark 버전을 생성.
+2. `primitive/*`: raw 값을 단순 매핑(색상, 간격, 반경, 그림자, 타이포 등) + 공용 타입.
+3. `semantic/colors.ts`, `semantic/typography.ts`: UI 의미 단위(bg/bd/text/action/status, h1~button)의 스케일을 정의. 설치 시 바로 theme 객체에 주입된다.
+4. `theme/lightTheme.ts|darkTheme.ts`: semantic + primitive 묶음을 구성. 새로운 토큰은 semantic 단계에서 정의 후 theme에 배선해야 한다.
+5. `unistyles.ts`: `StyleSheet.configure` 로 theme/breakpoint 등록 및 타입 증강. 어떤 앱이든 진입점에서 `import '@fleet-ui/core/unistyles';` 를 1회 호출해야 함.
+
+반드시 unistyles 3.0 버전이상을 기준으로 작성할 것.
+
+참고 문서
+https://www.unistyl.es/v3/references/dynamic-functions
+https://www.unistyl.es/v3/references/variants
+https://www.unistyl.es/v3/references/compound-variants
+https://www.unistyl.es/v3/references/use-unistyles
+
+## 개발 규칙
+
+- 문서 → 스펙 → 구현 순서를 지키며 Layer 간 참조 일관성을 유지. 코드 변경 시 해당 레이어 문서 업데이트 여부를 검토.
+- 새 컴포넌트/애니메이션 추가 시 패키지 README의 디렉토리·파일 생성 가이드를 따른다. 테스트/스토리까지 동시에 추가하는 것이 기본.
+- Expo Playground 라우트 추가 시 `app/_layout.tsx` stack에 화면을 등록하고 필요 시 하위 `_layout.tsx` 구성.
+- Storybook에서 토큰/컴포넌트가 노출돼야 하므로 신규 토큰·컴포넌트 추가 시 대응되는 Story를 작성해 QA 루프 확보.
+- Biome (`pnpm lint`, `pnpm format`) 과 Turbo task (`pnpm build|dev|test|typecheck`) 를 사용해 품질 확인. Expo/Storybook 전용 명령은 `package.json` 참고.

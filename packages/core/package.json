@@ -1,0 +1,51 @@
+{
+	"name": "@fleet-ui/core",
+	"version": "0.0.1",
+	"description": "Core utilities, design tokens, types, and hooks for Fleet UI",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"react-native": "./src/index.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"react-native": "./src/index.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		},
+		"./unistyles": {
+			"types": "./dist/unistyles.d.ts",
+			"react-native": "./src/unistyles.ts",
+			"import": "./dist/unistyles.mjs",
+			"require": "./dist/unistyles.js"
+		}
+	},
+	"files": [
+		"dist",
+		"src"
+	],
+	"scripts": {
+		"build": "tsup src/index.ts src/unistyles.ts --format cjs,esm --dts",
+		"dev": "tsup src/index.ts src/unistyles.ts --format cjs,esm --dts --watch",
+		"clean": "rm -rf dist",
+		"typecheck": "tsc --noEmit",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format .",
+		"format:fix": "biome format --write .",
+		"test": "jest"
+	},
+	"peerDependencies": {
+		"react": ">=18.0.0 || ^19.0.0",
+		"react-native": ">=0.81.0",
+		"react-native-edge-to-edge": ">=1.0.0",
+		"react-native-nitro-modules": ">=0.18.0",
+		"react-native-unistyles": ">=3.0.0"
+	},
+	"devDependencies": {
+		"@fleet-ui/typescript-config": "workspace:*"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

@@ -1,0 +1,9 @@
+{
+	"extends": "@fleet-ui/typescript-config/react-native.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src"
+	},
+	"include": ["src", "unistyles.ts"],
+	"exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]
+}
