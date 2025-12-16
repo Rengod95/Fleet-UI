@@ -64,8 +64,13 @@ storybook-static/
 .cache/
 tmp/
 temp/
-
+packages/cli/tmp/
 # OS
 Thumbs.db
 .Spotlight-V100
 .Trashes
+
+
+design-system/
+TestScriptPlayground/
+apps/

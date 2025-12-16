@@ -1,68 +1,75 @@
-import { Button } from '@fleet-ui/components';
-import type {
-	ButtonColorScheme,
-	ButtonRounded,
-	ButtonShadow,
-	ButtonSize,
-	ButtonVariant,
+import {
+	Button,
+	type ButtonColorScheme,
+	type ButtonRounded,
+	type ButtonShadow,
+	type ButtonSize,
+	type ButtonVariant,
 } from '@fleet-ui/components';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import {
+	commonStyles,
+	DemoIcon,
+	PageHeader,
+	Section,
+} from '../../common/views';
 
 const COLOR_SCHEMES: ButtonColorScheme[] = [
 	'primary',
-	'secondary',
 	'neutral',
-	'danger',
+	'error',
 	'success',
 	'warning',
 	'info',
 ];
 
-const VARIANTS: ButtonVariant[] = ['filled', 'outlined', 'flat', 'ghost', 'faded'];
+const VARIANTS: ButtonVariant[] = [
+	'filled',
+	'outlined',
+	'flat',
+	'ghost',
+	'faded',
+];
 
-const SIZES: ButtonSize[] = ['sm', 'md', 'lg'];
+const SIZES: ButtonSize[] = ['sm', 'md', 'lg', 'xl'];
 
-const SHADOWS: ButtonShadow[] = ['none', 'sm', 'md', 'lg'];
+const SHADOWS: ButtonShadow[] = [
+	'none',
+	'sm',
+	'md',
+	'lg',
+	'xl',
+	'2xl',
+	'smooth_sm',
+	'smooth_md',
+	'smooth_lg',
+	'floating',
+	'banner',
+	'inner',
+	'card',
+	'button',
+	'button_primary',
+	'overlay',
+];
 
 const ROUNDED: ButtonRounded[] = ['none', 'xs', 'sm', 'md', 'lg', 'full'];
 
-function Section({
-	title,
-	description,
-	children,
-}: {
-	title: string;
-	description?: string;
-	children: React.ReactNode;
-}) {
-	return (
-		<View style={styles.section}>
-			<Text style={styles.sectionTitle}>{title}</Text>
-			{description ? (
-				<Text style={styles.sectionDescription}>{description}</Text>
-			) : null}
-			<View style={styles.sectionBody}>{children}</View>
-		</View>
-	);
-}
-
-function DemoIcon({ label }: { label: string }) {
-	return <Text style={styles.icon}>{label}</Text>;
-}
-
 export default function ButtonExamplesScreen() {
+	useUnistyles();
 	return (
-		<ScrollView style={styles.container}>
-			<View style={styles.content}>
-				<Text style={styles.pageTitle}>Button</Text>
-				<Text style={styles.pageDescription}>
-					This page showcases the `@fleet-ui/components` Button across its props:
-					variant, size, colorScheme, shadow, rounded, fullWidth, loading, and
-					icon combinations.
-				</Text>
+		<ScrollView style={commonStyles.container}>
+			<View style={commonStyles.content}>
+				<PageHeader
+					title="Button"
+					description="This page showcases the `@fleet-ui/components` Button across its props: variant, size, colorScheme, shadow, rounded, fullWidth, loading, and icon combinations."
+				/>
 
-				<Section title="Variants" description="Visual treatments of the button.">
-					<View style={styles.row}>
+				<Section
+					title="Variants"
+					description="Visual treatments of the button."
+				>
+					<View style={commonStyles.row}>
 						{VARIANTS.map((variant) => (
 							<Button key={variant} variant={variant} style={styles.button}>
 								{variant}
@@ -76,7 +83,7 @@ export default function ButtonExamplesScreen() {
 					description="Semantic color roles mapped from the design tokens."
 				>
 					{COLOR_SCHEMES.map((scheme) => (
-						<View key={scheme} style={styles.row}>
+						<View key={scheme} style={commonStyles.row}>
 							{VARIANTS.map((variant) => (
 								<Button
 									key={`${scheme}-${variant}`}
@@ -84,15 +91,18 @@ export default function ButtonExamplesScreen() {
 									variant={variant}
 									style={styles.button}
 								>
-									{scheme} / {variant}
+									sda
 								</Button>
 							))}
 						</View>
 					))}
 				</Section>
 
-				<Section title="Sizes" description="Compact, default, and large density.">
-					<View style={styles.row}>
+				<Section
+					title="Sizes"
+					description="Compact, default, and large density."
+				>
+					<View style={commonStyles.row}>
 						{SIZES.map((size) => (
 							<Button key={size} size={size} style={styles.button}>
 								{size.toUpperCase()}
@@ -105,15 +115,16 @@ export default function ButtonExamplesScreen() {
 					title="Shadow"
 					description="Elevation presets from none to large."
 				>
-					<View style={styles.row}>
+					<View style={[commonStyles.row, { gap: 24 }]}>
 						{SHADOWS.map((shadow) => (
 							<Button
 								key={shadow}
 								shadow={shadow}
 								style={styles.button}
-								variant="filled"
+								colorScheme="neutral"
+								variant="ghost"
 							>
-								shadow: {shadow}
+								shadow:{shadow}
 							</Button>
 						))}
 					</View>
@@ -123,7 +134,7 @@ export default function ButtonExamplesScreen() {
 					title="Rounded"
 					description="Border radius presets, from sharp to pill."
 				>
-					<View style={styles.row}>
+					<View style={commonStyles.row}>
 						{ROUNDED.map((rounded) => (
 							<Button
 								key={rounded}
@@ -141,14 +152,14 @@ export default function ButtonExamplesScreen() {
 					title="Full width & loading"
 					description="Layout behavior and async loading state."
 				>
-					<View style={styles.fullWidthContainer}>
-						<Button fullWidth style={styles.fullWidthButton}>
+					<View style={commonStyles.fullWidthContainer}>
+						<Button fullWidth style={commonStyles.fullWidthButton}>
 							Default full width
 						</Button>
 						<Button
 							fullWidth
 							loading
-							style={styles.fullWidthButton}
+							style={commonStyles.fullWidthButton}
 							testID="button-loading"
 						>
 							Loading state
@@ -160,7 +171,7 @@ export default function ButtonExamplesScreen() {
 					title="Icons"
 					description="Left / right icons and icon-only usage."
 				>
-					<View style={styles.row}>
+					<View style={commonStyles.row}>
 						<Button
 							leftIcon={<DemoIcon label="←" />}
 							style={styles.button}
@@ -176,7 +187,7 @@ export default function ButtonExamplesScreen() {
 							Right icon
 						</Button>
 					</View>
-					<View style={styles.row}>
+					<View style={commonStyles.row}>
 						<Button
 							iconOnly
 							variant="filled"
@@ -201,7 +212,7 @@ export default function ButtonExamplesScreen() {
 					title="Disabled"
 					description="Disabled state, independent from loading."
 				>
-					<View style={styles.row}>
+					<View style={commonStyles.row}>
 						<Button disabled style={styles.button}>
 							Disabled
 						</Button>
@@ -215,66 +226,9 @@ export default function ButtonExamplesScreen() {
 	);
 }
 
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#f5f5f5',
-	},
-	content: {
-		padding: 20,
-		gap: 24,
-	},
-	pageTitle: {
-		fontSize: 28,
-		fontWeight: '700',
-		color: '#000',
-		marginBottom: 8,
-	},
-	pageDescription: {
-		fontSize: 14,
-		color: '#555',
-		lineHeight: 20,
-		marginBottom: 8,
-	},
-	section: {
-		marginTop: 16,
-	},
-	sectionTitle: {
-		fontSize: 18,
-		fontWeight: '600',
-		color: '#000',
-		marginBottom: 4,
-	},
-	sectionDescription: {
-		fontSize: 13,
-		color: '#666',
-		lineHeight: 18,
-		marginBottom: 8,
-	},
-	sectionBody: {
-		backgroundColor: '#fff',
-		borderRadius: 12,
-		padding: 12,
-		gap: 8,
-	},
-	row: {
-		flexDirection: 'row',
-		flexWrap: 'wrap',
-		gap: 8,
-	},
+const styles = StyleSheet.create(() => ({
 	button: {
 		marginRight: 4,
 		marginBottom: 4,
 	},
-	fullWidthContainer: {
-		gap: 8,
-	},
-	fullWidthButton: {
-		alignSelf: 'stretch',
-	},
-	icon: {
-		fontSize: 16,
-	},
-});
-
-
+}));

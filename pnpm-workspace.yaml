@@ -1,12 +1,10 @@
 packages:
-  # Core packages
-  - 'packages/core'
-  - 'packages/animations'
-  - 'packages/components'
-  
-  # Applications
-  - 'apps/*'
-  
-  # Development tools
-  - 'tools/*'
+  - packages/core
+  - packages/components
+  - packages/cli
+  - apps/*
+  - tools/*
 
+onlyBuiltDependencies:
+  - esbuild
+  - react-native-nitro-modules

@@ -1,5 +1,5 @@
 {
-	"extends": "@fleet-ui/typescript-config/react-native.json",
+	"extends": "../../tools/typescript-config/react-native.json",
 	"compilerOptions": {
 		"outDir": "./dist",
 		"rootDir": "./src"

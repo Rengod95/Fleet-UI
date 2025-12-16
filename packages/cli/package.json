@@ -1,0 +1,35 @@
+{
+  "name": "@fleet-ui/cli",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Fleet UI CLI (local install track)",
+  "bin": {
+    "fleet-ui": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "registry"
+  ],
+  "scripts": {
+    "sync-registry": "node scripts/sync-registry.js",
+    "build": "pnpm run sync-registry && tsup src/index.ts --format cjs --dts",
+    "dev": "pnpm run sync-registry && tsup src/index.ts --format cjs --dts --watch",
+    "test:fixtures": "pnpm run build && node scripts/test-fixtures.js",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format .",
+    "format:fix": "biome format --write ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@fleet-ui/typescript-config": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
+

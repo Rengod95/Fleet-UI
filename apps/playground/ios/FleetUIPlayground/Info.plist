@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>fleetui</string>
-          <string>com.inlee.fleetui.playground</string>
+          <string>com.inlee.fleet-ui-playground</string>
         </array>
       </dict>
     </array>

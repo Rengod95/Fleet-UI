@@ -8,22 +8,21 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx", "**/*.json"],
-		"experimentalScannerIgnores": [
-			"node_modules",
-			"dist",
-			"build",
-			".turbo",
-			"coverage",
-			".expo",
-			".expo-shared",
-			"storybook-static",
-			"ios/Pods",
-			"ios/build",
-			"android/app/build",
-			"android/build",
-			"*.tsbuildinfo"
-		]
+		"includes": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx", "**/*.json", "!!**/node_modules/**",
+			"!!**/dist/**",
+			"!!**/build/**",
+			"!!**/.turbo/**",
+			"!!**/coverage/**",
+			"!!**/.expo/**",
+			"!!**/.expo-shared/**",
+			"!!**/storybook-static/**",
+			"!!**/ios/Pods/**",
+			"!!**/ios/build/**",
+			"!!**/android/app/build/**",
+			"!!**/android/build/**",
+			"!!**/*.tsbuildinfo",
+			"!!**/pnpm-lock.yaml",
+			"!!**/Podfile.lock"]
 	},
 	"formatter": {
 		"enabled": true,

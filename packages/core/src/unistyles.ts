@@ -14,7 +14,7 @@
 import type { UnistylesThemes } from 'react-native-unistyles';
 import { StyleSheet } from 'react-native-unistyles';
 
-import { breakpoints } from './theme';
+import { primitiveBreakpoints } from './tokens';
 import { darkTheme } from './theme/darkTheme';
 import { lightTheme } from './theme/lightTheme';
 import type { FleetThemes } from './types';
@@ -24,12 +24,17 @@ export const themes: UnistylesThemes & FleetThemes = {
 	dark: darkTheme,
 };
 
+/**
+ * Configure Unistyles
+ * If you want to reject device's color scheme, you can set `adaptiveThemes` to false.
+ * And you can set `initialTheme` to 'light' or 'dark'.
+ */
 StyleSheet.configure({
-	settings: {
-		initialTheme: 'dark',
-	},
 	themes,
-	breakpoints,
+	breakpoints: primitiveBreakpoints,
+	settings: {
+		adaptiveThemes: true,
+	},
 });
 
-export { breakpoints, lightTheme, darkTheme };
+export { primitiveBreakpoints, lightTheme, darkTheme };

@@ -1,0 +1,141 @@
+{
+  "schema": 1,
+  "aliasPrefix": "@fleet-ui/local",
+  "core": {
+    "source": "core",
+    "defaultTargetDir": "fleet-ui/core"
+  },
+  "components": {
+    "defaultTargetDir": "fleet-ui/components",
+    "available": {
+      "Accordion": {
+        "source": "components/Accordion",
+        "optionalPeerDeps": []
+      },
+      "ActionButton": {
+        "source": "components/ActionButton",
+        "optionalPeerDeps": []
+      },
+      "BottomSheetModal": {
+        "source": "components/BottomSheetModal",
+        "optionalPeerDeps": []
+      },
+      "Button": {
+        "source": "components/Button",
+        "optionalPeerDeps": []
+      },
+      "Card": {
+        "source": "components/Card",
+        "optionalPeerDeps": []
+      },
+      "Checkbox": {
+        "source": "components/Checkbox",
+        "optionalPeerDeps": []
+      },
+      "CheckboxCard": {
+        "source": "components/CheckboxCard",
+        "optionalPeerDeps": []
+      },
+      "Chip": {
+        "source": "components/Chip",
+        "optionalPeerDeps": []
+      },
+      "ContextHeader": {
+        "source": "components/ContextHeader",
+        "optionalPeerDeps": []
+      },
+      "Divider": {
+        "source": "components/Divider",
+        "optionalPeerDeps": []
+      },
+      "Icon": {
+        "source": "components/Icon",
+        "optionalPeerDeps": []
+      },
+      "IconButton": {
+        "source": "components/IconButton",
+        "optionalPeerDeps": []
+      },
+      "ImageCard": {
+        "source": "components/ImageCard",
+        "optionalPeerDeps": []
+      },
+      "Input": {
+        "source": "components/Input",
+        "optionalPeerDeps": []
+      },
+      "Item": {
+        "source": "components/Item",
+        "optionalPeerDeps": []
+      },
+      "LayoutTop": {
+        "source": "components/LayoutTop",
+        "optionalPeerDeps": []
+      },
+      "Menu": {
+        "source": "components/Menu",
+        "optionalPeerDeps": []
+      },
+      "Modal": {
+        "source": "components/Modal",
+        "optionalPeerDeps": []
+      },
+      "OTPInput": {
+        "source": "components/OTPInput",
+        "optionalPeerDeps": []
+      },
+      "Progress": {
+        "source": "components/Progress",
+        "optionalPeerDeps": []
+      },
+      "Radio": {
+        "source": "components/Radio",
+        "optionalPeerDeps": []
+      },
+      "RadioCard": {
+        "source": "components/RadioCard",
+        "optionalPeerDeps": []
+      },
+      "Section": {
+        "source": "components/Section",
+        "optionalPeerDeps": []
+      },
+      "Slider": {
+        "source": "components/Slider",
+        "optionalPeerDeps": []
+      },
+      "State": {
+        "source": "components/State",
+        "optionalPeerDeps": []
+      },
+      "StepIndicator": {
+        "source": "components/StepIndicator",
+        "optionalPeerDeps": []
+      },
+      "Swiper": {
+        "source": "components/Swiper",
+        "optionalPeerDeps": []
+      },
+      "Switch": {
+        "source": "components/Switch",
+        "optionalPeerDeps": []
+      },
+      "TabBar": {
+        "source": "components/TabBar",
+        "optionalPeerDeps": []
+      },
+      "TableRow": {
+        "source": "components/TableRow",
+        "optionalPeerDeps": []
+      },
+      "Toast": {
+        "source": "components/Toast",
+        "optionalPeerDeps": []
+      },
+      "Typo": {
+        "source": "components/Typo",
+        "optionalPeerDeps": []
+      }
+    }
+  }
+}

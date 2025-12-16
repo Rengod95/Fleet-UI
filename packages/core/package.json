@@ -1,6 +1,6 @@
 {
 	"name": "@fleet-ui/core",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"description": "Core utilities, design tokens, types, and hooks for Fleet UI",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -36,10 +36,8 @@
 		"test": "jest"
 	},
 	"peerDependencies": {
-		"react": ">=18.0.0 || ^19.0.0",
-		"react-native": ">=0.81.0",
-		"react-native-edge-to-edge": ">=1.0.0",
-		"react-native-nitro-modules": ">=0.18.0",
+		"react": "^19.1.0",
+		"react-native": ">=0.81.5",
 		"react-native-unistyles": ">=3.0.0"
 	},
 	"devDependencies": {

@@ -1,27 +1,59 @@
 # Fleet UI
 
-A production-ready, cross-platform UI component and animation library for React and React Native.
+A production-ready, fully animated React native UI Components library with Unistyles.
 
-## 🎯 Features
+## 🎯 MAIN Features
+
+- ✅ **Trendy Designr** : Production Ready Design, IOS Inspired Universable Animations.
+- ✅ **Animated**: Smooth animations written by reanimated only. high perfromance.
+- ✅ **Customizable**: Easy to customizing compoent by your own purposes.
+- ✅ **Few Dependencies**: only need to import configruation file and Unistyles, no provider needed.
+- ✅ **Copy-Paste**: copy, paste only what you need
+- ✅ **Modular**: Install only what you need
+
+
+## 🎯 Also Support
 
 - ✅ **Cross-Platform**: Works seamlessly on iOS, Android, and Web
 - ✅ **Type-Safe**: Full TypeScript support
-- ✅ **Modular**: Install only what you need
 - ✅ **Themeable**: Built-in light/dark mode support with Unistyles
-- ✅ **Animated**: Smooth animations with React Native Reanimated
-- ✅ **Tested**: Comprehensive test coverage
-- ✅ **Documented**: Interactive Storybook documentation
 
 ## 📦 Packages
 
 | Package | Version | Description |
 |---------|---------|-------------|
 | [`@fleet-ui/components`](./packages/components) | 0.0.1 | UI component library |
-| [`@fleet-ui/animations`](./packages/animations) | 0.0.1 | Animation utilities and presets |
-| [`@fleet-ui/tokens`](./packages/tokens) | 0.0.1 | Design tokens (colors, spacing, typography) |
+| [`@fleet-ui/tokens`](./packages/tokens) | 0.0.1 | Design System bases, tokens (colors, spacing, typography) |
 | [`@fleet-ui/shared`](./packages/shared) | 0.0.1 | Shared utilities and types |
 
 ## 🚀 Quick Start
+
+### Track A (Local Install via CLI)
+
+This track copies Fleet UI code into your project so you can freely modify it.
+
+```bash
+# Initialize local Fleet UI core under ./fleet-ui/core
+pnpm dlx @fleet-ui/cli init
+
+# Add components locally under ./fleet-ui/components
+pnpm dlx @fleet-ui/cli add Button Modal
+
+# Validate configuration (alias, entry import, dependencies)
+pnpm dlx @fleet-ui/cli doctor
+```
+
+Your entry file (Expo Router: `app/_layout.tsx`) will be patched to include:
+
+```ts
+import '@fleet-ui/local/core/unistyles';
+```
+
+Required dependencies (must be installed in your app):
+
+```bash
+pnpm add react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets expo-blur expo-image expo-linear-gradient react-native-safe-area-context react-native-svg
+```
 
 ### Installation
 

@@ -46,6 +46,18 @@ export default function Home() {
 							<Text style={styles.arrow}>→</Text>
 						</Pressable>
 					</Link>
+
+					<Link href="/samples" asChild>
+						<Pressable style={styles.card}>
+							<View>
+								<Text style={styles.cardTitle}>📱 Sample Pages</Text>
+								<Text style={styles.cardDescription}>
+									Real-world UI flows with combined components
+								</Text>
+							</View>
+							<Text style={styles.arrow}>→</Text>
+						</Pressable>
+					</Link>
 				</View>
 
 				<View style={styles.section}>
