@@ -244,7 +244,7 @@ The monorepo enforces these coverage thresholds:
 
 ## Excluded from Coverage
 
-- `*.stories.tsx` - (removed) Storybook stories
+- `*.stories.tsx` - Storybook stories
 - `*.test.tsx` - Test files themselves
 - `index.ts` - Barrel exports
 

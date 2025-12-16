@@ -47,6 +47,7 @@ src/ComponentName/
 ├── ComponentName.native.tsx    # React Native implementation
 ├── ComponentName.web.tsx       # Web implementation
 ├── ComponentName.test.tsx      # Unit tests
+├── ComponentName.stories.tsx   # Storybook stories
 └── index.ts                    # Exports
 ```
 
@@ -188,9 +189,46 @@ describe('ComponentName', () => {
 });
 ```
 
-#### Playground examples
+#### ComponentName.stories.tsx (Storybook)
 
-Document all variants and states in the Playground app under `apps/playground/app/components/`.
+```typescript
+import type { Meta, StoryObj } from '@storybook/react';
+import { ComponentName } from './ComponentName';
+
+const meta: Meta<typeof ComponentName> = {
+  title: 'Components/ComponentName',
+  component: ComponentName,
+  argTypes: {
+    variant: {
+      control: 'select',
+      options: ['primary', 'secondary'],
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+    },
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof ComponentName>;
+
+export const Primary: Story = {
+  args: {
+    children: 'Primary Component',
+    variant: 'primary',
+    size: 'md',
+  },
+};
+
+export const Secondary: Story = {
+  args: {
+    children: 'Secondary Component',
+    variant: 'secondary',
+    size: 'md',
+  },
+};
+```
 
 #### index.ts (Exports)
 
@@ -219,7 +257,7 @@ React Native automatically resolves platform-specific files:
 
 1. **Use Unistyles for styling** - Ensures consistency and theme support
 2. **Write tests** - Maintain 80%+ coverage
-3. **Add Playground examples** - Document all variants and states
+3. **Add Storybook stories** - Document all variants and states
 4. **Export types** - Enable type-safe usage
 5. **Use tokens** - Import from `@my-sdk/tokens` for colors, spacing, etc.
 6. **Platform-specific code** - Keep platform differences minimal and isolated

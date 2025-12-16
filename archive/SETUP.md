@@ -108,9 +108,13 @@ pnpm --filter playground start
 # - w for web
 ```
 
-#### Option 2: (Removed) Storybook
+#### Option 2: Storybook
 
-Storybook support has been removed. Use the Playground app instead.
+```bash
+pnpm --filter storybook-app storybook
+
+# Opens at http://localhost:6006
+```
 
 ## Project Structure
 
@@ -122,7 +126,7 @@ fleet-ui/
 │   └── animations/       # Animation utilities
 ├── apps/
 │   ├── playground/       # Test app (Expo)
-│   └── (removed)         # Storybook removed
+│   └── storybook/        # Documentation
 ├── tools/                # Dev tools
 │   └── typescript-config/
 └── scripts/              # Build & utility scripts
@@ -139,7 +143,7 @@ components (depends on: core)
 animations (depends on: core)
   ↓
 playground (depends on: core, components, animations)
-storybook (removed)
+storybook (depends on: core, components, animations)
 ```
 
 ### Key Technologies

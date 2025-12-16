@@ -65,8 +65,6 @@ storybook-static/
 tmp/
 temp/
 packages/cli/tmp/
-# Private internal notes (do not commit)
-docs/*
 # OS
 Thumbs.db
 .Spotlight-V100

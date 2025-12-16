@@ -15,6 +15,7 @@
 			"!!**/coverage/**",
 			"!!**/.expo/**",
 			"!!**/.expo-shared/**",
+			"!!**/storybook-static/**",
 			"!!**/ios/Pods/**",
 			"!!**/ios/build/**",
 			"!!**/android/app/build/**",

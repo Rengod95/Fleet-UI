@@ -101,6 +101,22 @@ function MyApp() {
 - **[Build Guide](./BUILD_GUIDE.md)** - Building and publishing packages
 - **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute
 
+## 🎨 Storybook
+
+View interactive component documentation:
+
+```bash
+pnpm --filter storybook-app storybook
+```
+
+Then open `http://localhost:6006`
+
+### View on Mobile
+
+1. Start Storybook
+2. Find your local IP address
+3. Open `http://YOUR_IP:6006` on your mobile device
+
 ## 🎮 Playground
 
 Test components in a real React Native environment:
@@ -165,7 +181,8 @@ Quick overview:
 1. Create component directory in `packages/components/src/`
 2. Add platform-specific implementations (`.native.tsx` and `.web.tsx`)
 3. Write tests (`.test.tsx`)
-4. Export from `index.ts`
+4. Add Storybook stories (`.stories.tsx`)
+5. Export from `index.ts`
 
 ### Adding a New Animation
 
@@ -240,6 +257,7 @@ MIT © [Your Name/Organization]
 - [GitHub Repository](#)
 - [NPM Packages](#)
 - [Documentation](#)
+- [Storybook](#)
 - [Issue Tracker](#)
 
 ## 💡 Inspiration
@@ -266,6 +284,7 @@ fleet-ui/
 │   └── shared/          # Shared utilities
 ├── apps/
 │   ├── playground/      # React Native test app
+│   └── storybook/       # Interactive docs
 ├── tools/
 │   ├── typescript-config/
 │   └── eslint-config/
