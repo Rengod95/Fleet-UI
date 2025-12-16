@@ -302,5 +302,6 @@ See [GitHub Issues](#) for current known issues.
 
 ## 🔐 Security
 
+
 For security vulnerabilities, please email security@yourorg.com instead of using the issue tracker.
 

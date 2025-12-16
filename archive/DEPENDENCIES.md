@@ -132,13 +132,6 @@ Fleet UI는 모노레포 구조로, 공통 의존성은 루트에서 관리하�
 - tokens와 shared에 의존
 - Reanimated는 peer dependency
 
----
-
-### 5. apps/storybook
-
-Storybook app has been removed.
-
----
 
 ### 6. apps/playground
 
