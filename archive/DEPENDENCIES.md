@@ -136,29 +136,7 @@ Fleet UI는 모노레포 구조로, 공통 의존성은 루트에서 관리하�
 
 ### 5. apps/storybook
 
-**dependencies:**
-- `@fleet-ui/components`: workspace:*
-- `@fleet-ui/animations`: workspace:*
-- `@fleet-ui/tokens`: workspace:*
-- `@fleet-ui/shared`: workspace:*
-
-**devDependencies:**
-- `@storybook/addon-essentials`: ^8.0.6
-- `@storybook/addon-interactions`: ^8.0.6
-- `@storybook/addon-links`: ^8.0.6
-- `@storybook/addon-react-native-web`: ^0.0.23
-- `@storybook/blocks`: ^8.0.6
-- `@storybook/react`: ^8.0.6
-- `@storybook/react-webpack5`: ^8.0.6
-- `@storybook/test`: ^8.0.6
-- `storybook`: ^8.0.6
-- `babel-loader`: ^9.1.3
-- `babel-plugin-react-native-web`: ^0.19.11
-
-**특징:**
-- 모든 Fleet UI 패키지 사용
-- Storybook 전용 의존성만 포함
-- React/React Native는 루트에서 호이스팅
+Storybook app has been removed.
 
 ---
 
@@ -363,8 +341,8 @@ pnpm store prune
     │   ├── @fleet-ui/tokens
     │   └── @fleet-ui/shared
     │
-    ├── apps/storybook
-    │   ├── @fleet-ui/components
+    ├── (removed) apps/storybook
+    │   ├── Storybook removed
     │   ├── @fleet-ui/animations
     │   ├── @fleet-ui/tokens
     │   ├── @fleet-ui/shared

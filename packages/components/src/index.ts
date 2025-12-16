@@ -11,7 +11,6 @@
  *    - ComponentName.native.tsx (React Native implementation)
  *    - ComponentName.web.tsx    (Web implementation)
  *    - ComponentName.test.tsx   (tests)
- *    - ComponentName.stories.tsx (Storybook stories)
  *    - index.ts                 (exports)
  *
  * 3. Export from component's index.ts:

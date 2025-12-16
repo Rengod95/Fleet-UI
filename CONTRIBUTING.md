@@ -102,7 +102,6 @@ packages/components/src/YourComponent/
 ├── YourComponent.native.tsx # React Native implementation
 ├── YourComponent.web.tsx    # Web implementation
 ├── YourComponent.test.tsx   # Tests
-├── YourComponent.stories.tsx # Storybook
 └── index.ts                 # Exports
 ```
 
@@ -182,32 +181,9 @@ describe('YourComponent', () => {
 });
 ```
 
-### 4. Create Storybook Story
+### 4. Add Playground examples
 
-```typescript
-import type { Meta, StoryObj } from '@storybook/react';
-import { YourComponent } from './YourComponent';
-
-const meta: Meta<typeof YourComponent> = {
-  title: 'Components/YourComponent',
-  component: YourComponent,
-  argTypes: {
-    variant: {
-      control: 'select',
-      options: ['primary', 'secondary'],
-    },
-  },
-};
-
-export default meta;
-type Story = StoryObj<typeof YourComponent>;
-
-export const Primary: Story = {
-  args: {
-    variant: 'primary',
-  },
-};
-```
+Add a demo screen under `apps/playground/app/components/` that showcases all public props and variants.
 
 ### 5. Export Component
 
@@ -301,7 +277,7 @@ Every component should have:
 
 1. **TypeScript types** with JSDoc comments
 2. **README section** in the package
-3. **Storybook stories** with examples
+3. **Playground examples** with variants/props coverage
 4. **Usage examples** in code comments
 
 ### Adding to README

@@ -30,7 +30,7 @@
 		"test": "jest"
 	},
 	"dependencies": {
-		"@fleet-ui/core": "workspace:*"
+		"@fleet-ui/core": "^0.1.0"
 	},
 	"peerDependencies": {
 		"lucide-react-native": "^0.477.0",
