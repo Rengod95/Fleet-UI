@@ -4,6 +4,7 @@ import { runAdd } from './commands/add';
 import { runDoctor } from './commands/doctor';
 import { runInit } from './commands/init';
 
+// Fleet UI CLI: local install track entrypoint (Track A).
 type Parsed = {
 	command: string | null;
 	args: string[];

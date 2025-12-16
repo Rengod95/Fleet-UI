@@ -12,6 +12,18 @@ on:
           - minor
           - major
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "10.22.0"
+
 jobs:
   release:
     name: Create Release
@@ -25,12 +37,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: ${{ env.PNPM_VERSION }}
+          run_install: false
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -43,20 +58,20 @@ jobs:
 
       - name: Create changeset
         run: |
-          echo "---" > .changeset/release.md
-          echo "\"@my-sdk/components\": ${{ github.event.inputs.version }}" >> .changeset/release.md
-          echo "\"@my-sdk/animations\": ${{ github.event.inputs.version }}" >> .changeset/release.md
-          echo "\"@my-sdk/tokens\": ${{ github.event.inputs.version }}" >> .changeset/release.md
-          echo "\"@my-sdk/shared\": ${{ github.event.inputs.version }}" >> .changeset/release.md
-          echo "---" >> .changeset/release.md
-          echo "" >> .changeset/release.md
-          echo "Release ${{ github.event.inputs.version }} version" >> .changeset/release.md
+          FILE=".changeset/release-${{ github.run_id }}.md"
+          echo "---" > "$FILE"
+          echo "\"@fleet-ui/core\": ${{ github.event.inputs.version }}" >> "$FILE"
+          echo "\"@fleet-ui/components\": ${{ github.event.inputs.version }}" >> "$FILE"
+          echo "\"@fleet-ui/cli\": ${{ github.event.inputs.version }}" >> "$FILE"
+          echo "---" >> "$FILE"
+          echo "" >> "$FILE"
+          echo "Release ${{ github.event.inputs.version }} version" >> "$FILE"
 
       - name: Version packages
         run: pnpm changeset version
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           commit-message: "chore: version packages for ${{ github.event.inputs.version }} release"
           branch: release/${{ github.event.inputs.version }}
