@@ -1,0 +1,7 @@
+{
+  "schema": 1,
+  "aliasPrefix": "@fleet-ui/local",
+  "coreDir": "fleet-ui/core",
+  "componentsDir": "fleet-ui/components",
+  "entryFile": "app/_layout.tsx"
+}

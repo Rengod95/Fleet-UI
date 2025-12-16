@@ -71,6 +71,7 @@ Thumbs.db
 .Trashes
 
 
-design-system/
+design-system/*
 TestScriptPlayground/
-apps/
+apps/android
+apps/ios
