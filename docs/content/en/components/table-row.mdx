@@ -1,0 +1,126 @@
+### (A) One-Line Summary
+
+**`TableRow` displays a left label and right value (key-value pair) in a single-row layout.**  
+String/number content is rendered with default typography styles, and custom nodes can be placed as-is.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> **Prerequisite**: Import the unistyles side-effect in your app **entry file**.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add TableRow"
+pnpm dlx @fleet-ui/cli add TableRow
+```
+
+```ts title="Track A: import"
+import { TableRow } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { TableRow } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Basic Usage (Key-Value)
+
+```tsx title="TableRow basic usage"
+import { TableRow } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <>
+      <TableRow left="Email" right="user@example.com" />
+      <TableRow left="Plan" right="Pro" highlightRight />
+    </>
+  );
+}
+```
+
+#### D-2. align='left' + leftRatio
+
+Use `align="left"` to left-align both label and value like a "two-column" layout. Specify `leftRatio` to control the left column's width ratio.
+
+```tsx title="Left aligned columns"
+import { TableRow } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <TableRow
+      align="left"
+      leftRatio={35}
+      left="Company"
+      right="Fleet"
+    />
+  );
+}
+```
+
+#### D-3. Custom Nodes and Disabling Default Typography
+
+When passing custom components to `left/right`, use `disableLeftTextStyle/disableRightTextStyle` to prevent default text styles from being applied.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`TableRow` is a layout component with no internal state or animations (shared values).
+
+Rendering rules:
+- If `left/right` is a string/number, it's wrapped in `<Text>` with default styles
+- Otherwise, the passed node is rendered as-is
+
+---
+
+### (F) Accessibility
+
+Recommended practices:
+- (Web) Ensure keyboard/focus navigation is natural
+- (General) Verify state changes are properly conveyed to screen readers
+
+`TableRow` itself is a simple layout, so accessibility is the responsibility of the contained text/controls.
+
+Recommendations:
+- If the right value is an interactive element (button/link), assign appropriate `accessibilityRole`/label to that element.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/TableRow/TableRow.types.ts`.
+
+#### TableRow — `TableRowProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | Yes | - | Left label/title |
+| `right` | `ReactNode` | Yes | - | Right value/data |
+| `align` | `'left' \| 'space-between'` | No | `'space-between'` | Alignment mode |
+| `leftRatio` | `number` | No | - | Left width ratio (0–100), only meaningful with align='left' |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | Color theme |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size |
+| `leftVariant` | `'outlined' \| 'flat' \| 'ghost'` | No | `'ghost'` | Left container variant |
+| `rightVariant` | `'outlined' \| 'flat' \| 'ghost'` | No | `'ghost'` | Right container variant |
+| `highlightLeft` | `boolean` | No | `false` | Highlight left text (bold) |
+| `highlightRight` | `boolean` | No | `false` | Highlight right text (bold) |
+| `style` | `StyleProp<ViewStyle>` | No | - | Root style |
+| `leftStyle` | `StyleProp<ViewStyle>` | No | - | Left container style |
+| `rightStyle` | `StyleProp<ViewStyle>` | No | - | Right container style |
+| `leftTextStyle` | `StyleProp<TextStyle>` | No | - | Left text style (for string/number) |
+| `rightTextStyle` | `StyleProp<TextStyle>` | No | - | Right text style (for string/number) |
+| `disableLeftTextStyle` | `boolean` | No | `false` | Disable default left text style |
+| `disableRightTextStyle` | `boolean` | No | `false` | Disable default right text style |
+
+#### TableRow.Label / TableRow.Value
+
+- `TableRow.Label`: `TableRowLabelProps` (`children?`, `colorScheme?`, `size?`, `variant?`, `highlight?`, `style?`, `textStyle?`, `disableTextStyle?`)
+- `TableRow.Value`: `TableRowValueProps` (`children?`, `colorScheme?`, `size?`, `variant?`, `align?`, `highlight?`, `style?`, `textStyle?`, `disableTextStyle?`)

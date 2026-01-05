@@ -1,0 +1,182 @@
+### (A) One-liner
+
+**`Item` is a "row-unit layout" component commonly used in list/settings screens.**
+It divides structure with compound subcomponents like `ItemMedia / ItemContent / ItemActions`, and provides card-like press interaction (scale/opacity).
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Item**
+
+```bash title="Track A: add Item"
+pnpm dlx @fleet-ui/cli add Item
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+} from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+} from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Item basic usage"
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+  IconButton,
+} from '@fleet-ui/components';
+import { ChevronRight, User } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <Item onPress={() => {}}>
+      <ItemMedia mediaType="icon">
+        <User />
+      </ItemMedia>
+
+      <ItemContent>
+        <ItemTitle>Account</ItemTitle>
+        <ItemDescription>Profile/security settings</ItemDescription>
+      </ItemContent>
+
+      <ItemActions>
+        <IconButton icon={<ChevronRight />} aria-label="Navigate" onPress={() => {}} />
+      </ItemActions>
+    </Item>
+  );
+}
+```
+
+#### D-2. Media Alignment: `ItemMedia.verticalAlign`
+
+When media is icon/image and body has multiple lines, you can change media's vertical alignment.
+
+- `top`: Top aligned
+- `center`: Center aligned (default)
+- `bottom`: Bottom aligned
+
+#### D-3. Action Area: `ItemActions`
+
+Use `ItemActions` when placing control elements like buttons/switches/checkboxes on the right.
+However, defining policy at app level is recommended so the UX of entire row pressing with `onPress` doesn't conflict with right action pressing separately (event propagation).
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+`Item` doesn't have separate controlled/uncontrolled state—only provides Pressable interaction.
+
+#### E-2. Reanimated / Shared Value
+
+`Item` uses internal shared value for press interaction.
+
+- press-in: `scale = 0.96`, `opacity = 0.7` (spring)
+- press-out: `scale/opacity = 1` return
+
+> Caution: If you layer additional scale/opacity animation externally, press effect may be exaggerated or clipped in parent container with `overflow: hidden`.
+
+---
+
+### (F) Accessibility
+
+Recommended rules:
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+
+`Item` extends `PressableProps`, so `accessibilityRole`, `accessibilityLabel`, etc. can be passed as-is.
+
+Recommended rules:
+- If entire row is clickable, provide `accessibilityRole="button"` and label.
+- If separate buttons are in right `ItemActions`, provide `aria-label`/`accessibilityLabel` for each button.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/Item/Item.types.ts`.
+
+#### Item — `ItemProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | Color theme | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'fade'` | No | `'flat'` | Visual style | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | padding/density preset | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Corner radius | |
+| `shadow` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'none'` | Shadow preset | |
+| `children` | `ReactNode` | No | - | Internal content | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style override | |
+
+#### ItemMedia — `ItemMediaProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `ItemVariant` | No | `'filled'` | Media background/style preset |
+| `size` | `ItemSize` | No | `'md'` | Media size preset |
+| `mediaType` | `'icon' \| 'image'` | No | `'icon'` | Icon/image layout difference |
+| `verticalAlign` | `'top' \| 'center' \| 'bottom'` | No | `'center'` | Vertical alignment relative to body |
+| `children` | `ReactNode` | No | - | Media content |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override |
+
+#### ItemContent — `ItemContentProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | Usually `ItemTitle/ItemDescription` |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override |
+
+#### ItemTitle — `ItemTitleProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | Title |
+| `size` | `ItemSize` | No | `'md'` | Typo scale |
+| `style` | `StyleProp<TextStyle>` | No | - | Style override |
+
+#### ItemDescription — `ItemDescriptionProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | Description |
+| `size` | `ItemSize` | No | `'md'` | Typo scale |
+| `style` | `StyleProp<TextStyle>` | No | - | Style override |
+
+#### ItemActions / Header / Footer
+
+`ItemActionsProps`, `ItemHeaderProps`, `ItemFooterProps` are all `ViewProps`-based and provide `children`, `style` override.

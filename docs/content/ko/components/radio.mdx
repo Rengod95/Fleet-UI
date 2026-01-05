@@ -1,0 +1,131 @@
+### (A) 한줄 요약
+
+**`Radio`는 단일 선택(“이미 선택된 값은 유지”)을 표현하는 라디오 버튼 컴포넌트예요.**  
+`selected/defaultSelected`로 controlled/uncontrolled를 지원하고, 선택되지 않은 상태에서만 `onSelect(true)`가 호출되는 “radio semantics”를 강제해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Radio"
+pnpm dlx @fleet-ui/cli add Radio
+```
+
+```ts title="Track A: import"
+import { Radio } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Radio } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Radio`는 색상 전환/내부 점(Inner circle) 애니메이션을 위해 Reanimated를 써요.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(그룹에서의 controlled 사용)
+
+`Radio`는 “단일 컴포넌트”라서 그룹/라벨/설명 텍스트는 앱 레벨에서 조합해요.
+
+```tsx title="Radio controlled group pattern (app-level)"
+import { useState } from 'react';
+import { View, Text } from 'react-native';
+import { Radio } from '@fleet-ui/components';
+
+export function Example() {
+  const [value, setValue] = useState<'a' | 'b'>('a');
+
+  return (
+    <View style={{ gap: 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Radio
+          selected={value === 'a'}
+          onSelect={() => setValue('a')}
+          accessibilityLabel="옵션 A"
+        />
+        <Text>옵션 A</Text>
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Radio
+          selected={value === 'b'}
+          onSelect={() => setValue('b')}
+          accessibilityLabel="옵션 B"
+        />
+        <Text>옵션 B</Text>
+      </View>
+    </View>
+  );
+}
+```
+
+#### D-2. “토글이 아닌” 라디오 규칙
+
+이미 선택된 `Radio`를 다시 눌러도 내부적으로 상태가 바뀌지 않아요.
+
+- 선택됨 → 다시 누름: 변화 없음, `onSelect` 호출하지 않음
+- 선택 안 됨 → 누름: 선택됨, `onSelect(true)` 호출
+
+이 동작은 체크박스와 다르고(checkbox는 토글), 라디오의 의미를 유지하기 위한 설계예요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- controlled: `selected`가 있으면 그 값을 그대로 사용
+- uncontrolled: `defaultSelected`로 시작하고, 선택 시 내부 상태를 `true`로 만든다(선택 해제 없음)
+
+#### E-2. Reanimated / Shared Value
+
+- `progress = withTiming(selected ? 1 : 0)`로 내부 점(Inner circle)의 `scale/opacity`를 애니메이션해요.
+- 컨테이너 배경/보더는 `useAnimatedVariantColor`로 variants 결과 색을 가져와 `withTiming`으로 전환해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+`Radio`는 `Pressable` 기반이며 다음 접근성 정보를 설정해요.
+
+- `accessibilityRole="radio"`
+- `accessibilityState={{ checked: selected, disabled }}`
+- `accessibilityLabel`은 prop으로 전달(라벨 텍스트가 별도라면 반드시 제공 권장)
+
+> 참고: RN에서 라디오 그룹(`radiogroup`)을 자동으로 구성하지 않아서, 실제 그룹 UX(라벨/설명/포커스 이동)는 화면 컴포지션 레벨에서 책임져요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Radio/Radio.types.ts`의 `RadioProps`.
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | 색상 테마 | |
+| `variant` | `'filled' \| 'flat' \| 'outlined'` | No | `'filled'` | 스타일 variant | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기 | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | 그림자 | |
+| `selected` | `boolean` | No | - | 선택 상태(controlled) | 선택 해제는 외부에서 처리 |
+| `defaultSelected` | `boolean` | No | `false` | 초기 선택(uncontrolled) | 선택 해제 없음 |
+| `onSelect` | `(selected: boolean) => void` | No | - | 선택 콜백(항상 `true`) | false→true에서만 호출 |
+| `disabled` | `boolean` | No | `false` | 비활성화 | |
+| `accessibilityLabel` | `string` | No | - | 접근성 라벨 | 권장 |
+| `testID` | `string` | No | - | 테스트 식별자 | |
+| `style` | `StyleProp<ViewStyle>` | No | - | 스타일 오버라이드 | |

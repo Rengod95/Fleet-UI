@@ -1,0 +1,56 @@
+# Introduce
+
+Fleet UI는 React Native에서 **테마(react-native-unistyles) + 애니메이션(react-native-reanimated) + 컴포넌트**를 한 흐름으로 쓰기 쉽게 묶은 UI SDK예요.
+
+이 문서에서 알 수 있는 것:
+
+- Fleet UI가 어떤 문제를 해결하는지
+
+## 10초 요약
+
+Fleet UI는 미니멀리즘 + Fluid 애니메이션 기반으로 일관된 디자인을 유지하면서, 프로덕션에서 쓰는 UI를 더 빠르게 만들 수 있게 도와줘요.
+
+- **애니메이션**: 상호작용 가능한 컴포넌트는 거의 모두 Animation 디자인이 적용되어 있어요.
+- **DX(Developer Experience)**: 개발자가 쉽게 사용할 수 있도록 컴포넌트를 설계했어요.
+- **일관성**: 개발자가 수정하기 쉬운 자체 디자인 시스템을 기반으로 제작했어요.
+- **확장성**: 테마/토큰만 바꿔도 전체 UI를 안전하게 바꿀 수 있어요.
+
+지금 시작하려면 [Install로 설치 시작하기](/getting-started/install)로 가요.
+
+## 핵심 디자인 철학
+
+다음 두 철학을 근거로 설계했어요.
+
+- **범용적 미니멀리즘(Universal Minimalism)**: 모바일 UI/UX를 중심으로, 어디서나 자연스럽게 보이는 미니멀한 언어
+- **급진적 단순성(Radical Simplicity)**: 사용자가 무의식중에 사용하는 것처럼 자연스럽게 사용할 수 있도록 디자인하는 걸 목표로 해요.
+
+## 무엇을 제공하나요(제공 범위)
+
+Fleet UI는 “개별 컴포넌트 모음”만이 아니라, **컴포넌트가 의존하는 시스템**까지 같이 제공해요.
+
+- **Mobile-first 디자인**: 모바일 앱에서 자주 쓰는 화면 패턴을 포함해요(예: [Section 컴포넌트 보기](/components/section), [OTPInput 컴포넌트 보기](/components/otp-input)).
+- **테마/토큰 시스템**: `raw → primitive → semantic → theme` 흐름으로 토큰을 설계하고, 런타임 테마로 묶어서 제공해요.
+- **Variants System**: `colorScheme / variant / size ...` 같은 축을 조합해 스타일을 예측 가능하게 만들어요.
+- **접근성(A11y) 기본값**: role/state/상호작용 패턴을 가능한 범위에서 일관되게 맞춰요.
+- **모션/인터랙션 기본값**: Reanimated 기반 모션을 컴포넌트 기본 동작으로 제공해요.
+
+## 설계 원칙(왜 이렇게 만들었나요)
+
+Fleet UI는 아래 원칙을 기준으로 결정을 내려요.
+
+- **범용적 미니멀리즘(Universal Minimalism)**: 특정 브랜드에 과하게 치우치지 않으면서, 모바일에서 자연스럽게 보이는 기본 언어를 유지해요.
+- **급진적 단순성(Radical Simplicity)**: “옵션이 많아 보이는데 실제로는 어렵지 않은” 상태를 목표로 해요. 기본값이 안전하고, 필요할 때만 확장해요.
+
+## 구현에서 어떻게 드러나나요
+
+- **Mobile-first + 성능을 같이 챙겨요**: 스타일은 `react-native-unistyles`, 애니메이션은 `react-native-reanimated`로 구성하고, 가능한 한 UI thread에서 자연스럽게 동작하도록 설계해요.
+- **Copy/Paste도 가능하게 열어둬요**: 팀 상황에 따라 “로컬 설치(Track A)”로 코드를 소유하고 고칠 수도 있고, “패키지 설치(Track B)”로 안정적인 업데이트 흐름을 유지할 수도 있어요.
+- **문서가 규칙을 같이 제공해요**: 컴포넌트/토큰을 어떻게 확장해야 안전한지(참조 규칙, 토큰 계층 등)를 문서로 공유해요.
+
+## Next
+
+- [Fundamental 읽기](/fundamental): 왜 레이어/토큰 계층이 필요한지 큰 그림을 잡아요.
+- [Install로 설치 시작하기](/getting-started/install): Track A/B 중 하나로 설치를 진행해요.
+- [Theming System에서 테마 적용 보기](/fundamental/theming): 테마를 등록하고, theme 기반 StyleSheet를 만드는 방법을 확인해요.
+- [Token Architecture에서 토큰 구조 보기](/fundamental/token-architecture): `raw → primitive → semantic → theme` 파이프라인을 이해해요.
+

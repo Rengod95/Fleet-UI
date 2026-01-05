@@ -1,0 +1,137 @@
+### (A) One-liner
+
+**`Progress` is a component that displays "step-based progress."**
+Based on `step` (total steps) and `activeStep` (current step, 1-based), it renders track/thumb, and when `interactive=true`, users can tap specific steps to change progress.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Progress"
+pnpm dlx @fleet-ui/cli add Progress
+```
+
+```ts title="Track A: import"
+import { Progress } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Progress } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Progress` uses Reanimated to handle progress animation. These dependencies are required:
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Progress basic usage"
+import { Progress } from '@fleet-ui/components';
+
+export function Example() {
+  return <Progress step={5} activeStep={2} />;
+}
+```
+
+#### D-2. Thumb Mode vs Track-only Mode
+
+- `thumbVariant="circle" | "number"`: Renders Thumb (marker) for each step, connected by Track.
+- `thumbVariant="none"`: Renders **only step count Tracks** without Thumb to display steps themselves.
+
+#### D-3. Interactive Mode
+
+When `interactive=true`, each step (thumb or track) can be tapped, and callback passes **1-based step**.
+
+```tsx title="Interactive progress"
+import { useState } from 'react';
+import { Progress } from '@fleet-ui/components';
+
+export function Example() {
+  const [activeStep, setActiveStep] = useState(1);
+
+  return (
+    <Progress
+      step={5}
+      activeStep={activeStep}
+      interactive
+      onStepChange={setActiveStep}
+    />
+  );
+}
+```
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- `step` is clamped to 1~100.
+- `activeStep` is clamped to **0~step** range.
+  - `0`: No step is active
+  - `1..step`: Progressed to that step
+
+controlled/uncontrolled:
+- If `activeStep` is provided, controlled
+- Otherwise starts internal state with `defaultActiveStep`, and updates internal state in `interactive`
+
+#### E-2. Reanimated / Shared Value
+
+- Uses `activeStepSV` (`SharedValue<number>`) to sync progress state animation-based.
+- When `animated=true`, transitions `activeStepSV` with `withTiming`.
+- Track/Thumb internally calculates "complete/active" state as derived value, and animates fill opacity/scale, etc.
+
+---
+
+### (F) Accessibility
+
+- Root: `accessibilityRole="progressbar"`
+- `accessibilityValue: { min: 0, max: step, now: activeStep }`
+- `accessibilityLabel` default is <code>Progress: &#36;&#123;percentage&#125;%</code> format (overridable)
+
+When interactive:
+- Each thumb/track has `accessibilityRole="button"` + `accessibilityLabel="Step N(: label)"`.
+
+---
+
+### (G) Props Table
+
+> Reference: `ProgressProps` from `packages/components/src/Progress/Progress.types.ts`.
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `step` | `number` | Yes | - | Total step count (1~100) | Clamped internally |
+| `activeStep` | `number` | No | - | Current step (1-based, 0 is inactive) | controlled |
+| `defaultActiveStep` | `number` | No | `1` | Initial step | uncontrolled |
+| `onStepChange` | `(step: number) => void` | No | - | Step change callback | Useful in interactive |
+| `trackVariant` | `'lined' \| 'flat'` | No | `'flat'` | Track style | |
+| `thumbVariant` | `'circle' \| 'number' \| 'none'` | No | `'none'` | Thumb (marker) style | none is track-only |
+| `thumbGap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | thumb-track gap | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color theme | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size preset | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Rounded | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow | |
+| `interactive` | `boolean` | No | `false` | Enable step tap | |
+| `onStepPress` | `(step: number) => void` | No | - | Step tap callback (1-based) | Meaningful only in interactive |
+| `animated` | `boolean` | No | `true` | Use animation | |
+| `animationDuration` | `number` | No | `300` | Animation duration (ms) | |
+| `labels` | `{ stepIndex: number; label: string }[]` | No | - | Per-step labels (0-based) | |
+| `showLabels` | `boolean` | No | `false` | Show labels | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |

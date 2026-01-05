@@ -1,0 +1,155 @@
+### (A) One-liner
+
+**`Chip` is a component for displaying short labels/states, or creating clickable "filter/tag" style actions.**
+Press animation is only applied when `onPress` exists, and when `onClose` is provided, a close button is shown on the right to support "deletable chip" pattern.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Chip**
+
+```bash title="Track A: add Chip"
+pnpm dlx @fleet-ui/cli add Chip
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { Chip } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { Chip } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Chip` requires these dependencies for close icon and press interaction animation.
+
+```bash title="Recommended runtime deps"
+# For Expo, npx expo install is recommended
+pnpm add lucide-react-native react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Chip basic usage"
+import { Chip } from '@fleet-ui/components';
+
+export function Example() {
+  return <Chip onPress={() => {}}>Recommended</Chip>;
+}
+```
+
+#### D-2. Closable Chip: `onClose`
+
+When `onClose` is provided, close button is displayed on right, and **`rightIcon` is ignored** (when not loading).
+
+```tsx title="Closable chip"
+import { Chip } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Chip onPress={() => {}} onClose={() => console.log('close')}>
+      React Native
+    </Chip>
+  );
+}
+```
+
+> Close button press uses `event.stopPropagation()` to block parent press. This is designed so pressing close doesn't trigger `onPress`.
+
+#### D-3. Icon-only: `iconOnly`
+
+`iconOnly=true` is a pattern for rendering only icon without text. In this case, **`aria-label` or `accessibilityLabel` is required**.
+
+```tsx title="Icon-only chip (a11y required)"
+import { Chip } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 16, height: 16 }} />;
+}
+
+export function Example() {
+  return (
+    <Chip iconOnly aria-label="Favorite" onPress={() => {}}>
+      <DemoIcon />
+    </Chip>
+  );
+}
+```
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- `isDisabled = Boolean(disabled || loading)` (interaction blocked during loading)
+- `isInteractive = Boolean(onPress)` (treated as "non-clickable chip" if no onPress)
+
+Implementation disables Pressable with `disabled={isDisabled || !isInteractive}`, so if no `onPress`, the chip is rendered visually but becomes a "non-pressable element."
+
+#### E-2. Reanimated / Shared Value
+
+`Chip` processes press animation with internal shared value (only when `onPress` exists).
+
+- press-in: `scale = 0.95`, `opacity = 0.6` (spring)
+- press-out: `scale/opacity = 1` return
+
+In disabled (or loading) state, blocks press and additionally lowers opacity.
+
+---
+
+### (F) Accessibility
+
+- Default role: `accessibilityRole="button"` (when `onPress` exists)
+- Label determination priority:
+  - `'aria-label'` → `accessibilityLabel` (PressableProps) → string `children`
+- State passed:
+  - `accessibilityState: { disabled, busy }`
+
+Recommended rules:
+- When `iconOnly=true`, providing `aria-label` (web) or `accessibilityLabel` is recommended.
+- Close button internally provides `accessibilityLabel="Close"`. For app internationalization, consider wrapping or replacing the component.
+
+---
+
+### (G) Props Table
+
+> Reference: `ChipProps` from `packages/components/src/Chip/Chip.types.ts`.
+> `ChipProps` extends `PressableProps` (however, `children` and `style` are redefined).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'ghost' \| 'faded'` | No | `'filled'` | Visual style | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size/density | |
+| `shadow` | `ChipShadow` | No | `'none'` | Shadow preset | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'full'` | Corner radius | |
+| `inverted` | `boolean` | No | `false` | Style inversion (useful for selection states) | |
+| `loading` | `boolean` | No | `false` | Loading state (blocks interaction) | `busy=true` |
+| `iconOnly` | `boolean` | No | `false` | Render only icon without text | Label required (recommended) |
+| `leftIcon` | `ReactNode` | No | - | Left icon | Ignored if `iconOnly` |
+| `rightIcon` | `ReactNode` | No | - | Right icon | Ignored if `onClose` exists |
+| `children` | `ReactNode` | No | - | Chip content | If string, can be used as label |
+| `onClose` | `() => void` | No | - | Shows close button + callback | Separate from `onPress` |
+| `aria-label` | `string` | No | - | Accessibility label (needed for icon-only) | Especially important on Web |
+| `testID` | `string` | No | - | Test identifier | close is <code>&#36;&#123;testID&#125;-close</code> |
+| `style` | `PressableProps['style']` | No | - | Container style override | |
+
+#### PressableProps Inheritance (Summary)
+
+`ChipProps` extends `PressableProps`, so `onPress`, `onPressIn`, `onPressOut`, `disabled`, `accessibilityLabel`, etc. are supported as-is.

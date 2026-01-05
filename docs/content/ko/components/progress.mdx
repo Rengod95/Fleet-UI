@@ -1,0 +1,137 @@
+### (A) 한줄 요약
+
+**`Progress`는 “단계(step) 기반 진행률”을 표시하는 컴포넌트예요.**  
+`step`(총 단계 수)과 `activeStep`(현재 단계, 1-based)을 기반으로 트랙/썸(thumb)을 렌더링하고, `interactive=true`일 때 사용자가 특정 단계를 탭해 진행 단계를 변경할 수 있어요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Progress"
+pnpm dlx @fleet-ui/cli add Progress
+```
+
+```ts title="Track A: import"
+import { Progress } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Progress } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Progress`는 Reanimated를 사용해 진행 애니메이션을 처리해요. 사용하려면 아래 의존성이 필요해요.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Progress basic usage"
+import { Progress } from '@fleet-ui/components';
+
+export function Example() {
+  return <Progress step={5} activeStep={2} />;
+}
+```
+
+#### D-2. Thumb 모드 vs Track-only 모드
+
+- `thumbVariant="circle" | "number"`: 단계마다 Thumb(마커)를 렌더링하고, 사이를 Track이 연결해요.
+- `thumbVariant="none"`: Thumb 없이 **Track만 step개** 렌더링해서 단계 자체를 표시해요.
+
+#### D-3. Interactive 모드
+
+`interactive=true`이면 각 단계(thumb 또는 track)를 탭할 수 있고, 콜백은 **1-based step**으로 전달돼요.
+
+```tsx title="Interactive progress"
+import { useState } from 'react';
+import { Progress } from '@fleet-ui/components';
+
+export function Example() {
+  const [activeStep, setActiveStep] = useState(1);
+
+  return (
+    <Progress
+      step={5}
+      activeStep={activeStep}
+      interactive
+      onStepChange={setActiveStep}
+    />
+  );
+}
+```
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- `step`은 1~100으로 clamp돼요.
+- `activeStep`은 **0~step** 범위로 clamp돼요.
+  - `0`: 아무 단계도 활성화되지 않음
+  - `1..step`: 해당 단계까지 진행됨
+
+controlled/uncontrolled:
+- `activeStep`이 제공되면 controlled
+- 아니면 `defaultActiveStep`으로 내부 상태를 시작하고, `interactive`에서 내부 상태를 갱신해요.
+
+#### E-2. Reanimated / Shared Value
+
+- `activeStepSV`(`SharedValue<number>`)를 사용해서 애니메이션 기반으로 진행 상태를 동기화해요.
+- `animated=true`일 때 `withTiming`으로 `activeStepSV`를 전환해요.
+- Track/Thumb 내부는 derived value로 “완료/활성” 상태를 계산하고, fill opacity/scale 등을 애니메이션해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 루트: `accessibilityRole="progressbar"`
+- `accessibilityValue: { min: 0, max: step, now: activeStep }`
+- `accessibilityLabel`은 기본값으로 <code>Progress: &#36;&#123;percentage&#125;%</code> 형태를 사용해요(override 가능)
+
+interactive일 때:
+- 각 thumb/track은 `accessibilityRole="button"` + `accessibilityLabel="Step N(: label)"`을 가져요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Progress/Progress.types.ts`의 `ProgressProps`.
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `step` | `number` | Yes | - | 총 단계 수(1~100) | 내부에서 clamp |
+| `activeStep` | `number` | No | - | 현재 단계(1-based, 0은 비활성) | controlled |
+| `defaultActiveStep` | `number` | No | `1` | 초기 단계 | uncontrolled |
+| `onStepChange` | `(step: number) => void` | No | - | 단계 변경 콜백 | interactive에서 유용 |
+| `trackVariant` | `'lined' \| 'flat'` | No | `'flat'` | 트랙 스타일 | |
+| `thumbVariant` | `'circle' \| 'number' \| 'none'` | No | `'none'` | 썸(마커) 스타일 | none이면 track-only |
+| `thumbGap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | thumb-track 간격 | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | 색상 테마 | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기 프리셋 | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 라운드 | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | 그림자 | |
+| `interactive` | `boolean` | No | `false` | 단계 탭 활성화 | |
+| `onStepPress` | `(step: number) => void` | No | - | 단계 탭 콜백(1-based) | interactive에서만 의미 |
+| `animated` | `boolean` | No | `true` | 애니메이션 사용 | |
+| `animationDuration` | `number` | No | `300` | 애니메이션 지속(ms) | |
+| `labels` | `{ stepIndex: number; label: string }[]` | No | - | 단계별 레이블(0-based) | |
+| `showLabels` | `boolean` | No | `false` | 레이블 표시 여부 | |
+| `accessibilityLabel` | `string` | No | - | 접근성 라벨 | |
+| `testID` | `string` | No | - | 테스트 식별자 | |

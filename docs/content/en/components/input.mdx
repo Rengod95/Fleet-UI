@@ -1,0 +1,167 @@
+### (A) One-liner
+
+**`Input` is the basic form component for text input.**
+It supports `value/onChangeText` (controlled) or `defaultValue` (uncontrolled) patterns, and provides "form UX"-centered props like `description/errorMessage`, `startContent/endContent`, `isClearable`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Input**
+
+```bash title="Track A: add Input"
+pnpm dlx @fleet-ui/cli add Input
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { Input } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { Input } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Input` uses icons (clear button) and Reanimated-based visual feedback.
+
+```bash title="Recommended runtime deps"
+pnpm add lucide-react-native react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Input basic usage"
+import { Input } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Input
+      label="Email"
+      placeholder="name@example.com"
+      description="Enter the email you'll use to sign in."
+    />
+  );
+}
+```
+
+#### D-2. Controlled Pattern
+
+```tsx title="Input (controlled)"
+import { useState } from 'react';
+import { Input } from '@fleet-ui/components';
+
+export function Example() {
+  const [value, setValue] = useState('');
+
+  return (
+    <Input
+      label="Nickname"
+      value={value}
+      onChangeText={setValue}
+      placeholder="2-12 characters"
+    />
+  );
+}
+```
+
+#### D-3. Error/Validation: `errorMessage`, `isInvalid`
+
+- When `errorMessage` is provided, error text is displayed.
+- When `isInvalid=true`, the input wrapper runs a **shake animation** (left-right wobble).
+
+```tsx title="Input with error"
+import { Input } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Input
+      label="Password"
+      secureTextEntry
+      isInvalid
+      errorMessage="Password must be at least 8 characters."
+    />
+  );
+}
+```
+
+#### D-4. Slots: `startContent` / `endContent` + Clear Button
+
+- Use `startContent` / `endContent` to place icons/buttons at input start/end.
+- When `isClearable=true` and there's a value, and not `isDisabled/isReadOnly`, clear button (X) appears.
+- When clear button is pressed, value is set to `''` internally and `onClear()` is called.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- Controlled check: If `value` is provided, it's controlled; otherwise uses internal state based on `defaultValue`
+- `editable = !isDisabled && !isReadOnly`
+- Error color role: `evaluatedColorScheme = isInvalid ? 'error' : colorScheme`
+
+> Note: Default values in `InputProps` type and actual implementation may differ.
+> Example: In implementation, `isClearable` default may be `true`.
+
+#### E-2. Reanimated / Shared Value
+
+These shared values may be used in implementation:
+
+- `underlineScale`: Animation where underline bar expands on focus for `variant="underlined"`
+- Shake animation wobbling input wrapper left-right when `isInvalid`
+- Wrapper background/border color transitions with `withTiming` to variant color values
+
+---
+
+### (F) Accessibility
+
+`Input` extends RN `TextInputProps`, so accessibility props like `accessibilityLabel`/`accessibilityHint` can be passed as-is.
+
+Recommended rules:
+- Even with visual `label`, verify screen readers hear it clearly (`accessibilityLabel` or `label`/`placeholder` combination).
+- In error state, `errorMessage` is visible on screen; reinforce with `accessibilityHint` for "error reason/next action" if needed.
+- If using icon-only endContent (e.g., clear button), verify screen reader label isn't missing.
+
+---
+
+### (G) Props Table
+
+> Reference: `InputProps` from `packages/components/src/Input/Input.types.ts`.
+> `InputProps` extends `TextInputProps` (except `style`).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'filled' \| 'flat' \| 'bordered' \| 'underlined' \| 'faded'` | No | `'bordered'` | Input style variant | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | May evaluate to error if `isInvalid` |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Height/typo scale | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'inner'` | No | `'none'` | Shadow preset | |
+| `radius` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Corner radius | |
+| `label` | `string` | No | - | Label text | |
+| `labelPlacement` | `'inside' \| 'outside' \| 'outside-left'` | No | `'inside'` | Label position | Branching may be limited in current implementation |
+| `description` | `string` | No | - | Bottom description text | Hidden when `errorMessage` exists |
+| `errorMessage` | `string` | No | - | Bottom error text | Used for invalid UX when provided |
+| `startContent` | `ReactNode` | No | - | Input start slot | |
+| `endContent` | `ReactNode` | No | - | Input end slot | |
+| `isClearable` | `boolean` | No | `false`(types) | Show clear button | Implementation default may be `true` |
+| `isInvalid` | `boolean` | No | `false` | Invalid state | shake/color transition |
+| `isDisabled` | `boolean` | No | `false` | Disabled | `editable=false` |
+| `isReadOnly` | `boolean` | No | `false` | Read-only | `editable=false` |
+| `fullWidth` | `boolean` | No | `true` | Whether width 100% | |
+| `onClear` | `() => void` | No | - | Clear button callback | |
+
+#### TextInputProps Inheritance (Summary)
+
+`InputProps` extends `TextInputProps`, so RN standard input props like `value`, `defaultValue`, `onChangeText`, `placeholder`, `secureTextEntry` are supported as-is.

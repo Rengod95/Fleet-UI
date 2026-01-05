@@ -1,0 +1,278 @@
+import { PlaygroundFrame } from '@/components/PlaygroundFrame';
+
+# Token Architecture
+
+Fleet UI의 토큰 시스템은 “값을 안전하게 바꾸기 위해” 만든 **계층형 인터페이스**예요.  
+핵심은 **의미(semantic)를 고정**하고, 디자인 변경은 가능한 한 아래 레이어(raw/primitive)에서 흡수해 코드 수정 범위를 줄이는 거예요.
+
+```text
+raw → primitive → semantic → theme → runtime(react-native-unistyles)
+```
+
+이 문서는 아래 3가지를 한 번에 보여줘요.
+
+- **전체 토큰 구조(타입)**: `@fleet-ui/core` 테마가 무엇을 제공하는지
+- **값/키 구조**: colors / rounded(radius) / shadow / typography 같은 축이 core에서 어떻게 구성되는지
+- **시각 데모**: Playground 토큰 데모 화면을 문서에 임베드해서 바로 확인
+
+---
+
+## 1) 파이프라인 한눈에 보기(파일 구조 매핑)
+
+```text
+Raw Value Layer   (원천 값)                 packages/core/src/tokens/raw/*
+  ↓
+Primitive Layer   (스케일/규칙)             packages/core/src/tokens/primitive/*
+  ↓
+Semantic Layer    (의미 인터페이스)         packages/core/src/tokens/semantic/*
+  ↓
+Theme             (light/dark 최종 묶음)    packages/core/src/theme/*
+  ↓
+Unistyles Runtime (등록/소비)               packages/core/src/unistyles.ts
+```
+
+- **Raw**: 의미 없는 “원천 값”이에요(예: 11-step color scale).
+- **Primitive**: 합의된 스케일/규칙이에요(spacing, radius, shadow layer, typo atoms…).
+- **Semantic**: 앱/컴포넌트가 소비할 “의미 이름”이에요(content/text/border/solid…, h1/body…).
+- **Theme**: `light/dark`로 묶인 런타임 객체예요(토큰 + 유틸).
+
+여기서 기억할 1줄: **컴포넌트는 semantic을 소비하고, 변경은 raw/primitive에서 흡수해요.**
+
+---
+
+## 2) 최종 Theme 타입 인터페이스(“무엇이 들어있나?”)
+
+Fleet UI 런타임 테마는 아래 구조예요. (정의: `packages/core/src/types.ts`)
+
+```ts
+export interface FleetThemeBase {
+  typography: SemanticTypography;        // h1~caption~button 등 의미 기반 타입 스케일
+  text: PrimitiveTypography;             // fontFamily/fontWeight/letterSpacing 등 원자값
+  spacing: PrimitiveSpacing;             // 숫자 키 스케일 (0..20)
+  rounded: PrimitiveBorderRadius;        // none..full
+  zIndex: PrimitiveZIndex;
+  shadows: SemanticShadows;              // xs/sm/.../card/button/... 목적 기반
+  gradients: SemanticGradients;
+  utils: {
+    paletteHasSolid: typeof paletteHasSolid;
+    getPaletteForScheme: typeof getPaletteForScheme;
+    getColorSchemePaletteEntries: typeof getColorSchemePaletteEntries;
+    getIconColor: typeof getIconColor;
+  };
+}
+
+export type LightTheme = FleetThemeVariant<SemanticColors['light']>;
+export type DarkTheme = FleetThemeVariant<SemanticColors['dark']>;
+```
+
+중요 포인트:
+
+- **컴포넌트는 기본적으로 `theme.colors / theme.typography`(semantic)를 소비**해요.
+- `theme.text / theme.spacing / theme.rounded`는 “원자값/스케일”이라서, 필요할 때만 직접 써요.
+- `theme.shadows`는 primitive shadow layer를 기반으로, 색상(semantic colors)에 맞춰 **box-shadow 문자열로 최종화**돼요.
+
+---
+
+## 3) Colors: raw → semantic → theme.colors
+
+### 3.1 Raw colors (11-step scales)
+
+Raw는 “팔레트의 원천 값”이에요. 각 스킴은 `1..11` 단계 스케일을 가지고, `light/dark`는 기본적으로 **역순(reversed)** 스케일을 써요.
+(정의: `packages/core/src/tokens/raw/colors.ts`)
+
+```ts
+export const rawColors = {
+  primary: {
+    light: { '1': '#f0ffff', /* ... */ '11': '#001e2e' },
+    dark:  { '1': '#001e2e', /* ... */ '11': '#f0ffff' },
+  },
+  neutral: {
+    light: { '1': 'hsl(0, 0%, 100%)', /* ... */ '11': 'hsl(0, 0%, 4%)' },
+    dark:  { '1': 'hsla(0, 0%, 2%, 1)', /* ... */ '11': 'hsla(0, 0%, 98%, 0.8)' },
+  },
+  /* warning/success/info/error ... */
+  white: '#ffffff',
+  black: '#000000',
+  transparent: 'transparent',
+} as const;
+```
+
+### 3.2 Semantic colors(팔레트 인터페이스)
+
+Semantic은 Raw를 “UI 의미”로 재매핑해요. Fleet UI는 팔레트 역할을 크게 아래처럼 고정해요.
+(정의: `packages/core/src/tokens/semantic/colors.ts`)
+
+- **Surface(Content)**: `content_1..content_4`, `content_inversed`
+- **Text**: `text_1..text_4`, `text_inversed`
+- **Border**: `border_subtle/default/strong`
+- **State**: `hover`, `pressed`
+- **Action(일부 스킴)**: `solid` (주로 accent/brand 성격의 스킴에서 제공)
+
+또한 `neutral`은 shadow 계산에 쓰기 위한 `shadow` 값을 포함해요(`buildBasePalette`).
+
+```ts
+const buildBasePalette = (scale) => ({
+  content_1: scale['1'],
+  /* ... */
+  text_1: scale['11'],
+  /* ... */
+  shadow: scale['11'],
+});
+
+const buildColorPalette = (scale) => ({
+  content_1: scale['1'],
+  /* ... */
+  text_1: scale['11'],
+  solid: scale['5'],
+});
+```
+
+최종적으로 theme에서는 다음처럼 접근해요.
+
+- `theme.colors.neutral.content_1` / `theme.colors.neutral.text_1` / `theme.colors.neutral.border_subtle`
+- `theme.colors.primary.solid` / `theme.colors.error.solid` … (스킴별 제공 여부는 `utils.paletteHasSolid`로 확인)
+
+---
+
+## 4) Rounded(Radius): primitive 스케일 → theme.rounded
+
+Fleet UI는 radius를 `rounded`라는 이름으로 노출해요(React Native 스타일 관점에서 “rounded”가 더 자연스럽기 때문이에요).
+값은 px 단위 숫자이고, “토큰을 통해서만” 외곽 곡률을 표현하도록 유도해요.
+(정의: `packages/core/src/tokens/primitive/borderRadius.ts`)
+
+```ts
+export const primitiveBorderRadius = {
+  none: 0,
+  _2xs: 4,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 20,
+  xl: 24,
+  _2xl: 32,
+  full: 9999,
+} as const;
+```
+
+권장 사용 예시:
+
+- 카드/컨테이너: `theme.rounded.md`
+- 작은 칩/배지: `theme.rounded.sm` 또는 `theme.rounded.xs`
+- pill 형태: `theme.rounded.full`
+
+---
+
+## 5) Shadow: primitive layer → semantic shadow(최종 box-shadow)
+
+### 5.1 Primitive shadow(레이어 정의)
+
+Primitive shadow는 “그림자의 기하(geometry)”를 정의해요. 여러 레이어를 합성해 자연스러운 깊이감을 만들 수 있게 해요.
+(정의: `packages/core/src/tokens/primitive/shadow.ts`)
+
+```ts
+export const primitiveShadow = {
+  md: [
+    { x: 0, y: 4,  blur: 6, spread: -2, opacity: 0.09 },
+    { x: 0, y: 2,  blur: 6, spread: -2, opacity: 0.06 },
+    { x: 0, y: -2, blur: 6, spread: -1, opacity: 0.06 },
+  ],
+  /* xs/sm/lg/xl/2xl + toast/card/inner/banner ... */
+} as const;
+```
+
+### 5.2 Semantic shadow(목적 기반)
+
+Semantic shadow는 “어디에 쓰는 그림자인가?”를 기준으로 키를 고정해요.
+그리고 **현재 테마의 색상(semanticColors)**를 이용해 최종 `box-shadow` 문자열을 만들어요.
+(정의: `packages/core/src/tokens/semantic/shadow.ts`)
+
+- 예: `theme.shadows.card`, `theme.shadows.button`, `theme.shadows.overlay`, `theme.shadows.inner`, `theme.shadows.button_primary`…
+
+> 참고: RN에서는 플랫폼별 shadow 처리 방식이 다를 수 있지만, Fleet UI는 웹/RNW에서도 일관되게 보이도록 `boxShadow` 문자열을 기본 형태로 제공해요.
+
+---
+
+## 6) Typography: primitive atoms → semantic scale → theme.typography
+
+### 6.1 Primitive typography(원자값)
+
+Primitive는 폰트 패밀리/사이즈/웨이트/라인하이트/레터스페이싱을 “스케일”로 제공해요.
+(정의: `packages/core/src/tokens/primitive/typography.ts`)
+
+- `theme.text.fontFamily.primary`
+- `theme.text.fontSize.md`
+- `theme.text.fontWeight.semibold`
+- `theme.text.letterSpacing.tight`
+
+### 6.2 Semantic typography(용도 기반)
+
+Semantic은 **용도(h1~h6, body1~3, caption1~2, button)** 중심으로 조합을 제공해요.
+각 heading/body에는 Strong/Weak 변형이 함께 제공돼요.
+(정의: `packages/core/src/tokens/semantic/typography.ts`)
+
+- `theme.typography.h2Strong`
+- `theme.typography.body2`
+- `theme.typography.caption1Weak`
+- `theme.typography.button`
+
+---
+
+## 7) Theme 조립: light/dark에서 무엇이 달라지나?
+
+Theme는 semantic/primitive를 한데 묶어 Unistyles에 등록되는 최종 객체예요.
+(정의: `packages/core/src/theme/lightTheme.ts`, `packages/core/src/theme/darkTheme.ts`)
+
+- `colors`: `semanticColors.light` 또는 `semanticColors.dark`
+- `rounded`: `primitiveBorderRadius`
+- `spacing`: `primitiveSpacing`
+- `typography`: `semanticTypography`
+- `text`: `primitiveTypography`
+- `shadows`: `createSemanticShadows(현재 colors)`
+
+여기서 기억할 1줄: **light/dark는 “같은 키(의미)”를 유지하고 값만 바뀌어요.**
+
+---
+
+## 8) (Docs) CSS Variables 브릿지: “문서 사이트는 왜 subset만 쓰나?”
+
+docs는 앱과 같은 `lightTheme/darkTheme`를 기반으로 하지만, 웹 문서 UI에서 필요한 값만 뽑아 CSS 변수로 제공해요.
+
+- 생성 스크립트: `docs/scripts/generate-fleet-ui-theme.ts`
+- 생성 결과: `docs/styles/fleet-ui-theme.css` (`:root` / `.dark`)
+
+중요한 제약:
+
+- docs CSS 변수는 **문서 UI용 subset**이에요(예: `--background`, `--primary`, `--fleet-typo-*`).
+- Fleet UI 전체 토큰(예: `theme.colors.primary.content_1..`, `theme.rounded.*`, `theme.shadows.*`)을 “웹에서 전부” CSS 변수로 제공하는 구조는 아니에요.
+- 따라서 “전체 토큰을 직관적으로 확인”하려면 아래 Playground 데모(실제 RN theme 객체 소비)를 보는 게 가장 정확해요.
+
+여기서 기억할 1줄: **docs CSS 변수는 문서 UI용 subset이고, 전체 토큰은 Playground가 기준이에요.**
+
+---
+
+## 9) 전체 토큰 시각 데모(Playground)
+
+아래 데모는 `apps/playground/app/theme-demo.tsx` 화면을 그대로 임베드한 거예요.
+색/타이포/spacing/rounded/shadows를 한 번에 확인할 수 있어요.
+
+<PlaygroundFrame path="/theme-demo" title="Fleet UI Theme Demo (Playground)" height={720} />
+
+---
+
+## 안티패턴(자주 하는 실수)
+
+- 컴포넌트에서 raw 값을 직접 사용(하드코딩 포함)
+- semantic 없이 primitive만으로 UI 의미를 표현(변경 비용 증가)
+- 의미 대신 색 “이름” 기반 API 노출(예: `blue`, `red`)
+- 레이어를 건너뛰는 참조로 구조 붕괴(예: semantic이 raw를 직접 참조)
+
+## Next
+
+- [Theming System에서 테마 적용 보기](/fundamental/theming): theme/utils/variants를 실제 스타일 조합으로 연결해요.
+- [Install로 설치 흐름 다시 보기](/getting-started/install): 엔트리 import / deps / 트러블슈팅을 확인해요.
+
+## See also
+
+- [Fundamental 읽기](/fundamental): 왜 레이어/토큰 계층이 필요한지(WHY)를 잡아요.
+- [Theming System에서 테마 적용 보기](/fundamental/theming): Unistyles에서 테마가 어떻게 동작하는지(HOW)를 봐요.
+

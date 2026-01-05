@@ -1,0 +1,170 @@
+# Theming System
+Fleet UI는 `react-native-unistyles` 기반 테마 시스템을 사용해요. 이 페이지에서는 **테마를 등록하고(theme), 토큰을 꺼내 쓰고, variants로 조합하는 방법(HOW)**을 한 흐름으로 정리해요.
+
+## Overview
+
+Fleet UI의 핵심은 “값”이 아니라 “의미(semantic)”를 중심으로 스타일을 조합하는 거예요.  
+토큰 계층 구조와 파일 파이프라인은 [Token Architecture에서 토큰 구조 보기](/fundamental/token-architecture)에서 이어서 확인해요.
+
+## 이 페이지에서 할 수 있는 것(3가지)
+
+- **theme 기반 StyleSheet 만들기**: `StyleSheet.create((theme) => ...)` 패턴으로 토큰을 꺼내 써요.
+- **variants로 스타일 조합하기**: `colorScheme / variant / size ...` 축으로 스타일을 예측 가능하게 만들어요.
+- **다크모드/테마 전환 이해하기**: Unistyles가 테마를 어떻게 적용하는지 흐름을 잡아요.
+
+## 바로 쓰는 예제(theme 기반 StyleSheet)
+
+전제: 앱 **엔트리 파일**에서 한 번만 `import '@fleet-ui/core/unistyles'`를 호출해 테마를 등록해야 해요.
+
+```tsx
+import { Text, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+
+const styles = StyleSheet.create((theme) => ({
+  container: {
+    backgroundColor: theme.colors.neutral.content_1,
+    padding: theme.spacing[4],
+    borderRadius: theme.rounded.md,
+  },
+  title: {
+    ...theme.typography.body1,
+    color: theme.colors.neutral.text_1,
+    fontWeight: theme.text.fontWeight.semibold,
+  },
+}));
+
+export function Example() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Hello Fleet UI</Text>
+    </View>
+  );
+}
+```
+
+## Fleet UI 테마 인터페이스(무엇이 들어있나요)
+
+`@fleet-ui/core` 테마는 아래 축으로 구성돼요. (타입 정의: `packages/core/src/types.ts`)
+
+| 축(속성) | 레이어 | 언제 쓰나요 |
+| --- | --- | --- |
+| `colors.*` | semantic | 배경/텍스트/보더/상태/액션 색을 의미 기반으로 꺼내요 |
+| `typography` | semantic | `h1~`, `body~`, `caption~`처럼 “용도” 기반 타이포 조합을 꺼내요 |
+| `spacing` | primitive | padding/gap 같은 간격 스케일을 꺼내요 |
+| `rounded` | primitive | radius 스케일을 꺼내요 |
+| `shadows` | semantic | card/button 같은 목적 기반 그림자를 꺼내요 |
+| `gradients` | semantic | 그라디언트 토큰을 꺼내요 |
+| `zIndex` | primitive | 레이어링 스케일을 꺼내요 |
+| `text` | primitive | fontWeight/letterSpacing 같은 원자값이 필요할 때만 꺼내요 |
+| `utils` | runtime | `colorScheme × variant` 조합을 안전하게 만들 때 써요(아래 참고) |
+
+## `theme.utils`는 언제 필요해요?
+
+컴포넌트에서 `colorScheme`에 따라 팔레트를 고르고, `variant`에 따라 `bg/text/border`를 계산해야 할 때가 많아요.  
+이때 “스킴이 늘어날 때마다 switch 문을 추가”하는 대신, `utils`로 안전한 계산을 만들 수 있어요.  
+(구현 참고: `packages/cli/registry/core/utils/variants.ts`)
+
+### `paletteHasSolid(palette)`
+
+- **언제 써요**: `filled` 같은 variant에서 “강조 배경(solid)”이 필요한데, 모든 팔레트가 `solid`를 가지진 않을 때요.
+- **무엇을 해요**: `solid` 제공 여부를 안전하게 판별해요.
+- **대안은요**: `solid`가 없으면 `content_inversed` 같은 대체 토큰으로 분기해요.
+
+### `getPaletteForScheme(theme, colorScheme)`
+
+- **언제 써요**: `colorScheme="primary"` 같은 값을 받아 팔레트를 매핑해야 할 때요.
+- **무엇을 해요**: `theme.colors.primary/error/...`를 한 곳에서 매핑해요.
+
+### `getColorSchemePaletteEntries(theme)`
+
+- **언제 써요**: `compoundVariants`를 “지원하는 모든 colorScheme”에 대해 자동 생성하고 싶을 때요.
+- **무엇을 해요**: `[(scheme, palette)]` 형태의 엔트리를 만들어 순회할 수 있게 해요.
+
+### `getIconColor(theme, colorScheme, variant)`
+
+- **언제 써요**: 아이콘 색이 `variant`에 따라 달라질 때요(예: filled면 `text_inversed`, outlined면 `text_1`).
+- **무엇을 해요**: `paletteHasSolid`까지 포함해서 안전한 아이콘 색을 계산해요.
+
+## 테마 전환 및 다크모드
+
+기본적으로 Unistyles의 [AdaptiveThemes](https://www.unistyl.es/v3/guides/theming/#adaptive-themes)로 시스템 테마(다크/라이트) 변경을 자동으로 감지해요.  
+시스템 테마 변경을 강제로 끄고 싶다면 `adaptiveThemes: false`로 설정하면 돼요.
+
+```ts
+// core/unistyles.ts
+StyleSheet.configure({
+  settings: {
+    adaptiveThemes: false,
+  },
+});
+```
+
+### 특정 테마 강제 설정
+
+사용자 설정에서 라이트/다크를 고정하거나, 특정 테마를 강제로 설정하고 싶다면 [Unistyles 테마 설정 가이드](https://www.unistyl.es/v3/guides/theming/#_top)를 참고해요.
+
+## Variants System(용어부터)
+
+Fleet UI 컴포넌트는 props 축을 조합해 스타일을 만들어요. 문서에서는 아래 식별자를 그대로 써요.
+
+- **`colorScheme`(색상 역할)**: `primary/neutral/error/...`처럼 “의미”를 선택해요.
+- **`variant`(변형)**: `filled/outlined/flat/ghost/...`처럼 “표현 방식”을 선택해요.
+- **`size`(크기)**: 패딩/높이/타이포 등 크기 축을 선택해요.
+- **`rounded` / `shadow`**: 곡률/그림자 축을 선택해요.
+
+여러 축이 만나 “조합에 따라 값이 달라질 때”는 `compoundVariants`를 써요.
+
+### `compoundVariants`를 순회 기반으로 만들기
+
+새로운 `colorScheme`이 추가될 때마다 수기로 배열을 늘리는 대신, `theme.utils.getColorSchemePaletteEntries(theme)`로 순회해 자동 생성할 수 있어요.
+
+```ts
+const containerCompoundVariants = theme.utils
+  .getColorSchemePaletteEntries(theme)
+  .flatMap(([scheme, palette]) => [
+    { colorScheme: scheme, variant: 'filled', styles: { backgroundColor: palette.solid ?? palette.content_inversed } },
+    { colorScheme: scheme, variant: 'outlined', styles: { borderColor: palette.solid ?? palette.content_inversed } },
+  ]);
+```
+
+## Style Composition(우선순위)
+
+컴포넌트가 기본 스타일(StyleSheet)과 외부 `style` prop을 동시에 지원할 때는 “우선순위”가 중요해요.
+
+- **권장**: 기본 스타일 → (선택)애니메이션 스타일 → 사용자 style  
+  사용자 style을 마지막에 두면, 소비자가 안전하게 오버라이드할 수 있어요.
+
+```tsx
+<Pressable style={[styles.container, props.style]} />
+```
+
+### Reanimated Animated style을 함께 쓰는 법
+
+Reanimated를 써도 원칙은 같아요: **정적 스타일 + animatedStyle + 사용자 style** 순서를 유지해요.
+
+```tsx
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+<AnimatedPressable style={[buttonStyles.container, animatedStyle, style]} />
+```
+
+또한 “variant로 결정되는 색상”을 애니메이션 환경에서 써야 한다면, `useAnimatedVariantColor`처럼 스타일 값을 안전하게 읽는 패턴을 써요.
+
+## 안티패턴(자주 하는 실수)
+
+- **토큰 키를 바꾸는 방식으로 테마를 수정하기**: 컴포넌트가 토큰 키를 계약처럼 참조하므로, 키를 바꾸면 깨질 수 있어요.
+  - **권장**: 키(의미)는 유지하고, 값만 바꿔요.
+- **하드코딩(색상 코드/px)**: theme 토큰 대신 하드코딩 값을 넣으면 일관성과 변경 용이성이 무너져요.
+  - **권장**: `theme.colors / theme.typography / theme.spacing / theme.rounded`를 먼저 써요.
+- **semantic을 건너뛰고 raw/primitive를 직접 소비**: 변경 비용이 커져요.
+  - **권장**: 가능하면 semantic을 먼저 소비하고, 예외만 primitive로 내려가요.
+
+## Next
+
+- [Install로 설치 흐름 다시 보기](/getting-started/install): 엔트리 import / deps / 트러블슈팅을 다시 확인해요.
+- [Token Architecture에서 토큰 구조 보기](/fundamental/token-architecture): 토큰 파이프라인과 변경 지점을 잡아요.
+
+## See also
+
+- [Fundamental 읽기](/fundamental): 왜 레이어/토큰 계층이 필요한지(WHY)를 먼저 잡아요.
+

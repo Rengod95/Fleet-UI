@@ -1,0 +1,154 @@
+### (A) One-liner
+
+**`ActionButton` is an action button with "icon/image-like content + (optional) title" structure.**
+It's well-suited for creating card-type actions like "square content area + caption title" rather than regular text buttons (`Button`), and provides press interaction (spring scale) and accessibility label rules by default.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add ActionButton**
+
+```bash title="Track A: add ActionButton"
+pnpm dlx @fleet-ui/cli add ActionButton
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { ActionButton } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { ActionButton } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`ActionButton` requires Reanimated for press interaction animation.
+
+```bash title="Recommended runtime deps"
+# For Expo, npx expo install is recommended
+pnpm add react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="ActionButton basic usage"
+import { ActionButton } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 24, height: 24 }} />;
+}
+
+export function Example() {
+  return (
+    <ActionButton title="New Post" onPress={() => {}}>
+      <DemoIcon />
+    </ActionButton>
+  );
+}
+```
+
+#### D-2. `title` and `accessibilityLabel` (Important)
+
+`ActionButton` uses `title` as default accessibility label when present.
+Conversely, when there's no `title` (= no on-screen text) and only icon/image is displayed, providing `accessibilityLabel` for screen reader users is recommended.
+
+In dev mode, a warning is output when detecting these conditions:
+
+- No `title` and
+- No `accessibilityLabel`
+
+```tsx title="Icon-only a11y (recommended)"
+import { ActionButton } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 24, height: 24 }} />;
+}
+
+export function Example() {
+  return (
+    <ActionButton accessibilityLabel="Favorite" onPress={() => {}}>
+      <DemoIcon />
+    </ActionButton>
+  );
+}
+```
+
+#### D-3. Layout/Customization Points
+
+- `extend`: Use for action buttons that "expand" horizontally in parent layout (e.g., even distribution in grid/row layouts).
+- `rootStyle` / `contentStyle` / `textStyle`: Points for overriding root/content/title styles. (Array styles also supported.)
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+`ActionButton` derives these internally:
+
+- `isDisabled = Boolean(disabled)`
+- `accessibilityState = { disabled: isDisabled }`
+
+#### E-2. Reanimated / Shared Value
+
+Uses `scale` shared value for press interaction.
+
+- press-in: `scale = 0.86` spring animation
+- press-out: `scale = 1` return
+- If disabled, ignores press-in and blocks press with `preventDefault()`.
+
+> Caution: If you apply scale animation externally (e.g., from parent Animated.View), it multiplies with press animation and may shrink excessively. Recommend unifying responsibility to one side (internal/external).
+
+---
+
+### (F) Accessibility
+
+- Default role: `accessibilityRole="button"`
+- Label: `accessibilityLabel || title`
+- State passed: `accessibilityState: { disabled }`
+
+Recommended rules:
+- When there's no on-screen text (`title`), providing `accessibilityLabel` is recommended.
+
+---
+
+### (G) Props Table
+
+> Reference: `ActionButtonProps` from `packages/components/src/ActionButton/ActionButton.types.ts`.
+> `ActionButtonProps` extends `PressableProps` (however, `children` and `style` are redefined).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | Check general styles in Playground |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'faded'` | No | `'flat'` | Visual style | Check general styles in Playground |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size/density | |
+| `extend` | `boolean` | No | `false` | Horizontal expand (flex: 1) | Affects layout container policy |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset (applied to content container) | |
+| `containerRounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | Root container rounded | |
+| `contentRounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | Content container rounded | |
+| `title` | `string` | No | - | Title text below content | If absent, `accessibilityLabel` recommended |
+| `children` | `ReactNode` | No | - | Content area (icon/image, etc.) | |
+| `rootStyle` | `StyleProp<ViewStyle>` | No | - | Root container style override | |
+| `contentStyle` | `StyleProp<ViewStyle>` | No | - | Content container style override | |
+| `textStyle` | `StyleProp<TextStyle>` | No | - | Title text style override | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label (especially needed when no title) | |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### PressableProps Inheritance (Summary)
+
+`ActionButtonProps` extends `PressableProps`, so basic press props like `onPress`, `onPressIn`, `onPressOut`, `disabled` are supported as-is.

@@ -1,0 +1,177 @@
+### (A) 한줄 요약
+
+**`Toast`는 짧은 피드백 메시지를 화면 상단/하단에 잠깐 보여주는 오버레이 컴포넌트예요.**  
+`ToastProvider`가 단일 토스트 상태와 타이머를 관리하고, `useToast()` 또는 전역 컨트롤러(`toast/showToast`)로 표시/숨김을 트리거할 수 있어요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Toast"
+pnpm dlx @fleet-ui/cli add Toast
+```
+
+```ts title="Track A: import"
+import { ToastProvider, useToast, toast, showToast, hideToast } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { ToastProvider, useToast, toast, showToast, hideToast } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Toast`는 제스처/애니메이션/세이프에어리어를 쓸 수 있어요.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-gesture-handler react-native-reanimated react-native-safe-area-context react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. Provider 설치(필수)
+
+`ToastProvider`는 화면 최상단(예: App root)에 1회 배치하는 걸 권장해요.
+
+```tsx title="ToastProvider"
+import { ToastProvider } from '@fleet-ui/components';
+
+export function AppRoot() {
+  return (
+    <ToastProvider defaultPosition="top" defaultDuration={4000}>
+      {/* ... app ... */}
+    </ToastProvider>
+  );
+}
+```
+
+#### D-2. Hook로 사용: `useToast()`
+
+```tsx title="useToast"
+import { Button } from '@fleet-ui/components';
+import { useToast } from '@fleet-ui/components';
+
+export function Example() {
+  const { show, hide } = useToast();
+
+  return (
+    <Button
+      onPress={() => {
+        const handle = show({
+          title: '저장됨',
+          description: '변경 사항이 반영되었습니다.',
+          colorScheme: 'success',
+        });
+        // handle.hide()로 닫을 수 있음
+      }}
+    >
+      저장
+    </Button>
+  );
+}
+```
+
+#### D-3. 전역 호출: `toast/showToast`
+
+컨텍스트 접근이 어려운 레이어(예: service)에서는 전역 컨트롤러를 쓸 수 있어요.
+
+```ts title="showToast"
+import { showToast, hideToast } from '@fleet-ui/components';
+
+export function notify() {
+  const h = showToast({ title: '완료', duration: 1500 });
+  // h?.hide() 또는 hideToast(h?.id)
+}
+```
+
+> 주의: 전역 컨트롤러는 Provider가 mount되고 handler가 연결된 이후에만 동작해요.
+
+#### D-4. 메시지 템플릿(성공/실패/경고)
+
+토스트는 사용자가 “다음 행동”을 바로 알 수 있을 때 가장 유용해요. 가능하면 아래 패턴을 따라 써요.
+
+- **성공**: 무엇이 완료됐는지 + 다음에 할 일(있다면)
+  - 예: `title="저장했어요"`, `description="변경 사항이 반영됐어요."`
+- **실패/에러**: 무엇이 실패했는지 + 이유(알 수 있을 때) + 다음 행동
+  - 예: `title="저장하지 못했어요"`, `description="네트워크를 확인하고 다시 시도해요."`
+- **경고**: 영향 + 선택지(필요하면)
+  - 예: `title="로그인이 필요해요"`, `description="계속하려면 로그인해요."`
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. Provider 상태 모델
+
+- Provider 내부 상태는 `toast: ToastInternalState | null` 단일 슬롯이에요.
+- `show(options)`는 새 id(<code>toast-&#36;&#123;Date.now()&#125;</code>)를 만들고 기존 타이머를 정리한 뒤, 상태를 새 토스트로 덮어써요.
+- `duration > 0`이면 `setTimeout(() => hide(id), duration)`로 자동 닫힘을 예약해요.
+- `hide(id?)`는 id가 다르면 무시해서 “다른 토스트를 실수로 닫는 것”을 방지해요.
+
+#### E-2. Toast 애니메이션/제스처
+
+`Toast` 자체는 Reanimated shared value로 다음을 애니메이션한다.
+
+- enter/exit: translateY(opposite direction), opacity, scale
+- dragToDismiss=true이면 `Gesture.Pan()`으로 세로 드래그 시 opacity/scale을 진행률에 맞춰 줄이고,
+  - `displacement > closeThreshold` 또는 `velocity > 500`이면 닫힘으로 판정해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 토스트 카드: `accessibilityRole="alert"` (중요 알림으로 읽힘)
+- 닫기 버튼은 `IconButton`의 `aria-label="토스트 닫기"`를 권장해요(웹 접근성)
+
+권장:
+
+- 중요한 오류/경고는 `title/description`을 명확히 제공해요.
+- 사용자가 바로 해결할 수 있다면 `action`으로 즉시 수행 가능한 조치를 제공해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Toast/Toast.types.ts`의 public 타입들.
+
+#### ToastProvider — `ToastProviderProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | 앱 콘텐츠 |
+| `defaultPosition` | `'top' \| 'bottom'` | No | `'top'` | 기본 위치 |
+| `defaultDuration` | `number` | No | `4000` | 기본 지속(ms) |
+
+#### Toast content — `ToastShowOptions`(show에 전달)
+
+| Option | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `string` | No | - | 제목 |
+| `description` | `string` | No | - | 설명 |
+| `icon` | `ReactNode` | No | - | 아이콘 |
+| `colorScheme` | `'neutral' \| 'primary' \| 'success' \| 'warning' \| 'error' \| 'info'` | No | - | 색상 테마 |
+| `variant` | `'filled' \| 'flat' \| 'faded'` | No | - | 스타일 variant |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | 크기 |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | - | 라운드 |
+| `position` | `'top' \| 'bottom'` | No | provider 기본값 | 표시 위치 |
+| `insets` | `number \| { top?: number; bottom?: number; horizontal?: number }` | No | - | 여백(세이프에어리어와 합산) |
+| `safeArea` | `boolean` | No | `true` | 세이프에어리어 사용 |
+| `duration` | `number` | No | provider 기본값 | 자동 닫힘(ms), 0/falsey면 유지 |
+| `closable` | `boolean` | No | - | 닫기 버튼 표시 |
+| `dragToDismiss` | `boolean` | No | `true` | 드래그로 닫기 |
+| `closeThreshold` | `number` | No | `48` | 드래그 임계치(px) |
+| `onPress` | `() => void` | No | - | 토스트 본문 클릭 |
+| `action` | `{ label: string; onPress: () => void }` | No | - | 액션 버튼 |
+| `onShow` | `() => void` | No | - | 표시 콜백 |
+| `onClose` | `() => void` | No | - | 닫힘 콜백 |
+| `testID` | `string` | No | - | 테스트 식별자 |

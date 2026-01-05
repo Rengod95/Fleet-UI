@@ -1,0 +1,217 @@
+### (A) 한줄 요약
+
+**`BottomSheetModal`은 화면 하단에서 올라오는 모달(바텀 시트)을 제공하는 합성(Compound) 컴포넌트예요.**  
+루트는 `visible`로 노출 상태를 제어하고, 내부 서브컴포넌트(`Header/Body/BodyDescription/Action/Footer`)로 레이아웃을 구성해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **BottomSheetModal 추가**
+
+```bash title="Track A: add BottomSheetModal"
+pnpm dlx @fleet-ui/cli add BottomSheetModal
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { BottomSheetModal } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { BottomSheetModal } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`BottomSheetModal`은 내부적으로 `@gorhom/bottom-sheet`를 래핑해요. 사용하려면 아래 의존성이 필요해요(보통 Reanimated/gesture-handler 설정 포함).
+
+```bash title="Recommended runtime deps"
+# Expo라면 npx expo install 사용을 권장
+pnpm add @gorhom/bottom-sheet react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="BottomSheetModal basic usage"
+import { useState } from 'react';
+import { View, Text } from 'react-native';
+import { BottomSheetModal, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <View>
+      <Button onPress={() => setOpen(true)}>바텀 시트 열기</Button>
+
+      <BottomSheetModal
+        visible={open}
+        onDismiss={() => setOpen(false)}
+        size="lg"
+        detached
+      >
+        <BottomSheetModal.Header title="제목" subtitle="설명" />
+        <BottomSheetModal.Body>
+          <Text>콘텐츠 영역</Text>
+        </BottomSheetModal.Body>
+        <BottomSheetModal.Action
+          layout="horizontal"
+          showPrimary
+          showSecondary
+          primaryButtonProps={{ children: '확인' }}
+          secondaryButtonProps={{ children: '취소' }}
+        />
+      </BottomSheetModal>
+    </View>
+  );
+}
+```
+
+#### D-2. `visible` + `onDismiss`: 외부 제어 모델(중요)
+
+`BottomSheetModal`은 루트에서 `visible`로 노출 여부를 제어해요.
+
+- `visible=true`가 되면 내부에서 `present()`가 호출돼요.
+- `visible=false`가 되면 내부에서 dismiss를 시도해요.
+- `onDismiss`에서는 **상태를 false로 내려야** 해요.
+
+> 주의: `onDismiss`는 “닫힘 이벤트 통지”라기보다, 타입/주석 기준으로 **호출되어야 모달이 정상 해제되는 계약**에 가까워요. 그래서 `visible`과 `onDismiss`를 한 쌍으로 운영해야 해요.
+
+#### D-3. 합성(Compound) 서브컴포넌트
+
+`BottomSheetModal`은 아래 서브컴포넌트를 제공해요.
+
+- `BottomSheetModal.Header`: `title/subtitle/actionIcon` 또는 `children`로 헤더 구성
+- `BottomSheetModal.Body`: 본문 컨테이너(패딩/사이즈 프리셋)
+- `BottomSheetModal.BodyDescription`: 중앙 정렬 설명 텍스트 프리셋
+- `BottomSheetModal.Action`: Primary/Secondary 버튼 영역(누르면 close 후 dismiss)
+- `BottomSheetModal.Footer`: 하단 커스텀 영역
+
+#### D-4. Backdrop / Background 커스터마이징
+
+루트에서:
+- `backdropComponent?: (props) => ReactElement | null`
+- `backgroundComponent?: (props) => ReactElement | null`
+
+을 통해 Gorhom 바텀시트의 backdrop/background를 커스터마이징할 수 있어요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+`BottomSheetModal`은 내부적으로 아래 흐름으로 동작해요.
+
+- 외부: `visible`(state)와 `onDismiss`(setter 역할)
+- 내부: `useEffect`로 `visible` 변화에 따라 `present()` / `dismiss()` 호출
+- 내부 컨텍스트: `InnerContext.close()`가 `onDismiss()`를 호출한 뒤 dismiss를 수행
+
+즉, “닫기”는 내부적으로도 항상 `onDismiss()`를 통해 외부 상태를 내리는 걸 우선해요.
+
+#### E-2. Reanimated / Shared Value
+
+바텀 시트의 제스처/애니메이션은 주로 `@gorhom/bottom-sheet` 내부에서 처리돼요. 문서 관점에서는 다음을 권장해요.
+
+- 프로젝트에 Reanimated/gesture-handler 설정이 정상 적용되어 있는지 확인
+- 모달 내부에서 스크롤/제스처가 충돌하는 UI를 구성할 때(예: 가로 스와이프 + 바텀시트 드래그) 제스처 우선순위를 점검
+
+---
+
+### (F) 접근성(누락 금지)
+
+`BottomSheetModal` 루트는 모달 스코프를 강조하기 위해 아래를 설정해요.
+
+- `accessibilityViewIsModal`
+- `importantForAccessibility="yes"`
+- 내부 콘텐츠 컨테이너에도 `accessible` + `accessibilityViewIsModal`
+
+권장사항:
+- 닫기 버튼(또는 취소 액션)은 스크린리더 사용자에게 명확해야 하므로, `BottomSheetModal.Action`을 쓸 때 버튼 라벨을 명시해요.
+- 아이콘만 있는 `actionIcon`을 사용하는 경우, 해당 아이콘 요소에 적절한 접근성 라벨을 제공해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/BottomSheetModal/BottomSheetModal.types.ts`의 public 타입들.
+
+#### BottomSheetModal (Root) — `BottomSheetModalProps` (alias: `BottomSheetModalRootProps`)
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `visible` | `boolean` | Yes | `false` | 모달 노출 상태 | 외부 제어 필수 |
+| `onDismiss` | `() => void` | Yes | - | 닫힘 시 호출(외부 상태를 false로 전환) | 필수 계약 |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'lg'` | 콘텐츠 컨테이너 폭 프리셋 | sm=80%, md=90%, lg=100% |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'overlay'` | No | `'md'` | 그림자 프리셋 | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 모서리 둥글기 | |
+| `detached` | `boolean` | No | `true` | 화면 하단에서 분리(detached) 모드 | `bottomInset`과 함께 사용 |
+| `bottomInset` | `number` | No | `12` | detached 모드 하단 여백(안전영역에 더해짐) | 안전영역 + 오프셋 |
+| `backdropComponent` | `(props: BottomSheetBackdropProps) => ReactElement \| null` | No | - | 커스텀 backdrop | |
+| `backgroundComponent` | `(props: BottomSheetBackgroundProps) => ReactElement \| null` | No | - | 커스텀 background | |
+| `children` | `ReactNode` | Yes | - | 모달 콘텐츠 | |
+
+> `BottomSheetModalProps`는 `@gorhom/bottom-sheet`의 `BottomSheetModalProps`를 상속하지만, `snapPoints/backgroundStyle/index/enableDynamicSizing/handleComponent/handleIndicatorStyle/onDismiss` 등 일부는 컴포넌트에서 제어해요.
+
+#### Header — `BottomSheetModalHeaderProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | 헤더 프리셋 크기 | |
+| `title` | `string` | No | - | 헤더 타이틀 | |
+| `subtitle` | `string` | No | - | 헤더 서브타이틀 | |
+| `alignment` | `'center' \| 'start' \| 'end'` | No | `'start'` | 텍스트/아이콘 정렬 | |
+| `actionIcon` | `ReactNode` | No | - | 상단 액션 아이콘 | 아이콘-only면 라벨 권장 |
+| `children` | `ReactNode` | No | - | 커스텀 헤더 내용(제공 시 title/subtitle 대신) | |
+| `titleStyle` | `StyleProp<TextStyle>` | No | - | 타이틀 스타일 | |
+| `subtitleStyle` | `StyleProp<TextStyle>` | No | - | 서브타이틀 스타일 | |
+| `iconWrapperStyle` | `StyleProp<ViewStyle>` | No | - | 아이콘 래퍼 스타일 | |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 | |
+
+#### Body — `BottomSheetModalBodyProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | 본문 패딩 프리셋 |
+| `children` | `ReactNode` | Yes | - | 본문 콘텐츠 |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 |
+
+#### BodyDescription — `BottomSheetModalBodyDescriptionProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | 타이포 프리셋 |
+| `children` | `ReactNode` | Yes | - | 설명 텍스트 |
+| `style` | `StyleProp<TextStyle>` | No | - | 텍스트 스타일 |
+
+#### Action — `BottomSheetModalActionProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `size` | `ButtonSize` | No | - | 내부 Button 사이즈 | |
+| `primaryButtonProps` | `Partial<ButtonProps>` | No | - | Primary 버튼 props | press 시 close + dismiss |
+| `secondaryButtonProps` | `Partial<ButtonProps>` | No | - | Secondary 버튼 props | press 시 close + dismiss |
+| `layout` | `'horizontal' \| 'vertical'` | No | `'horizontal'` | 버튼 배치 방향 | |
+| `showPrimary` | `boolean` | No | `true` | Primary 표시 여부 | |
+| `showSecondary` | `boolean` | No | `false` | Secondary 표시 여부 | |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 | |
+
+#### Footer — `BottomSheetModalFooterProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | 하단 패딩 프리셋 |
+| `children` | `ReactNode` | Yes | - | 하단 콘텐츠 |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 |

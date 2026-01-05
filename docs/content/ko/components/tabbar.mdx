@@ -1,0 +1,124 @@
+### (A) 한줄 요약
+
+**`TabBar`는 여러 탭 중 현재 탭을 표시하고 탭 전환을 트리거하는 수평 탭 컴포넌트예요.**  
+선택 인덱스(`selectedPage`)를 외부에서 제어하고, 내부에서 indicator 애니메이션과 스크롤(가시 영역 유지)을 동기화해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add TabBar"
+pnpm dlx @fleet-ui/cli add TabBar
+```
+
+```ts title="Track A: import"
+import { TabBar } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { TabBar } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`TabBar`는 Reanimated + worklets를 사용해요(스크롤/indicator 동기화).
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-worklets react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 기본 사용(권장)
+
+```tsx title="TabBar basic usage"
+import { useState } from 'react';
+import { TabBar } from '@fleet-ui/components';
+
+export function Example() {
+  const [page, setPage] = useState(0);
+
+  return (
+    <TabBar
+      selectedPage={page}
+      items={['홈', '검색', '저장', '설정']}
+      onSelect={setPage}
+    />
+  );
+}
+```
+
+#### D-2. 비활성 탭 처리
+
+- `disabledIndices`: 특정 인덱스를 비활성
+- `isItemDisabled(item, index)`: 아이템 기반으로 비활성 계산
+
+#### D-3. 접근성 라벨 커스터마이즈
+
+아이템이 문자열이면 기본적으로 그 문자열을 라벨로 사용하지만, ReactNode 아이템은 라벨을 직접 제공해야 해요.
+
+- `accessibilityLabels[index]` (최우선)
+- `getItemAccessibilityLabel(item, index)`
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+`selectedPage`는 외부 controlled 값이에요. 내부에서는 이를 `dragProgress`(SharedValue)로 동기화해 indicator 애니메이션과 스크롤 위치를 계산해요.
+
+탭 클릭 시:
+- UI thread에서 `dragProgress = withSpring(index)`로 indicator를 먼저 이동
+- 동시에 JS thread에서 `onSelect(index)`를 호출해 외부 상태가 따라오도록 해요.
+- “내부 클릭으로 인한 selectedPage 업데이트”는 즉시 동기화로 spring을 덮어쓰지 않게 하려고 일정 시간(약 800ms) 스킵하는 가드가 있어요.
+
+#### E-2. indicator 계산
+
+- item layout(x/width) + text layout(width)를 수집해 indicator의 left/width(또는 scaleX)를 계산해요.
+- `variant='underlined'`는 scaleX 기반이고, 나머지는 left/width 직접 계산 방식이에요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+각 탭 아이템(`TabBarItem`)은:
+- `accessibilityRole="tab"`
+- `accessibilityState={{ selected, disabled }}`
+- `accessibilityLabel`은 상위에서 결정된 값이 전달돼요.
+
+> 참고: 루트에 `tablist` role을 명시하지는 않아요. 필요하면 상위 화면에서 컨테이너 역할을 추가로 부여하는 걸 고려해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/TabBar/TabBar.types.ts`의 `TabBarProps`.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `selectedPage` | `number` | Yes | - | 현재 선택 인덱스(controlled) |
+| `items` | `(string \| ReactNode)[]` | Yes | - | 탭 아이템 |
+| `onSelect` | `(index: number) => void` | No | - | 탭 선택 콜백 |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'primary'` | 색상 테마 |
+| `variant` | `'underlined' \| 'filled' \| 'faded' \| 'flat' \| 'ghost'` | No | `'filled'` | 스타일 variant |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 크기 |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | 라운드 |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | 그림자 |
+| `indicatorShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | indicator 그림자 |
+| `indicatorPadding` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | indicator와 컨테이너 사이 시각적 패딩 |
+| `getItemAccessibilityLabel` | `(item, index) => string \| undefined` | No | - | 아이템 접근성 라벨 계산 |
+| `accessibilityLabels` | `(string \| undefined)[]` | No | - | 아이템 접근성 라벨 배열(최우선) |
+| `hitSlop` | `PressableProps['hitSlop']` | No | - | 탭 hitSlop 기본값 오버라이드 |
+| `disabledIndices` | `number[]` | No | - | 비활성 인덱스 목록 |
+| `isItemDisabled` | `(item, index) => boolean` | No | - | 비활성 여부 계산 함수 |

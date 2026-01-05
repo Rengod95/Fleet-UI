@@ -1,0 +1,110 @@
+### (A) 한줄 요약
+
+**`Card`는 콘텐츠를 시각적으로 묶어 “섹션/블록”을 만드는 컨테이너 컴포넌트예요.**  
+`variant`/`colorScheme` 조합으로 배경/보더 톤을 결정하고, `size`로 padding/minHeight 밀도를 제어해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Card 추가**
+
+```bash title="Track A: add Card"
+pnpm dlx @fleet-ui/cli add Card
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { Card } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { Card } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Card basic usage"
+import { Card, Typo } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Card>
+      <Typo>카드 콘텐츠</Typo>
+    </Card>
+  );
+}
+```
+
+#### D-2. `variant` / `colorScheme` 의미(개념)
+
+`Card`는 `variant`와 `colorScheme` 조합으로 배경/보더 톤을 결정해요.
+
+- `variant="base"`: 기본 배경(content_1)
+- `variant="fade"`: 한 단계 옅은 배경(content_2) + subtle border
+- `variant="outlined"`: 투명 배경 + 기본 border
+- `variant="flat"`: 옅은 배경(content_2)
+
+> 실제 색상 값은 테마 팔레트에 의해 결정되므로, 제품 톤을 바꾸고 싶다면 토큰/테마 레이어에서 조정하는 것을 권장해요.
+
+#### D-3. `size`는 “padding + minHeight” 프리셋
+
+`Card`의 `size`는 단순 스케일이 아니라, 내부 padding과 최소 높이(minHeight)에 영향을 줘요.  
+레이아웃 밀도가 중요한 화면(리스트 vs 상세)에서는 `size`를 기준으로 일관성을 유지하는 걸 권장해요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+`Card`는 내부 상태나 Reanimated 애니메이션을 가지지 않는 “순수 컨테이너”에 가까워요.  
+대신 스타일 변형(variants/compoundVariants)으로 시각적 조합을 제공해요.
+
+구현상 특징:
+- `colorScheme + variant` 조합을 `compoundVariants`로 처리해 배경/보더를 결정해요.
+- `overflow: 'hidden'`이 기본 적용돼서, 내부 콘텐츠가 rounded 영역을 넘어가지 않게 해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+확인할 점:
+- (웹) 키보드/포커스 이동이 자연스러운지 확인해요.
+- (공통) 상태 변화가 스크린리더에 충분히 전달되는지 확인해요.
+
+`Card`는 기본적으로 인터랙티브 요소가 아니라 “레이아웃 컨테이너”이므로 `accessibilityRole="none"`으로 제공돼요.
+
+권장 규칙:
+- 카드 자체가 클릭/탭 가능한 UI라면, `Card`를 `Pressable`로 감싸거나(또는 별도의 인터랙션 컴포넌트를 사용) 해당 요소에 role/label/state를 부여한다.
+- 단순 콘텐츠 그룹핑 용도에서는 `Card`를 그대로 써요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Card/Card.types.ts`의 `CardProps`.  
+> `CardProps`는 `ViewProps`를 상속해요(단, `children`은 재정의돼요).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'base' \| 'fade' \| 'outlined' \| 'flat'` | No | `'base'` | 배경/보더 스타일 프리셋 | 범용 스타일은 Playground로 확인 |
+| `rounded` | `'none' \| '_2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '_2xl' \| 'full'` | No | `'md'` | 모서리 둥글기 | |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | padding/minHeight 프리셋 | 레이아웃 밀도 제어 |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | 의미 기반 컬러 역할 | |
+| `fullWidth` | `boolean` | No | `true` | width 100%로 확장 | false면 `alignSelf: 'flex-start'` |
+| `shadow` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| 'smooth_lg' \| 'inner'` | No | `'none'` | 그림자 프리셋 | `overflow: hidden`과 조합 시 시각 차이 주의 |
+| `children` | `ReactNode` | No | - | 카드 내부 콘텐츠 | |
+
+#### ViewProps 상속(요약)
+
+`CardProps`는 `ViewProps`를 상속하므로 `style` 등 기본 레이아웃 props를 지원해요.

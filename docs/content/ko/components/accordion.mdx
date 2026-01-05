@@ -1,0 +1,189 @@
+### (A) 한줄 요약
+
+**`Accordion`은 여러 섹션을 “접기/펼치기”로 보여주는 컴포넌트예요.**  
+`type="single" | "multiple"`로 동작 모델을 고르고, `Accordion.Item / Header / Content` 합성(Compound) 구조로 UI를 구성해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Accordion 추가**
+
+```bash title="Track A: add Accordion"
+pnpm dlx @fleet-ui/cli add Accordion
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { Accordion } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { Accordion } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Accordion`은 헤더 아이콘(기본 Chevron)과 인터랙션 애니메이션을 위해 아래 의존성이 필요해요.
+
+```bash title="Recommended runtime deps"
+# Expo라면 npx expo install 사용을 권장
+pnpm add lucide-react-native react-native-reanimated react-native-gesture-handler
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Accordion basic usage (single)"
+import { Accordion } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Accordion type="single" defaultValue="item-1" collapsible>
+      <Accordion.Item value="item-1">
+        <Accordion.Header>배송 정보</Accordion.Header>
+        <Accordion.Content>배송은 2~3일 소요됩니다.</Accordion.Content>
+      </Accordion.Item>
+
+      <Accordion.Item value="item-2">
+        <Accordion.Header>환불 정책</Accordion.Header>
+        <Accordion.Content>구매 후 7일 이내 환불 가능합니다.</Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  );
+}
+```
+
+#### D-2. `type`에 따른 상태 모델(중요)
+
+`Accordion`은 **single / multiple**에 따라 “열림 상태” 타입이 달라져요.
+
+- **single**: 하나만 열림  
+  - 비제어: `defaultValue?: string`  
+  - 제어: `value?: string`, `onValueChange?: (value: string) => void`
+- **multiple**: 여러 개 동시 열림  
+  - 비제어: `defaultValue?: string[]`  
+  - 제어: `value?: string[]`, `onValueChange?: (value: string[]) => void`
+
+> `type="single"`에서 `collapsible=true`면 “모두 닫기”가 가능해요. 이때 `onValueChange`는 **빈 문자열(`''`)**을 전달할 수 있어요(닫힘 상태 표현).  
+> 앱에서는 이 값 해석 규칙을 한 번 정해서 통일하는 걸 권장해요.
+
+#### D-3. `Accordion.Item`의 `value`는 “상태의 키”
+
+`Accordion.Item`의 `value: string`은 열림 상태를 식별하는 **고유 키**예요.
+
+- controlled/uncontrolled 모두에서 `value`를 기반으로 “열림 여부”를 계산해요.
+- `type="multiple"`에서는 “열린 값들의 배열”에 포함되는지로 판단해요.
+
+#### D-4. 헤더 아이콘/슬롯: `leftIcon`, `rightIcon`
+
+`Accordion.Header`는:
+- `leftIcon`으로 좌측 슬롯을 렌더링하고
+- `rightIcon`이 없으면 기본 아이콘(ChevronDown)을 렌더링하며(열림 상태에 따라 회전)
+- `rightIcon={false}`로 기본 아이콘을 숨길 수 있어요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+`Accordion`은 **루트 컨텍스트 + 아이템 컨텍스트**로 상태를 전파해요.
+
+- Root(`Accordion`)에서 관리하는 값
+  - `expandedValues: string[]` (현재 열린 item 값 목록)
+  - `toggleItem(value: string)` (열림/닫힘 토글)
+- Item(`Accordion.Item`)에서 파생되는 값
+  - `isExpanded: boolean` (`expandedValues`에 자신의 `value`가 포함되는지)
+  - `isDisabled: boolean` (`Accordion.Item`의 `disabled`)
+
+#### E-2. Reanimated / Shared Value
+
+`Accordion`의 애니메이션은 주로 2개 영역에 있어요.
+
+- **Header**: press-in/out 스케일/불투명도 + Chevron 회전  
+  - `rotation` shared value가 `withTiming`으로 0↔180도 전환돼요.
+- **Content**: 콘텐츠 높이를 측정한 뒤, `height`를 `withTiming`으로 애니메이션  
+  - `onLayout`로 측정한 `animatedHeight`를 저장하고, `isExpanded`에 따라 `height/opacity`를 시간 애니메이션으로 전환한다.
+
+  - `onLayout`로 측정한 `animatedHeight`를 저장하고, `isExpanded`에 따라 `height/opacity`를 시간 애니메이션으로 전환해요.
+
+> 주의: Content는 내부에서 실제 높이를 “측정”해서 애니메이션하므로, 콘텐츠가 동적으로 바뀌는 경우(예: 이미지 로딩 후 높이 변동)는 **레이아웃 재측정 타이밍**을 고려해야 해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+`Accordion.Header`는 기본적으로 버튼 역할을 해요.
+
+- 기본 role: `accessibilityRole="button"`
+- 라벨 규칙:
+  - `accessibilityLabel`이 있으면 사용
+  - 없고 `children`이 문자열이면 `children`을 라벨로 사용
+- 상태 전달:
+  - `accessibilityState: { expanded, disabled }`
+
+아이템 비활성화는 `Accordion.Item disabled`로 처리하고, Header에서 press를 막고 `opacity`를 낮춰요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Accordion/Accordion.types.ts`의 public 타입들.  
+> `AccordionProps`는 `ViewProps`를 상속하며, `AccordionHeaderProps`는 `PressableProps`를 상속한다.
+
+#### Accordion (Root) — `AccordionProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `type` | `'single' \| 'multiple'` | Yes | - | 확장 모드 선택 | 상태 타입이 달라짐 |
+| `collapsible` | `boolean` | No | `false` | single 모드에서 “모두 닫기” 허용 | multiple에서는 의미 없음(항상 여러 개 닫기 가능) |
+| `defaultValue` | `string` 또는 `string[]` | No | - | 비제어 모드 초기값 | `type`에 따라 타입 결정 |
+| `value` | `string` 또는 `string[]` | No | - | 제어 모드 값 | `type`에 따라 타입 결정 |
+| `onValueChange` | `(value: string) => void` 또는 `(value: string[]) => void` | No | - | 값 변경 콜백 | single에서 닫힘은 `''` 가능 |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | 색상 테마 | Playground에서 데모 제공 |
+| `variant` | `'ghost' \| 'outlined' \| 'flat' \| 'faded'` | No | `'ghost'` | 시각적 스타일 | Playground에서 데모 제공 |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | 그림자 프리셋 | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기/밀도 | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 모서리 둥글기 | |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 아이템 간 gap | |
+| `children` | `ReactNode` | Yes | - | `Accordion.Item` 등 자식 요소 | |
+
+#### Accordion Item — `AccordionItemProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `value` | `string` | Yes | - | 아이템 고유 키 | 상태 식별자 |
+| `disabled` | `boolean` | No | `false` | 비활성화 여부 | Header press 차단 + a11y disabled |
+| `headerContentGap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | - | Header와 Content 사이 간격 | 스타일/rounded/shadow 적용 방식에 영향 |
+| `children` | `ReactNode` | Yes | - | `Accordion.Header`, `Accordion.Content` | |
+
+#### Accordion Header — `AccordionHeaderProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `leftIcon` | `ReactNode` | No | - | 좌측 아이콘 슬롯 | |
+| `rightIcon` | `ReactNode \| false` | No | - | 우측 아이콘 슬롯(기본 Chevron) / `false`면 숨김 | |
+| `children` | `ReactNode` | Yes | - | 헤더 콘텐츠(보통 제목 문자열) | 문자열이면 a11y 라벨로도 사용 |
+
+#### Accordion Content — `AccordionContentProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | 콘텐츠 | 문자열이면 내부에서 `Text`로 래핑됨(줄바꿈/표현은 children 유형에 따라 달라질 수 있음) |
+
+#### RN Props 상속(요약)
+
+- `AccordionProps`는 `ViewProps`를 상속해요(예: `style` 등).
+- `AccordionHeaderProps`는 `PressableProps`를 상속해요(예: `onPress`, `disabled`, `accessibilityLabel` 등).  
+  단, `children`은 컴포넌트에서 재정의한다.

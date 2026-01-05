@@ -1,0 +1,133 @@
+### (A) One-liner
+
+**`Checkbox` is the basic input component for expressing/toggling boolean selection state.**
+It works with `checked` (controlled) or `defaultChecked` (uncontrolled), and animates press interaction and check icon transition with Reanimated.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Checkbox**
+
+```bash title="Track A: add Checkbox"
+pnpm dlx @fleet-ui/cli add Checkbox
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { Checkbox } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { Checkbox } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Checkbox` requires these dependencies for check icon and interaction animation.
+
+```bash title="Recommended runtime deps"
+# For Expo, npx expo install is recommended
+pnpm add lucide-react-native react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Checkbox (uncontrolled)"
+import { Checkbox } from '@fleet-ui/components';
+
+export function Example() {
+  return <Checkbox defaultChecked onCheckedChange={(v) => console.log(v)} />;
+}
+```
+
+#### D-2. Controlled Pattern
+
+```tsx title="Checkbox (controlled)"
+import { useState } from 'react';
+import { Checkbox } from '@fleet-ui/components';
+
+export function Example() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <Checkbox
+      checked={checked}
+      onCheckedChange={setChecked}
+      accessibilityLabel="Agree to terms"
+    />
+  );
+}
+```
+
+> When both `onPress` and `onCheckedChange` are provided, internally `onPress` is called first, then `onCheckedChange(newChecked)` is called.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- If `checked` is provided, operates in controlled mode.
+- Otherwise uses internal state initialized with `defaultChecked`.
+
+When disabled:
+- Prevents event with `preventDefault()` and doesn't change state on press.
+
+#### E-2. Reanimated / Shared Value
+
+`Checkbox` uses two animations:
+
+- Press interaction: `scale` shared value for press-in/out spring
+  - press-in: `scale = 0.7`
+  - press-out: `scale = 1`
+- Check icon transition: `progress` derived value (0↔1) for icon scale/opacity animation
+
+Also, background/border colors transition with spring using unistyles animated variant color.
+
+---
+
+### (F) Accessibility
+
+- Default role: `accessibilityRole="checkbox"`
+- State passed: `accessibilityState: { checked, disabled }`
+- Providing `accessibilityLabel` is recommended where possible (especially when checkbox is placed standalone).
+
+> Note: This implementation doesn't provide `mixed` (indeterminate) state as a public prop.
+
+---
+
+### (G) Props Table
+
+> Reference: `CheckboxProps` from `packages/components/src/Checkbox/Checkbox.types.ts`.
+> `CheckboxProps` extends `PressableProps` (however, `children` and `style` are redefined).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color scheme | |
+| `variant` | `'filled' \| 'flat' \| 'outlined'` | No | `'filled'` | Style variant | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'sm'` | Corner radius | |
+| `checked` | `boolean` | No | - | Check state (controlled) | |
+| `defaultChecked` | `boolean` | No | `false` | Initial check (uncontrolled) | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | Check change callback | |
+| `disabled` | `boolean` | No | `false` | Disabled | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style override | |
+
+#### PressableProps Inheritance (Summary)
+
+`CheckboxProps` extends `PressableProps`, so press-related props like `onPress`, `onPressIn`, `onPressOut` are supported as-is.

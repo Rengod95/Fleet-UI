@@ -1,0 +1,158 @@
+### (A) One-liner
+
+**`Modal` is an overlay modal component that appears at the center of the screen.**
+It controls visibility state externally with `visible`/`onClose`, and content is composed with `Modal.Header/Body/Description/Footer` compound structure. "Close paths" like backdrop click/swipe/Android back button are controlled with `closable` and related props.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Modal"
+pnpm dlx @fleet-ui/cli add Modal
+```
+
+```ts title="Track A: import"
+import { Modal } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Modal } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Modal` requires these dependencies:
+
+- `expo-blur` (backdrop blur)
+- `react-native-reanimated`, `react-native-gesture-handler` (animation/swipe dismiss)
+- `lucide-react-native` (header close icon)
+
+```bash title="Required deps (Expo)"
+npx expo install expo-blur
+```
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-gesture-handler lucide-react-native react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Modal basic usage"
+import { useState } from 'react';
+import { Text } from 'react-native';
+import { Modal, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onPress={() => setOpen(true)}>Open</Button>
+
+      <Modal visible={open} onClose={() => setOpen(false)}>
+        <Modal.Header title="Notice" />
+        <Modal.Description content="There's an important notice." />
+        <Modal.Body>
+          <Text>Body content</Text>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="ghost" onPress={() => setOpen(false)}>Close</Button>
+          <Button onPress={() => setOpen(false)}>Confirm</Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+}
+```
+
+#### D-2. Close Policy: `closable`, `swipeToDismiss`
+
+- When `closable=true`:
+  - Closes on backdrop click
+  - (Optional) Closes on swipe down
+  - Closes on Android hardware back button
+- When `closable=false`:
+  - Restricts closing via backdrop/back button (and ESC on web)
+  - Close is provided only through **explicit paths** like buttons
+
+#### D-3. Swipe Dismiss Details: `swipeThreshold`
+
+When `swipeToDismiss=true`, closes under these conditions:
+
+- Drag distance (`translationY`) exceeds `swipeThreshold`, or
+- `velocityY > 500`
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+`Modal` controls `visible` externally and doesn't hold internal state directly.
+So to close, you must set external state to `false` in `onClose()`.
+
+#### E-2. Reanimated / Shared Value
+
+Implementation can animate with these shared values:
+
+- Backdrop `opacity` (withTiming)
+- Content `translateY` (withTiming / withSpring)
+- Sync backdrop opacity with swipe progress (interpolate)
+
+Also handles swipe dismiss gesture with `Gesture.Pan()`.
+
+---
+
+### (F) Accessibility
+
+- Modal overlay sets modal scope with `accessibilityViewIsModal` + `importantForAccessibility="yes"`.
+- Handles screen reader "close" gesture with `onAccessibilityEscape` (when closable).
+- `Modal.Header` close button should have `accessibilityRole="button"` + `accessibilityLabel="Close modal"`.
+
+Recommended rules:
+- Close button label can be customized with app i18n policy via custom header.
+- (Web) Verify ESC/focus navigation is natural for keyboard users.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/Modal/Modal.types.ts`.
+
+#### Modal (Root) — `ModalRootProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `visible` | `boolean` | Yes | - | Modal visibility state | External control |
+| `onClose` | `() => void` | Yes | - | Close callback (change external state to false) | Required |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Content max width/padding preset | |
+| `colorScheme` | `'base' \| 'inverted'` | No | `'base'` | Color theme | |
+| `rounded` | `'none' \| '_2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Round preset | |
+| `closable` | `boolean` | No | `true` | Allow close via backdrop/swipe/back button | |
+| `swipeToDismiss` | `boolean` | No | `true` | Enable swipe dismiss | Works with `closable` |
+| `swipeThreshold` | `number` | No | `100` | Swipe dismiss threshold (px) | |
+| `backdropOpacity` | `number` | No | `0.5`(types) / impl default may be `0.3` | Backdrop opacity | Note difference between impl default and type annotation |
+| `useBackdropBlur` | `boolean` | No | `true` | Use backdrop blur | `expo-blur` required |
+| `backdropBlurIntensity` | `number` | No | `50` | Blur intensity (0~100) | |
+| `backdropBlurTint` | `'light' \| 'dark'` | No | `'light'` | Blur tint | |
+| `modalProps` | `Omit<RNModalProps, 'visible' \| 'children' \| 'transparent' \| 'animationType'>` | No | - | RN Modal props override | Some props are fixed internally |
+| `contentStyle` | `StyleProp<ViewStyle>` | No | - | Content style override | |
+| `backdropStyle` | `StyleProp<ViewStyle>` | No | - | Backdrop style override | |
+| `onShow` | `() => void` | No | - | Show callback | |
+| `onDismiss` | `() => void` | No | - | Dismiss callback | |
+| `children` | `ReactNode` | Yes | - | Modal content | |
+
+#### Header / Body / Description / Footer
+
+- `Modal.Header`: `ModalHeaderProps` (`title?`, `showCloseButton?`, `children?`, `titleStyle?`)
+- `Modal.Body`: `ModalBodyProps` (`children`)
+- `Modal.Description`: `ModalDescriptionProps` (`content`, `contentStyle?`, `containerStyle?`)
+- `Modal.Footer`: `ModalFooterProps` (`children`)

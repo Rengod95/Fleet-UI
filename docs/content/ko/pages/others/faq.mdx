@@ -1,0 +1,38 @@
+# FAQ
+
+자주 나오는 설정/빌드 이슈를 모아뒀어요. 문제가 생기면 아래 질문부터 확인해요.
+
+---
+
+## Unistyles가 적용되지 않아요(테마가 안 먹어요)
+
+**원인(자주)**: 엔트리 파일에 `@fleet-ui/*/core/unistyles` import가 빠졌어요.
+
+**해결**:
+
+- Track A: `import '@fleet-ui/local/core/unistyles';`
+- Track B: `import '@fleet-ui/core/unistyles';`
+
+---
+
+## Reanimated 관련 에러로 앱이 크래시돼요
+
+**원인(자주)**: `react-native-reanimated/plugin`이 없거나 plugins 배열 마지막이 아니에요.
+
+**해결**:
+
+- `babel.config.js`에 `react-native-reanimated/plugin`이 있는지 확인해요.
+- plugins 배열의 **마지막**인지 확인해요.
+
+---
+
+## `@fleet-ui/local/*` 모듈을 찾을 수 없다고 나와요(Track A)
+
+**원인(자주)**: alias 설정이 타입/런타임 중 한쪽만 잡혀 있어요.
+
+**해결**:
+
+- `tsconfig.json`에 `paths`가 있는지 확인해요.
+- `babel.config.js`에 `module-resolver` alias가 있는지 확인해요.
+- `react-native-unistyles/plugin`의 `autoProcessImports`에 `@fleet-ui/local`이 포함돼 있는지 확인해요.
+

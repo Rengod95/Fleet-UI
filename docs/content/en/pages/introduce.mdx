@@ -1,0 +1,55 @@
+# Introduce
+
+Fleet UI is a UI SDK for React Native that bundles **theming (react-native-unistyles) + animation (react-native-reanimated) + components** into a seamless workflow.
+
+What you'll learn:
+
+- What problems Fleet UI solves
+
+## 10-Second Summary
+
+Fleet UI helps you build production-ready UIs faster while maintaining a consistent design based on minimalism and fluid animations.
+
+- **Animation**: Nearly all interactive components come with animation design built-in.
+- **DX (Developer Experience)**: Components are designed to be easy to use.
+- **Consistency**: Built on our own design system that's easy to modify.
+- **Extensibility**: Swap themes/tokens to safely change the entire UI.
+
+Ready to start? Go to [Install](/getting-started/install).
+
+## Core Design Philosophy
+
+Fleet UI is designed around two philosophies:
+
+- **Universal Minimalism**: A minimal visual language centered on mobile UI/UX that looks natural anywhere.
+- **Radical Simplicity**: The goal is to design so naturally that users operate it without thinking.
+
+## What Fleet UI Provides
+
+Fleet UI isn't just a "component collection"—it also provides the **system those components depend on**.
+
+- **Mobile-first design**: Includes common mobile screen patterns (e.g., [Section component](/components/section), [OTPInput component](/components/otp-input)).
+- **Theme/token system**: Tokens are designed in the `raw → primitive → semantic → theme` flow and bundled as a runtime theme.
+- **Variants system**: Combine axes like `colorScheme / variant / size ...` to make styles predictable.
+- **Accessibility (A11y) defaults**: role/state/interaction patterns are aligned consistently where possible.
+- **Motion/interaction defaults**: Reanimated-based motion is provided as a component default behavior.
+
+## Design Principles
+
+Fleet UI makes decisions based on these principles:
+
+- **Universal Minimalism**: Maintain a default visual language that looks natural on mobile without leaning too heavily into any specific brand.
+- **Radical Simplicity**: The goal is "looks like there are many options, but it's actually not hard." Defaults are safe, and you only extend when needed.
+
+## How This Shows in Implementation
+
+- **Mobile-first + performance together**: Styles use `react-native-unistyles`, animations use `react-native-reanimated`, and everything is designed to run naturally on the UI thread where possible.
+- **Copy/Paste is also possible**: Depending on your team's situation, you can "own and modify the code" with local install (Track A), or maintain a stable update flow with package install (Track B).
+- **Documentation provides rules too**: We share documentation on how to safely extend components/tokens (reference rules, token hierarchy, etc.).
+
+## Next
+
+- [Read Fundamental](/fundamental): Get the big picture of why layers/token hierarchy are needed.
+- [Start installing with Install](/getting-started/install): Proceed with installation via Track A or B.
+- [View theme application in Theming System](/fundamental/theming): See how to register a theme and create theme-based StyleSheets.
+- [View token structure in Token Architecture](/fundamental/token-architecture): Understand the `raw → primitive → semantic → theme` pipeline.

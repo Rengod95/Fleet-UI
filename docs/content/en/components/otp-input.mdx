@@ -1,0 +1,156 @@
+### (A) One-liner
+
+**`OTPInput` is a component that receives verification code (One-Time Password) input via "slot UI."**
+Actual input is handled by invisible `TextInput`, and `OTPSlot`s are rendered on screen. It provides paste/pattern validation/completion callback (`onComplete`), and you can use `useOTPInput` hook to separate the same logic.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add OTPInput"
+pnpm dlx @fleet-ui/cli add OTPInput
+```
+
+```ts title="Track A: import"
+import { OTPInput } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { OTPInput } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="OTPInput basic usage"
+import { OTPInput } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <OTPInput
+      maxLength={6}
+      onComplete={(code) => console.log('complete', code)}
+      accessibilityLabel="Verification code input"
+    />
+  );
+}
+```
+
+#### D-2. Pattern Validation: `pattern`
+
+When `pattern` is provided, updates are ignored if input value doesn't match the regex.
+
+```tsx title="Digits only"
+import { OTPInput } from '@fleet-ui/components';
+
+export function Example() {
+  return <OTPInput maxLength={6} pattern="^\\d*$" />;
+}
+```
+
+#### D-3. Paste Handling: `pasteTransformer`
+
+When "multiple characters at once" come in from input event, it's considered a paste and transformed via `pasteTransformer` before applying.
+Default transformer extracts `maxLength` digits from pasted text.
+
+#### D-4. Custom Render: `render`
+
+When `render` is provided, instead of default `OTPSlot`, you can draw custom UI receiving `slots` render info.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model (`useOTPInput`)
+
+Core states managed inside the hook are:
+
+- `value`: Current OTP string
+- `prevValue`: Previous frame value (for slot animation trigger)
+- `isFocused`: Overall focus state
+
+Input processing:
+- Input is truncated to `maxLength` and stored.
+- If `pattern` exists, checks regex pass.
+- When length becomes `maxLength`, calls `onComplete(value)`.
+
+Slot creation:
+- `slots[index]` contains `char/prevChar/placeholderChar/isActive/hasFakeCaret`, etc.
+
+#### E-2. Reanimated / Shared Value
+
+`OTPSlot` uses these animations:
+
+- Typing bounce (on new character input): scale + translateY sequence
+- Focus display:
+  - `bordered/faded` uses borderWidth 1↔2
+  - `underlined` uses underlineScale 0↔1
+- Color transition: Transition background/border color with spring (error color on error)
+
+`OTPCaret` implements blinking with withRepeat(withTiming).
+
+---
+
+### (F) Accessibility
+
+Accessibility is structured to focus on "invisible actual TextInput."
+
+- Slot container (`Pressable`) is hidden with `accessible={false}`
+- Actual `TextInput` is `accessible` with:
+  - `accessibilityRole="text"`
+  - `accessibilityState={{ disabled }}`
+  - Default label: <code>OTP input with &#36;&#123;maxLength&#125; digits</code>
+  - Default hint: `Enter your verification code`
+
+On iOS, uses `opacity: 0.02` instead of `opacity: 0` to hide for paste functionality (caret is hidden).
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/OTPInput/OTPInput.types.ts`.
+
+#### OTPInput — `OTPInputProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `maxLength` | `number` | Yes | - | OTP length (slot count) | |
+| `defaultValue` | `string` | No | `''` | Initial value | |
+| `onChangeText` | `(value: string) => void` | No | - | Value change callback | |
+| `onComplete` | `(value: string) => void` | No | - | All input complete callback | |
+| `pattern` | `string \| RegExp` | No | - | Input validation regex | Ignores update on mismatch |
+| `placeholder` | `string` | No | - | Per-slot placeholder string | |
+| `pasteTransformer` | `(pasted: string) => string` | No | - | Paste transform function | Default transformer provided |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Slot focus/color scheme | |
+| `variant` | `'flat' \| 'bordered' \| 'underlined' \| 'faded'` | No | `'bordered'` | Slot style variant | |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Slot size/spacing/typo | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Rounded | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow | |
+| `isDisabled` | `boolean` | No | `false` | Disabled | |
+| `isInvalid` | `boolean` | No | `false` | Error state | Slot color transition |
+| `gap` | `number` | No | - | Gap between slots (theme.spacing index) | Can be auto-determined by size |
+| `containerStyle` | `StyleProp<ViewStyle>` | No | - | Root container style | |
+| `slotStyle` | `StyleProp<ViewStyle>` | No | - | Slot style override | |
+| `slotTextStyle` | `StyleProp<TextStyle>` | No | - | Slot text style | |
+| `caretStyle` | `StyleProp<ViewStyle>` | No | - | Caret style | |
+| `render` | `(props: OTPRenderProps) => ReactNode` | No | - | Custom render function | Replaces default OTPSlot |
+
+#### TextInputProps Inheritance (Summary)
+
+`OTPInputProps` extends `TextInputProps`, but `value`, `onChangeText`, `maxLength`, `style` are controlled by component.
+`accessibilityLabel/accessibilityHint`, `inputMode`, `keyboardType`, `secureTextEntry`, etc. can be passed as-is.
+
+#### Hook: `useOTPInput`
+
+`useOTPInput(options)` returns `inputRef/value/isFocused/renderProps/handlers/actions`, enabling reuse of same input logic in custom UI.

@@ -1,0 +1,169 @@
+### (A) 한줄 요약
+
+**`RadioCard`는 “라디오 선택 UI + 카드 레이아웃”을 한 번에 제공하는 선택형 카드 컴포넌트예요.**  
+단독으로 쓰면 선택 토글(checkbox처럼)도 가능하고, `RadioCardGroup` 안에서 쓰면 단일 선택(radio semantics)으로 동작해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add RadioCard"
+pnpm dlx @fleet-ui/cli add RadioCard
+```
+
+```ts title="Track A: import"
+import { RadioCard, RadioCardGroup } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { RadioCard, RadioCardGroup } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 그룹 사용(권장): 단일 선택
+
+```tsx title="RadioCardGroup (single select)"
+import { RadioCard, RadioCardGroup } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <RadioCardGroup
+      name="배송 방식"
+      defaultValue="standard"
+      onValueChange={(v) => console.log(v)}
+      gap="md"
+    >
+      <RadioCard
+        value="standard"
+        title="일반 배송"
+        description="3~5일 소요"
+      />
+      <RadioCard
+        value="express"
+        title="빠른 배송"
+        description="내일 도착"
+        selectedVariant="filled"
+        selectedColorScheme="primary"
+      />
+    </RadioCardGroup>
+  );
+}
+```
+
+그룹 안에서는:
+- 다시 같은 카드를 눌러도 선택이 해제되지 않는다(라디오).
+- 선택은 `value` 문자열로 관리되며 `RadioCardGroup.onValueChange(value)`로 전달된다.
+
+#### D-2. 단독 사용: 선택 토글(주의)
+
+`RadioCard`를 단독으로 쓰면 내부적으로 `selected/defaultSelected/onSelect`로 토글 동작이 가능하다.  
+이 동작은 “라디오”라기보다는 “선택 카드(checkbox-like)”에 가깝기 때문에, 여러 개를 나란히 두고 단일 선택을 원한다면 반드시 `RadioCardGroup`을 써요.
+
+#### D-3. 레이아웃 슬롯
+
+콘텐츠 구성은 다음 슬롯으로 분리돼요.
+
+- `header`: 카드 상단 헤더 영역
+- `footer`: 카드 하단 푸터 영역
+- `media`: 타이틀 좌측의 아이콘/이미지
+- `left`/`right`: 본문(content) 좌우 슬롯
+
+#### D-4. 선택 시 스타일 오버라이드
+
+- `selectedColorScheme`: 선택된 상태에서만 색상 스킴 변경
+- `selectedVariant`: 선택된 상태에서만 카드 variant 변경
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델(우선순위)
+
+`RadioCard`의 선택 상태는 아래 우선순위로 결정돼요.
+
+1) **Group**: `RadioCardGroup` 컨텍스트가 있으면 `groupContext.isSelected(value)`를 사용(단일 선택)
+2) **Controlled**: `selected` prop이 있으면 해당 값 사용
+3) **Uncontrolled**: `defaultSelected`로 내부 state를 시작하고 탭 시 토글
+
+`RadioCardGroup`은 controlled/uncontrolled 모두 지원해요.
+- controlled: `value`로 제어
+- uncontrolled: `defaultValue` + 내부 `internalValue`
+
+#### E-2. 애니메이션
+
+- press-in/out: 스케일/불투명도 spring (`0.98/0.8` ↔ `1/1`)
+- 색상 전환: background/border/title/description을 variant 기반 색으로 가져와 spring으로 전환
+
+---
+
+### (F) 접근성(누락 금지)
+
+그룹:
+- `RadioCardGroup`은 `accessibilityRole="radiogroup"`를 써요.
+- `name` 또는 `accessibilityLabel`로 그룹 라벨을 제공해요.
+
+카드:
+- `RadioCard`는 `accessibilityRole="radio"`
+- `accessibilityState={{ checked, disabled }}`
+- 기본 라벨은 `accessibilityLabel || title`
+
+내부 indicator(`Radio` 컴포넌트)는 시각적 보조 요소로 취급하고, `accessible={false}`로 숨겨 중복 읽기를 방지해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/RadioCard/RadioCard.types.ts`의 public 타입들.
+
+#### RadioCard — `RadioCardProps`
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | Yes | - | 카드 타이틀 | 접근성 기본 라벨로도 사용됨 |
+| `description` | `string` | No | - | 설명 텍스트 | |
+| `header` | `ReactNode` | No | - | 상단 헤더 슬롯 | |
+| `footer` | `ReactNode` | No | - | 하단 푸터 슬롯 | |
+| `media` | `ReactNode` | No | - | 타이틀 좌측 미디어 | |
+| `left` | `ReactNode` | No | - | 본문 좌측 슬롯 | |
+| `right` | `ReactNode` | No | - | 본문 우측 슬롯 | |
+| `value` | `string` | Yes | - | 그룹 선택 식별자 | group에서 필수 |
+| `selected` | `boolean` | No | - | 선택 상태(controlled, 단독 사용 시) | group 내부에서는 무시됨 |
+| `defaultSelected` | `boolean` | No | `false` | 초기 선택(uncontrolled, 단독) | group 내부에서는 무시됨 |
+| `onSelect` | `(selected: boolean) => void` | No | - | 선택 토글 콜백(단독) | group 내부에서는 무시됨 |
+| `colorScheme` | `ItemColorScheme` | No | `'neutral'` | 카드 색상 스킴 | |
+| `variant` | `ItemVariant` | No | `'outlined'` | 카드 variant | |
+| `size` | `ItemSize` | No | `'md'` | 카드 size | |
+| `rounded` | `ItemRounded` | No | `'md'` | 라운드 | |
+| `shadow` | `ItemShadow` | No | `'none'` | 그림자 | |
+| `indicatorPosition` | `'start' \| 'end'` | No | `'end'` | 라디오 위치 | |
+| `indicatorVariant` | `RadioVariant` | No | `'filled'` | 라디오 variant | |
+| `selectedColorScheme` | `ItemColorScheme` | No | - | 선택 시 색상 스킴 오버라이드 | |
+| `selectedVariant` | `ItemVariant` | No | - | 선택 시 variant 오버라이드 | |
+| `disabled` | `boolean` | No | `false` | 비활성화 | group disabled와 OR |
+| `style` | `StyleProp<ViewStyle>` | No | - | 스타일 오버라이드 | |
+| `accessibilityLabel` | `string` | No | - | 접근성 라벨 | 기본: title |
+| `testID` | `string` | No | - | 테스트 식별자 | |
+
+#### RadioCardGroup — `RadioCardGroupProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `value` | `string` | No | - | 선택 값(controlled) |
+| `defaultValue` | `string` | No | - | 초기 선택 값(uncontrolled) |
+| `onValueChange` | `(value: string) => void` | No | - | 선택 변경 콜백 |
+| `name` | `string` | No | - | 그룹 이름(a11y) |
+| `disabled` | `boolean` | No | `false` | 그룹 비활성화 |
+| `children` | `ReactNode` | No | - | `RadioCard` children |
+| `style` | `ViewProps['style']` | No | - | 컨테이너 스타일 |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 카드 간격 |

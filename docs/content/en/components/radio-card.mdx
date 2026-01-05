@@ -1,0 +1,169 @@
+### (A) One-liner
+
+**`RadioCard` is a selectable card component providing "radio selection UI + card layout" in one.**
+Used standalone, selection toggle (like checkbox) is possible, and when used inside `RadioCardGroup`, it operates with single selection (radio semantics).
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add RadioCard"
+pnpm dlx @fleet-ui/cli add RadioCard
+```
+
+```ts title="Track A: import"
+import { RadioCard, RadioCardGroup } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { RadioCard, RadioCardGroup } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Group Usage (Recommended): Single Selection
+
+```tsx title="RadioCardGroup (single select)"
+import { RadioCard, RadioCardGroup } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <RadioCardGroup
+      name="Shipping Method"
+      defaultValue="standard"
+      onValueChange={(v) => console.log(v)}
+      gap="md"
+    >
+      <RadioCard
+        value="standard"
+        title="Standard Delivery"
+        description="3-5 days"
+      />
+      <RadioCard
+        value="express"
+        title="Express Delivery"
+        description="Next day arrival"
+        selectedVariant="filled"
+        selectedColorScheme="primary"
+      />
+    </RadioCardGroup>
+  );
+}
+```
+
+Inside group:
+- Pressing same card again doesn't deselect (radio).
+- Selection is managed by `value` string and passed via `RadioCardGroup.onValueChange(value)`.
+
+#### D-2. Standalone Usage: Selection Toggle (Caution)
+
+Using `RadioCard` standalone enables toggle behavior with `selected/defaultSelected/onSelect` internally.
+This behavior is closer to "selection card (checkbox-like)" than "radio," so if you want single selection with multiple cards side by side, be sure to use `RadioCardGroup`.
+
+#### D-3. Layout Slots
+
+Content composition is separated into these slots:
+
+- `header`: Card top header area
+- `footer`: Card bottom footer area
+- `media`: Icon/image to left of title
+- `left`/`right`: Body (content) left/right slots
+
+#### D-4. Style Override on Selection
+
+- `selectedColorScheme`: Change color scheme only when selected
+- `selectedVariant`: Change card variant only when selected
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model (Priority)
+
+`RadioCard` selection state is determined by this priority:
+
+1) **Group**: If `RadioCardGroup` context exists, uses `groupContext.isSelected(value)` (single selection)
+2) **Controlled**: If `selected` prop exists, uses that value
+3) **Uncontrolled**: Starts internal state with `defaultSelected` and toggles on tap
+
+`RadioCardGroup` supports both controlled/uncontrolled.
+- controlled: Control with `value`
+- uncontrolled: `defaultValue` + internal `internalValue`
+
+#### E-2. Animation
+
+- press-in/out: Scale/opacity spring (`0.98/0.8` ↔ `1/1`)
+- Color transition: Gets background/border/title/description from variant-based colors and transitions with spring
+
+---
+
+### (F) Accessibility
+
+Group:
+- `RadioCardGroup` uses `accessibilityRole="radiogroup"`.
+- Provides group label with `name` or `accessibilityLabel`.
+
+Card:
+- `RadioCard` is `accessibilityRole="radio"`
+- `accessibilityState={{ checked, disabled }}`
+- Default label is `accessibilityLabel || title`
+
+Internal indicator (`Radio` component) is treated as visual auxiliary element and hidden with `accessible={false}` to prevent duplicate reading.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/RadioCard/RadioCard.types.ts`.
+
+#### RadioCard — `RadioCardProps`
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | Yes | - | Card title | Also used as accessibility default label |
+| `description` | `string` | No | - | Description text | |
+| `header` | `ReactNode` | No | - | Top header slot | |
+| `footer` | `ReactNode` | No | - | Bottom footer slot | |
+| `media` | `ReactNode` | No | - | Media to left of title | |
+| `left` | `ReactNode` | No | - | Body left slot | |
+| `right` | `ReactNode` | No | - | Body right slot | |
+| `value` | `string` | Yes | - | Group selection identifier | Required in group |
+| `selected` | `boolean` | No | - | Selection state (controlled, standalone) | Ignored inside group |
+| `defaultSelected` | `boolean` | No | `false` | Initial selection (uncontrolled, standalone) | Ignored inside group |
+| `onSelect` | `(selected: boolean) => void` | No | - | Selection toggle callback (standalone) | Ignored inside group |
+| `colorScheme` | `ItemColorScheme` | No | `'neutral'` | Card color scheme | |
+| `variant` | `ItemVariant` | No | `'outlined'` | Card variant | |
+| `size` | `ItemSize` | No | `'md'` | Card size | |
+| `rounded` | `ItemRounded` | No | `'md'` | Rounded | |
+| `shadow` | `ItemShadow` | No | `'none'` | Shadow | |
+| `indicatorPosition` | `'start' \| 'end'` | No | `'end'` | Radio position | |
+| `indicatorVariant` | `RadioVariant` | No | `'filled'` | Radio variant | |
+| `selectedColorScheme` | `ItemColorScheme` | No | - | Selection color scheme override | |
+| `selectedVariant` | `ItemVariant` | No | - | Selection variant override | |
+| `disabled` | `boolean` | No | `false` | Disabled | OR'd with group disabled |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | Default: title |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### RadioCardGroup — `RadioCardGroupProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `value` | `string` | No | - | Selection value (controlled) |
+| `defaultValue` | `string` | No | - | Initial selection value (uncontrolled) |
+| `onValueChange` | `(value: string) => void` | No | - | Selection change callback |
+| `name` | `string` | No | - | Group name (a11y) |
+| `disabled` | `boolean` | No | `false` | Group disabled |
+| `children` | `ReactNode` | No | - | `RadioCard` children |
+| `style` | `ViewProps['style']` | No | - | Container style |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Card gap |

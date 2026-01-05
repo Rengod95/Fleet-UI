@@ -1,0 +1,136 @@
+### (A) 한줄 요약
+
+**`Switch`는 on/off 토글 상태를 표현하고 변경하는 컴포넌트예요.**  
+`checked/defaultChecked`로 controlled/uncontrolled를 지원하고, Reanimated 기반으로 thumb 이동/스케일 애니메이션과 배경 색 전환을 제공해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: init"
+pnpm dlx @fleet-ui/cli init
+```
+
+```bash title="Track A: add Switch"
+pnpm dlx @fleet-ui/cli add Switch
+```
+
+```ts title="Track A: import"
+import { Switch } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```bash title="Track B: install packages"
+pnpm add @fleet-ui/core @fleet-ui/components
+```
+
+```ts title="Track B: import"
+import { Switch } from '@fleet-ui/components';
+```
+
+---
+
+### (C) Playground에서 확인 가능한 범용 Props(문서에서 반복하지 않음)
+
+`variant/size/rounded/thumbShadow/thumbShape/colorScheme` 조합은 Playground에서 확인할 수 있어서 반복 예제는 최소화해요.
+
+대신 이 문서에서는:
+- controlled/uncontrolled 모델과 `onCheckedChange`
+- `thumbPadding`이 “px” 단위로 직접 들어가는 점
+- 접근성 role/state 전달 방식
+
+에 집중해요.
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. Controlled 패턴(권장)
+
+```tsx title="Switch controlled"
+import { useState } from 'react';
+import { Switch } from '@fleet-ui/components';
+
+export function Example() {
+  const [checked, setChecked] = useState(false);
+  return (
+    <Switch
+      checked={checked}
+      onCheckedChange={setChecked}
+      accessibilityLabel="알림 받기"
+    />
+  );
+}
+```
+
+#### D-2. Uncontrolled 패턴
+
+```tsx title="Switch uncontrolled"
+import { Switch } from '@fleet-ui/components';
+
+export function Example() {
+  return <Switch defaultChecked onCheckedChange={(v) => console.log(v)} />;
+}
+```
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- controlled: `checked`가 있으면 그 값을 사용
+- uncontrolled: `defaultChecked`로 내부 state를 시작하고, 탭 시 내부 state를 토글
+
+탭 시 흐름:
+- disabled면 이벤트를 막고 종료
+- 새 값 `newValue = !checked` 계산
+- uncontrolled면 내부 state 업데이트
+- `onPress` 호출 후 `onCheckedChange(newValue)` 호출
+
+#### E-2. 애니메이션
+
+- `progress = withTiming(checked ? 1 : 0)`으로 thumb 이동/스케일을 제어해요.
+- 배경색은 `useAnimatedVariantColor`로 variant 결과 색을 가져와 `withTiming`으로 전환해요.
+- thumb 이동 거리는 size/shape/padding으로 계산돼요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+`Switch`는 다음을 설정해요.
+
+- `accessibilityRole="switch"`
+- `accessibilityState={{ checked, disabled }}`
+- `accessibilityLabel`은 prop으로 전달(라벨 텍스트가 별도라면 제공 권장)
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Switch/Switch.types.ts`의 `SwitchProps`.
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'`(types) / 구현 기본값은 `'success'` | 색상 테마 | 기본값 차이 주의 |
+| `variant` | `'lined' \| 'filled' \| 'flat'` | No | `'filled'` | 스타일 variant | filled는 inner shadow |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기 | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md'` | No | `'md'` | 라운드 | |
+| `thumbShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | thumb 그림자 | |
+| `thumbShape` | `'oval' \| 'circle'` | No | `'oval'` | thumb 모양 | |
+| `thumbPadding` | `number` | No | size 기반 | thumb 내부 padding(px) | 숫자(px) |
+| `checked` | `boolean` | No | - | 현재 상태(controlled) | |
+| `defaultChecked` | `boolean` | No | `false` | 초기 상태(uncontrolled) | |
+| `onCheckedChange` | `(value: boolean) => void` | No | - | 상태 변경 콜백 | |
+| `disabled` | `boolean` | No | `false` | 비활성화 | |
+| `accessibilityLabel` | `string` | No | - | 접근성 라벨 | |
+| `testID` | `string` | No | - | 테스트 식별자 | |
+| `style` | `StyleProp<ViewStyle>` | No | - | 루트 스타일 오버라이드 | |
+| `thumbStyle` | `StyleProp<ViewStyle>` | No | - | thumb 스타일 오버라이드 | |

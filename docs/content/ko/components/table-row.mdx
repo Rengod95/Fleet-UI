@@ -1,0 +1,126 @@
+### (A) 한줄 요약
+
+**`TableRow`는 좌측 라벨과 우측 값(키-값)을 한 줄 레이아웃으로 정렬해 보여주는 컴포넌트예요.**  
+문자열/숫자 콘텐츠는 기본 타이포 스타일을 적용해 렌더링하고, 필요하면 커스텀 노드도 그대로 배치할 수 있어요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add TableRow"
+pnpm dlx @fleet-ui/cli add TableRow
+```
+
+```ts title="Track A: import"
+import { TableRow } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { TableRow } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 기본 사용(키-값)
+
+```tsx title="TableRow basic usage"
+import { TableRow } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <>
+      <TableRow left="이메일" right="user@example.com" />
+      <TableRow left="플랜" right="Pro" highlightRight />
+    </>
+  );
+}
+```
+
+#### D-2. align='left' + leftRatio
+
+라벨과 값이 모두 왼쪽 정렬된 “2열”처럼 보이게 하고 싶다면 `align="left"`를 써요. 이때 `leftRatio`로 좌측 폭 비율을 지정할 수 있어요.
+
+```tsx title="Left aligned columns"
+import { TableRow } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <TableRow
+      align="left"
+      leftRatio={35}
+      left="회사"
+      right="Fleet"
+    />
+  );
+}
+```
+
+#### D-3. 커스텀 노드와 기본 타이포 비활성화
+
+`left/right`에 커스텀 컴포넌트를 넣는 경우, 기본 텍스트 스타일을 적용하지 않기 위해 `disableLeftTextStyle/disableRightTextStyle`을 사용할 수 있어요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+`TableRow`는 내부 상태/애니메이션(shared value)을 가지지 않는 레이아웃 컴포넌트예요.
+
+렌더링 규칙:
+- `left/right`가 문자열/숫자면 `<Text>`로 감싸 기본 스타일을 적용
+- 그 외는 전달된 노드를 그대로 렌더
+
+---
+
+### (F) 접근성(누락 금지)
+
+권장 규칙:
+- (웹) 키보드/포커스 이동이 자연스러운지 확인해요.
+- (공통) 상태 변화가 스크린리더에 충분히 전달되는지 확인해요.
+
+`TableRow` 자체는 단순 레이아웃이라서 접근성은 포함된 텍스트/컨트롤이 책임져요.
+
+권장:
+- 우측 값이 버튼/링크 등 인터랙티브 요소라면 해당 요소에 `accessibilityRole`/label을 부여해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/TableRow/TableRow.types.ts`의 public 타입들.
+
+#### TableRow — `TableRowProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | Yes | - | 좌측 라벨/타이틀 |
+| `right` | `ReactNode` | Yes | - | 우측 값/데이터 |
+| `align` | `'left' \| 'space-between'` | No | `'space-between'` | 정렬 모드 |
+| `leftRatio` | `number` | No | - | 좌측 폭 비율(0~100), align='left'에서만 의미 |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | 색상 테마 |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기 |
+| `leftVariant` | `'outlined' \| 'flat' \| 'ghost'` | No | `'ghost'` | 좌측 컨테이너 variant |
+| `rightVariant` | `'outlined' \| 'flat' \| 'ghost'` | No | `'ghost'` | 우측 컨테이너 variant |
+| `highlightLeft` | `boolean` | No | `false` | 좌측 텍스트 강조(굵게) |
+| `highlightRight` | `boolean` | No | `false` | 우측 텍스트 강조(굵게) |
+| `style` | `StyleProp<ViewStyle>` | No | - | 루트 스타일 |
+| `leftStyle` | `StyleProp<ViewStyle>` | No | - | 좌측 컨테이너 스타일 |
+| `rightStyle` | `StyleProp<ViewStyle>` | No | - | 우측 컨테이너 스타일 |
+| `leftTextStyle` | `StyleProp<TextStyle>` | No | - | 좌측 텍스트 스타일(문자열/숫자일 때) |
+| `rightTextStyle` | `StyleProp<TextStyle>` | No | - | 우측 텍스트 스타일(문자열/숫자일 때) |
+| `disableLeftTextStyle` | `boolean` | No | `false` | 좌측 기본 텍스트 스타일 비활성화 |
+| `disableRightTextStyle` | `boolean` | No | `false` | 우측 기본 텍스트 스타일 비활성화 |
+
+#### TableRow.Label / TableRow.Value
+
+- `TableRow.Label`: `TableRowLabelProps` (`children?`, `colorScheme?`, `size?`, `variant?`, `highlight?`, `style?`, `textStyle?`, `disableTextStyle?`)
+- `TableRow.Value`: `TableRowValueProps` (`children?`, `colorScheme?`, `size?`, `variant?`, `align?`, `highlight?`, `style?`, `textStyle?`, `disableTextStyle?`)

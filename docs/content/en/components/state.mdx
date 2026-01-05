@@ -1,0 +1,104 @@
+### (A) One-liner
+
+**`State` is a component that shows "result state" like success/error/warning in a single screen block.**
+It provides default icon/title/description/action button, and when needed, `asset/title/description/button` can be replaced with custom nodes.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add State"
+pnpm dlx @fleet-ui/cli add State
+```
+
+```ts title="Track A: import"
+import { State } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { State } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Basic Usage (Recommended Pattern)
+
+```tsx title="State basic usage"
+import { State } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <State
+      variant="success"
+      title="Complete"
+      description="Request has been processed successfully."
+      button={<State.Button onPress={() => {}}>Go to Home</State.Button>}
+    />
+  );
+}
+```
+
+#### D-2. Custom asset/title/description
+
+`asset`, `title`, `description` can receive ReactNode. (If string, renders with default typo style)
+
+`variant="ghost"` doesn't render default icon frame at all, making it suitable for image/illustration-based state screens.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`State` is a static presentation component without internal state or animation (shared value).
+
+`State.Button` when `loading`:
+- Treated as `disabled`, blocking clicks
+- Renders `ActivityIndicator`
+
+---
+
+### (F) Accessibility
+
+- Root: `accessibilityRole="summary"` (state summary block)
+- Title (when string): `accessibilityRole="header"`
+- Button: `accessibilityRole="button"`, `accessibilityState={{ disabled, busy }}`
+  - `busy` is true when `loading=true`
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/State/State.types.ts`.
+
+#### State — `StateProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `'error' \| 'warning' \| 'info' \| 'success' \| 'neutral' \| 'ghost'` | No | `'neutral'` | State variant |
+| `asset` | `ReactNode` | No | - | Top visual (icon/image, etc.) |
+| `title` | `ReactNode` | No | - | Title |
+| `description` | `ReactNode` | No | - | Description |
+| `button` | `ReactNode` | No | - | Bottom action (usually `State.Button`) |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style |
+| `titleStyle` | `StyleProp<TextStyle>` | No | - | Title style override |
+| `descriptionStyle` | `StyleProp<TextStyle>` | No | - | Description style override |
+
+#### State.Button — `StateButtonProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | Button label |
+| `onPress` | `() => void` | No | - | Click handler |
+| `disabled` | `boolean` | No | `false` | Disabled |
+| `loading` | `boolean` | No | `false` | Loading state (= disabled + busy) |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override |
+| `testID` | `string` | No | - | Test identifier |

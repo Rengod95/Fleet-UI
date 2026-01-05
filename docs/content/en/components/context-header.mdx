@@ -1,0 +1,136 @@
+### (A) One-liner
+
+**`ContextHeader` is a custom header component that can replace native navigation header on mobile screens.**
+It provides 3-area structure: left (back/custom), center (title), right (action), and supports screen layout options like safe area inclusion/fixed positioning.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add ContextHeader**
+
+```bash title="Track A: add ContextHeader"
+pnpm dlx @fleet-ui/cli add ContextHeader
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { ContextHeader } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { ContextHeader } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`lucide-react-native` is needed to use default back button icon.
+
+```bash title="Recommended runtime deps"
+pnpm add lucide-react-native react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="ContextHeader basic usage"
+import { ContextHeader } from '@fleet-ui/components';
+
+export function Example() {
+  return <ContextHeader title="Details" onBackPress={() => {}} />;
+}
+```
+
+#### D-2. Left Area: `left` vs Default BackButton
+
+- When `left` is provided, **replaces default BackButton**.
+- When no `left` and `showBackButton=true`, default BackButton is displayed.
+- When default BackButton is pressed, `onBackPress()` is called.
+
+```tsx title="Custom left / right"
+import { ContextHeader, IconButton } from '@fleet-ui/components';
+import { X } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <ContextHeader
+      title="Profile"
+      left={<IconButton aria-label="Close" icon={<X />} onPress={() => {}} />}
+      right={<IconButton aria-label="Edit" icon={<X />} onPress={() => {}} />}
+      showBackButton={false}
+    />
+  );
+}
+```
+
+#### D-3. Title Alignment: `titleAlign` Auto Rule
+
+When `titleAlign` is not specified, implementation automatically determines as follows:
+
+- If left content exists (= `left` exists or `showBackButton=true`), default is `'center'`
+- If no left content, default is `'left'`
+
+This rule prevents "awkward layout when forcing center title with empty left side."
+
+#### D-4. Safe Area/Fixed Positioning
+
+- `includeSafeAreaTop=true`: Adds paddingTop equal to top safe area inset.
+- `fixed=true`: Fixes header to top with `position: 'absolute'`.
+
+> Caution: When using `fixed=true`, body content can go behind header, so typically you need to secure top padding/margin separately in screen container.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`ContextHeader` has no internal state/animation (shared value).
+Instead, it determines these "layout policies" internally:
+
+- `hasLeftContent = left !== undefined || showBackButton`
+- Default `titleAlign` auto-determined based on `hasLeftContent`
+- When `titleAlign='center'`, title uses absolute positioning for center alignment (pointerEvents="none")
+
+---
+
+### (F) Accessibility
+
+- Title text renders with `accessibilityRole="header"`.
+- Default BackButton:
+  - `accessibilityRole="button"`
+  - `accessibilityLabel="Go back"`
+
+Recommended rules:
+- When putting icon-only buttons in `left/right`, provide `aria-label`/`accessibilityLabel` for those buttons.
+
+---
+
+### (G) Props Table
+
+> Reference: `ContextHeaderProps` from `packages/components/src/ContextHeader/ContextHeader.types.ts`.
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | No | - | Header title | Title has a11y header role |
+| `left` | `ReactNode` | No | - | Left custom content | Replaces default back button when provided |
+| `right` | `ReactNode` | No | - | Right custom content | Action button area |
+| `showBackButton` | `boolean` | No | `true` | Show default back button | Meaningless if `left` exists |
+| `onBackPress` | `() => void` | No | - | Default back button callback | |
+| `includeSafeAreaTop` | `boolean` | No | `false` | Include top safe area | |
+| `fixed` | `boolean` | No | `false` | Absolute fixed positioning | Layout caution |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Height/typo preset | |
+| `paddingHorizontal` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Left/right padding preset | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset | |
+| `titleAlign` | `'left' \| 'center'` | No | `'center'`(with left content) / `'left'`(without) | Title alignment | Auto-determination rule exists |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+| `titleStyle` | `StyleProp<TextStyle>` | No | - | Title style | |
+| `testID` | `string` | No | - | Test identifier | back is <code>&#36;&#123;testID&#125;-back-button</code> |

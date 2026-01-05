@@ -1,0 +1,277 @@
+import { PlaygroundFrame } from '@/components/PlaygroundFrame';
+
+# Token Architecture
+
+Fleet UI's token system is a **hierarchical interface** designed "to safely change values."
+The key is to **lock semantic meaning**, and have design changes absorbed at lower layers (raw/primitive) where possible to reduce code modification scope.
+
+```text
+raw → primitive → semantic → theme → runtime(react-native-unistyles)
+```
+
+This document shows these 3 things at once:
+
+- **Overall token structure (types)**: What the `@fleet-ui/core` theme provides
+- **Value/key structure**: How axes like colors / rounded(radius) / shadow / typography are organized in core
+- **Visual demo**: Playground token demo screen embedded in docs for immediate reference
+
+---
+
+## 1) Pipeline at a Glance (File Structure Mapping)
+
+```text
+Raw Value Layer   (source values)              packages/core/src/tokens/raw/*
+  ↓
+Primitive Layer   (scales/rules)               packages/core/src/tokens/primitive/*
+  ↓
+Semantic Layer    (semantic interface)          packages/core/src/tokens/semantic/*
+  ↓
+Theme             (light/dark final bundle)    packages/core/src/theme/*
+  ↓
+Unistyles Runtime (registration/consumption)   packages/core/src/unistyles.ts
+```
+
+- **Raw**: "Source values" without meaning (e.g., 11-step color scale).
+- **Primitive**: Agreed scales/rules (spacing, radius, shadow layer, typo atoms…).
+- **Semantic**: "Semantic names" that apps/components consume (content/text/border/solid…, h1/body…).
+- **Theme**: Runtime object bundled as `light/dark` (tokens + utils).
+
+One line to remember: **Components consume semantic, changes are absorbed at raw/primitive.**
+
+---
+
+## 2) Final Theme Type Interface ("What's inside?")
+
+Fleet UI runtime theme has this structure. (Definition: `packages/core/src/types.ts`)
+
+```ts
+export interface FleetThemeBase {
+  typography: SemanticTypography;        // semantic-based type scale like h1~caption~button
+  text: PrimitiveTypography;             // atomic values like fontFamily/fontWeight/letterSpacing
+  spacing: PrimitiveSpacing;             // number key scale (0..20)
+  rounded: PrimitiveBorderRadius;        // none..full
+  zIndex: PrimitiveZIndex;
+  shadows: SemanticShadows;              // purpose-based like xs/sm/.../card/button/...
+  gradients: SemanticGradients;
+  utils: {
+    paletteHasSolid: typeof paletteHasSolid;
+    getPaletteForScheme: typeof getPaletteForScheme;
+    getColorSchemePaletteEntries: typeof getColorSchemePaletteEntries;
+    getIconColor: typeof getIconColor;
+  };
+}
+
+export type LightTheme = FleetThemeVariant<SemanticColors['light']>;
+export type DarkTheme = FleetThemeVariant<SemanticColors['dark']>;
+```
+
+Key points:
+
+- **Components consume `theme.colors / theme.typography` (semantic) by default**.
+- `theme.text / theme.spacing / theme.rounded` are "atomic values/scales"—only use directly when needed.
+- `theme.shadows` is **finalized as box-shadow strings** based on primitive shadow layers, matched to colors (semantic colors).
+
+---
+
+## 3) Colors: raw → semantic → theme.colors
+
+### 3.1 Raw colors (11-step scales)
+
+Raw is "palette source values." Each scheme has a `1..11` step scale, and `light/dark` basically use **reversed** scales.
+(Definition: `packages/core/src/tokens/raw/colors.ts`)
+
+```ts
+export const rawColors = {
+  primary: {
+    light: { '1': '#f0ffff', /* ... */ '11': '#001e2e' },
+    dark:  { '1': '#001e2e', /* ... */ '11': '#f0ffff' },
+  },
+  neutral: {
+    light: { '1': 'hsl(0, 0%, 100%)', /* ... */ '11': 'hsl(0, 0%, 4%)' },
+    dark:  { '1': 'hsla(0, 0%, 2%, 1)', /* ... */ '11': 'hsla(0, 0%, 98%, 0.8)' },
+  },
+  /* warning/success/info/error ... */
+  white: '#ffffff',
+  black: '#000000',
+  transparent: 'transparent',
+} as const;
+```
+
+### 3.2 Semantic colors (palette interface)
+
+Semantic remaps Raw to "UI meaning." Fleet UI roughly locks palette roles like this.
+(Definition: `packages/core/src/tokens/semantic/colors.ts`)
+
+- **Surface(Content)**: `content_1..content_4`, `content_inversed`
+- **Text**: `text_1..text_4`, `text_inversed`
+- **Border**: `border_subtle/default/strong`
+- **State**: `hover`, `pressed`
+- **Action (some schemes)**: `solid` (mainly provided in accent/brand-type schemes)
+
+Also, `neutral` includes a `shadow` value for shadow calculation (`buildBasePalette`).
+
+```ts
+const buildBasePalette = (scale) => ({
+  content_1: scale['1'],
+  /* ... */
+  text_1: scale['11'],
+  /* ... */
+  shadow: scale['11'],
+});
+
+const buildColorPalette = (scale) => ({
+  content_1: scale['1'],
+  /* ... */
+  text_1: scale['11'],
+  solid: scale['5'],
+});
+```
+
+In the final theme, access like this:
+
+- `theme.colors.neutral.content_1` / `theme.colors.neutral.text_1` / `theme.colors.neutral.border_subtle`
+- `theme.colors.primary.solid` / `theme.colors.error.solid` … (Check scheme-specific availability with `utils.paletteHasSolid`)
+
+---
+
+## 4) Rounded(Radius): primitive scale → theme.rounded
+
+Fleet UI exposes radius as `rounded` (since "rounded" is more natural from a React Native style perspective).
+Values are px-unit numbers, and we guide expressing outer curvature "only through tokens."
+(Definition: `packages/core/src/tokens/primitive/borderRadius.ts`)
+
+```ts
+export const primitiveBorderRadius = {
+  none: 0,
+  _2xs: 4,
+  xs: 8,
+  sm: 12,
+  md: 16,
+  lg: 20,
+  xl: 24,
+  _2xl: 32,
+  full: 9999,
+} as const;
+```
+
+Recommended usage examples:
+
+- Card/container: `theme.rounded.md`
+- Small chip/badge: `theme.rounded.sm` or `theme.rounded.xs`
+- Pill shape: `theme.rounded.full`
+
+---
+
+## 5) Shadow: primitive layer → semantic shadow (final box-shadow)
+
+### 5.1 Primitive shadow (layer definition)
+
+Primitive shadow defines "shadow geometry." You can compose multiple layers for natural depth.
+(Definition: `packages/core/src/tokens/primitive/shadow.ts`)
+
+```ts
+export const primitiveShadow = {
+  md: [
+    { x: 0, y: 4,  blur: 6, spread: -2, opacity: 0.09 },
+    { x: 0, y: 2,  blur: 6, spread: -2, opacity: 0.06 },
+    { x: 0, y: -2, blur: 6, spread: -1, opacity: 0.06 },
+  ],
+  /* xs/sm/lg/xl/2xl + toast/card/inner/banner ... */
+} as const;
+```
+
+### 5.2 Semantic shadow (purpose-based)
+
+Semantic shadow locks keys based on "what is this shadow for?"
+And uses the **current theme's colors (semanticColors)** to create the final `box-shadow` string.
+(Definition: `packages/core/src/tokens/semantic/shadow.ts`)
+
+- Example: `theme.shadows.card`, `theme.shadows.button`, `theme.shadows.overlay`, `theme.shadows.inner`, `theme.shadows.button_primary`…
+
+> Note: In RN, shadow handling may differ by platform, but Fleet UI provides `boxShadow` strings as the basic form for consistent appearance on web/RNW as well.
+
+---
+
+## 6) Typography: primitive atoms → semantic scale → theme.typography
+
+### 6.1 Primitive typography (atomic values)
+
+Primitive provides font family/size/weight/line height/letter spacing as "scales."
+(Definition: `packages/core/src/tokens/primitive/typography.ts`)
+
+- `theme.text.fontFamily.primary`
+- `theme.text.fontSize.md`
+- `theme.text.fontWeight.semibold`
+- `theme.text.letterSpacing.tight`
+
+### 6.2 Semantic typography (purpose-based)
+
+Semantic provides combinations centered on **purpose (h1~h6, body1~3, caption1~2, button)**.
+Each heading/body also comes with Strong/Weak variants.
+(Definition: `packages/core/src/tokens/semantic/typography.ts`)
+
+- `theme.typography.h2Strong`
+- `theme.typography.body2`
+- `theme.typography.caption1Weak`
+- `theme.typography.button`
+
+---
+
+## 7) Theme Assembly: What's Different in light/dark?
+
+Theme is the final object that bundles semantic/primitive together and registers with Unistyles.
+(Definition: `packages/core/src/theme/lightTheme.ts`, `packages/core/src/theme/darkTheme.ts`)
+
+- `colors`: `semanticColors.light` or `semanticColors.dark`
+- `rounded`: `primitiveBorderRadius`
+- `spacing`: `primitiveSpacing`
+- `typography`: `semanticTypography`
+- `text`: `primitiveTypography`
+- `shadows`: `createSemanticShadows(current colors)`
+
+One line to remember: **light/dark maintain "same keys (meaning)" and only values change.**
+
+---
+
+## 8) (Docs) CSS Variables Bridge: "Why does the docs site only use a subset?"
+
+Docs are based on the same `lightTheme/darkTheme` as the app, but only extract needed values for web docs UI as CSS variables.
+
+- Generation script: `docs/scripts/generate-fleet-ui-theme.ts`
+- Output: `docs/styles/fleet-ui-theme.css` (`:root` / `.dark`)
+
+Important constraints:
+
+- Docs CSS variables are a **subset for docs UI** (e.g., `--background`, `--primary`, `--fleet-typo-*`).
+- This is NOT a structure that provides all Fleet UI tokens (e.g., `theme.colors.primary.content_1..`, `theme.rounded.*`, `theme.shadows.*`) "fully" as CSS variables on web.
+- So to "intuitively check all tokens," viewing the Playground demo below (consuming actual RN theme object) is most accurate.
+
+One line to remember: **Docs CSS variables are a subset for docs UI, and Playground is the standard for all tokens.**
+
+---
+
+## 9) Full Token Visual Demo (Playground)
+
+The demo below is the `apps/playground/app/theme-demo.tsx` screen embedded as-is.
+You can check colors/typo/spacing/rounded/shadows all at once.
+
+<PlaygroundFrame path="/theme-demo" title="Fleet UI Theme Demo (Playground)" height={720} />
+
+---
+
+## Anti-patterns (Common Mistakes)
+
+- Using raw values directly in components (including hardcoding)
+- Expressing UI meaning with only primitive without semantic (increases change cost)
+- Exposing color "name"-based API instead of meaning (e.g., `blue`, `red`)
+- Structural collapse from layer-skipping references (e.g., semantic directly referencing raw)
+
+## Next
+
+- [View theme application in Theming System](/fundamental/theming): Connect theme/utils/variants to actual style composition.
+- [View installation flow in Install](/getting-started/install): Check entry import / deps / troubleshooting.
+
+## See also
+
+- [Read Fundamental](/fundamental): Grasp why (WHY) layers/token hierarchy are needed.
+- [View theme application in Theming System](/fundamental/theming): See how (HOW) themes work in Unistyles.

@@ -1,0 +1,156 @@
+### (A) 한줄 요약
+
+**`OTPInput`은 인증 코드(One-Time Password)를 “슬롯 UI”로 입력받는 컴포넌트다.**  
+실제 입력은 보이지 않는 `TextInput`이 담당하고, 화면에는 `OTPSlot`들이 렌더링된다. 붙여넣기/패턴 검증/완료 콜백(`onComplete`)을 제공하며, `useOTPInput` 훅으로 동일 로직을 분리해 사용할 수도 있다.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add OTPInput"
+pnpm dlx @fleet-ui/cli add OTPInput
+```
+
+```ts title="Track A: import"
+import { OTPInput } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { OTPInput } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="OTPInput basic usage"
+import { OTPInput } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <OTPInput
+      maxLength={6}
+      onComplete={(code) => console.log('complete', code)}
+      accessibilityLabel="인증 코드 입력"
+    />
+  );
+}
+```
+
+#### D-2. 패턴 검증: `pattern`
+
+`pattern`을 제공하면 입력 값이 정규식에 맞지 않을 때 업데이트를 무시한다.
+
+```tsx title="Digits only"
+import { OTPInput } from '@fleet-ui/components';
+
+export function Example() {
+  return <OTPInput maxLength={6} pattern="^\\d*$" />;
+}
+```
+
+#### D-3. 붙여넣기 처리: `pasteTransformer`
+
+입력 이벤트에서 “한 번에 여러 글자”가 들어오면 붙여넣기로 간주하고 `pasteTransformer`로 변환 후 적용한다.  
+기본 변환기는 pasted 텍스트에서 `maxLength` 자리 숫자를 추출한다.
+
+#### D-4. 커스텀 렌더: `render`
+
+`render`를 제공하면 기본 `OTPSlot` 대신, `slots` 렌더 정보를 받아 커스텀 UI를 그릴 수 있다.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델(`useOTPInput`)
+
+훅 내부에서 관리되는 핵심 상태는 아래다.
+
+- `value`: 현재 OTP 문자열
+- `prevValue`: 이전 프레임 값(슬롯 애니메이션 트리거용)
+- `isFocused`: 전체 포커스 상태
+
+입력 처리:
+- 입력은 `maxLength`로 잘라 저장한다.
+- `pattern`이 있으면 정규식 통과 여부를 검사한다.
+- 길이가 `maxLength`가 되면 `onComplete(value)`를 호출한다.
+
+슬롯 생성:
+- `slots[index]`는 `char/prevChar/placeholderChar/isActive/hasFakeCaret` 등을 포함한다.
+
+#### E-2. Reanimated / Shared Value
+
+`OTPSlot`은 다음 애니메이션을 써요.
+
+- 타이핑 바운스(새 글자 입력 시): scale + translateY 시퀀스
+- 포커스 표시:
+  - `bordered/faded`는 borderWidth 1↔2
+  - `underlined`는 underlineScale 0↔1
+- 색상 전환: background/border 색을 스프링으로 전환(에러일 때 error 색)
+
+`OTPCaret`는 깜빡임을 withRepeat(withTiming)으로 구현한다.
+
+---
+
+### (F) 접근성(누락 금지)
+
+접근성은 “보이지 않는 실제 TextInput”에 집중시키는 구조다.
+
+- 슬롯 컨테이너(`Pressable`)는 `accessible={false}`로 숨기고
+- 실제 `TextInput`은 `accessible`이며:
+  - `accessibilityRole="text"`
+  - `accessibilityState={{ disabled }}`
+  - 기본 라벨: <code>OTP input with &#36;&#123;maxLength&#125; digits</code>
+  - 기본 힌트: `Enter your verification code`
+
+iOS에서는 붙여넣기 기능을 위해 `opacity: 0` 대신 `opacity: 0.02`로 숨긴다(캐럿은 숨김).
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/OTPInput/OTPInput.types.ts`의 public 타입들.
+
+#### OTPInput — `OTPInputProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `maxLength` | `number` | Yes | - | OTP 길이(슬롯 개수) | |
+| `defaultValue` | `string` | No | `''` | 초기 값 | |
+| `onChangeText` | `(value: string) => void` | No | - | 값 변경 콜백 | |
+| `onComplete` | `(value: string) => void` | No | - | 모두 입력 완료 콜백 | |
+| `pattern` | `string \| RegExp` | No | - | 입력 검증 정규식 | 불일치 시 업데이트 무시 |
+| `placeholder` | `string` | No | - | 슬롯별 placeholder 문자열 | |
+| `pasteTransformer` | `(pasted: string) => string` | No | - | 붙여넣기 변환 함수 | 기본 변환기 제공 |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | 슬롯 포커스/색상 스킴 | |
+| `variant` | `'flat' \| 'bordered' \| 'underlined' \| 'faded'` | No | `'bordered'` | 슬롯 스타일 variant | |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 슬롯 크기/간격/타이포 | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | 라운드 | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | 그림자 | |
+| `isDisabled` | `boolean` | No | `false` | 비활성화 | |
+| `isInvalid` | `boolean` | No | `false` | 에러 상태 | 슬롯 색상 전환 |
+| `gap` | `number` | No | - | 슬롯 간 간격(theme.spacing index) | size로 자동 결정 가능 |
+| `containerStyle` | `StyleProp<ViewStyle>` | No | - | 루트 컨테이너 스타일 | |
+| `slotStyle` | `StyleProp<ViewStyle>` | No | - | 슬롯 스타일 오버라이드 | |
+| `slotTextStyle` | `StyleProp<TextStyle>` | No | - | 슬롯 텍스트 스타일 | |
+| `caretStyle` | `StyleProp<ViewStyle>` | No | - | 캐럿 스타일 | |
+| `render` | `(props: OTPRenderProps) => ReactNode` | No | - | 커스텀 렌더 함수 | 기본 OTPSlot 대체 |
+
+#### TextInputProps 상속(요약)
+
+`OTPInputProps`는 `TextInputProps`를 상속하지만, `value`, `onChangeText`, `maxLength`, `style`은 컴포넌트가 제어한다.  
+`accessibilityLabel/accessibilityHint`, `inputMode`, `keyboardType`, `secureTextEntry` 등은 그대로 전달 가능하다.
+
+#### Hook: `useOTPInput`
+
+`useOTPInput(options)`는 `inputRef/value/isFocused/renderProps/handlers/actions`를 반환해, 커스텀 UI에서도 동일한 입력 로직을 재사용할 수 있다.

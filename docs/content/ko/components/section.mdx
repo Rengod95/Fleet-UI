@@ -1,0 +1,123 @@
+### (A) 한줄 요약
+
+**`Section`은 화면을 “헤더(제목/부제/우측 액션) + 본문”으로 나누는 레이아웃 컴포넌트예요.**  
+문서/설정/목록 화면에서 블록 단위로 정보를 묶고, 우측 액션(텍스트/아이콘)을 일관된 패턴으로 제공해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Section"
+pnpm dlx @fleet-ui/cli add Section
+```
+
+```ts title="Track A: import"
+import { Section } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Section } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 기본 패턴(문자열 props만으로 구성)
+
+`title/subtitle/right`가 문자열이면 내부에서 기본 Typography를 사용해 렌더링해요.
+
+```tsx title="Section basic usage"
+import { Section, Button } from '@fleet-ui/components';
+import { View, Text } from 'react-native';
+
+export function Example() {
+  return (
+    <Section
+      title="결제 수단"
+      subtitle="기본 결제 수단을 선택해 주세요."
+      right={<Section.RightTypo onPress={() => {}}>변경</Section.RightTypo>}
+    >
+      <View>
+        <Text>내용</Text>
+      </View>
+    </Section>
+  );
+}
+```
+
+#### D-2. 우측 액션: 텍스트 vs 아이콘
+
+- 텍스트 액션: `Section.RightTypo`
+- 아이콘 액션: `Section.RightIcon` (interactive일 때 `aria-label` 또는 `accessibilityLabel` 필수)
+
+`SectionHeader`는 `right`가 없고 `rightIcon`만 있으면 내부적으로 `RightIcon`을 만들어준다.
+
+#### D-3. 레이아웃 제어: `titleRatio`, `subtitlePosition`
+
+- `titleRatio`: 헤더에서 타이틀 영역이 차지할 비율(0~100). 우측 영역은 나머지 비율을 써요.
+- `subtitlePosition`: 부제를 타이틀 row 위(`top`) 또는 아래(`bottom`, 기본)로 배치
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+`Section` 자체는 내부 상태를 가지지 않는 레이아웃 컴포넌트예요.
+
+다만 우측 액션(`RightTypo`, `RightIcon`)이 “인터랙티브”일 때(= `onPress` 또는 `onPressIn/out`이 제공될 때), 내부에서 press 피드백 애니메이션을 제공해요.
+
+- press-in: scale/opacity spring (`scale=0.8`, `opacity=0.7`)
+- press-out: 원복
+
+---
+
+### (F) 접근성(누락 금지)
+
+`Section`은 레이아웃 컴포넌트이므로 접근성은 주로 “우측 액션”에서 중요해요.
+
+- `Section.RightTypo`:
+  - 인터랙티브이면 `accessibilityRole="button"`과 `accessibilityState.disabled`를 설정해요.
+- `Section.RightIcon`:
+  - 인터랙티브이면 `accessibilityRole="button"` + `accessibilityLabel`을 설정해요.
+  - 개발 모드에서 인터랙티브인데 라벨이 없으면 경고를 출력해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Section/Section.types.ts`의 public 타입들.
+
+#### Section — `SectionProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `ReactNode` | No | - | 헤더 타이틀 |
+| `subtitle` | `ReactNode` | No | - | 헤더 부제 |
+| `right` | `ReactNode` | No | - | 헤더 우측 영역(우선) |
+| `rightIcon` | `ReactNode` | No | - | 헤더 우측 아이콘(`right` 없을 때만 사용) |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 크기 프리셋 |
+| `gap` | `keyof FleetTheme['spacing'] \| number` | No | `3` | 헤더 내부 요소 간 세로 간격 |
+| `padding` | `keyof FleetTheme['spacing'] \| number` | No | `0` | 헤더/본문 공통 수평 패딩 |
+| `contentSpacing` | `keyof FleetTheme['spacing'] \| number` | No | `5` | 헤더-본문 간격 및 본문 top padding |
+| `titleRatio` | `number` | No | `70` | 헤더에서 타이틀 영역 비율 |
+| `subtitlePosition` | `'top' \| 'bottom'` | No | `'bottom'` | 부제 위치 |
+| `headerStyle` | `ViewProps['style']` | No | - | 헤더 스타일 |
+| `contentStyle` | `ViewProps['style']` | No | - | 본문 스타일 |
+| `children` | `ReactNode` | No | - | 본문 콘텐츠 |
+| `testID` | `string` | No | - | 테스트 식별자 |
+
+#### Subcomponents
+
+- `Section.Header`: `SectionHeaderProps`
+- `Section.Title`: `SectionTitleProps` (`size?`, `children`, `testID?` + TextProps)
+- `Section.Subtitle`: `SectionSubtitleProps` (`size?`, `children`, `testID?` + TextProps)
+- `Section.RightTypo`: `SectionRightTypoProps` (`size?`, `style?`, `containerStyle?`, `textProps?` + PressableProps)
+- `Section.RightIcon`: `SectionRightIconProps` (`size?`, `icon`, `aria-label?`, `style?` + PressableProps)

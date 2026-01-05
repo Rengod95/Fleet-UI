@@ -1,0 +1,158 @@
+### (A) 한줄 요약
+
+**`Modal`은 화면 중앙에 띄우는 오버레이 모달 컴포넌트예요.**  
+`visible`/`onClose`로 노출 상태를 외부에서 제어하고, `Modal.Header/Body/Description/Footer` 합성(Compound) 구조로 내용을 구성해요. 백드롭 클릭/스와이프/안드로이드 백버튼 같은 “닫힘 경로”는 `closable`과 관련 props로 제어해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Modal"
+pnpm dlx @fleet-ui/cli add Modal
+```
+
+```ts title="Track A: import"
+import { Modal } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Modal } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Modal`은 아래 의존성이 필요해요.
+
+- `expo-blur` (백드롭 블러)
+- `react-native-reanimated`, `react-native-gesture-handler` (애니메이션/스와이프 dismiss)
+- `lucide-react-native` (헤더 닫기 아이콘)
+
+```bash title="Required deps (Expo)"
+npx expo install expo-blur
+```
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-gesture-handler lucide-react-native react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Modal basic usage"
+import { useState } from 'react';
+import { Text } from 'react-native';
+import { Modal, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onPress={() => setOpen(true)}>열기</Button>
+
+      <Modal visible={open} onClose={() => setOpen(false)}>
+        <Modal.Header title="알림" />
+        <Modal.Description content="중요한 안내가 있습니다." />
+        <Modal.Body>
+          <Text>본문 콘텐츠</Text>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="ghost" onPress={() => setOpen(false)}>닫기</Button>
+          <Button onPress={() => setOpen(false)}>확인</Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+}
+```
+
+#### D-2. 닫힘 정책: `closable`, `swipeToDismiss`
+
+- `closable=true`이면:
+  - 백드롭 클릭으로 닫힘
+  - (옵션) 스와이프 다운으로 닫힘
+  - 안드로이드 하드웨어 백버튼으로 닫힘
+- `closable=false`이면:
+  - 백드롭/백버튼(및 웹의 ESC)로 닫히지 않도록 제한해요
+  - 닫기는 버튼처럼 **명시적인 경로만** 제공해요
+
+#### D-3. 스와이프 dismiss 세부: `swipeThreshold`
+
+`swipeToDismiss=true`일 때, 다음 조건이면 닫혀요.
+
+- 드래그 거리(`translationY`)가 `swipeThreshold`를 초과하거나
+- `velocityY > 500`인 경우
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+`Modal`은 외부에서 `visible`을 제어하고, 내부에서 직접 상태를 가지지 않아요.  
+그래서 닫히려면 `onClose()`에서 외부 상태를 `false`로 바꿔야 해요.
+
+#### E-2. Reanimated / Shared Value
+
+구현에서는 아래 shared value로 애니메이션할 수 있어요.
+
+- 백드롭 `opacity` (withTiming)
+- 콘텐츠 `translateY` (withTiming / withSpring)
+- 스와이프 진행도에 따라 백드롭 opacity를 동기화(interpolate)
+
+또한 `Gesture.Pan()`으로 스와이프 dismiss 제스처를 처리해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 모달 오버레이는 `accessibilityViewIsModal` + `importantForAccessibility="yes"`로 모달 스코프를 설정해요.
+- `onAccessibilityEscape`로 스크린리더 “닫기” 제스처를 처리해요(closable일 때).
+- `Modal.Header`의 닫기 버튼은 `accessibilityRole="button"` + `accessibilityLabel="모달 닫기"`를 권장해요.
+
+권장 규칙:
+- 닫기 버튼 라벨은 앱 i18n 정책에 맞춰 커스텀 헤더로 바꿀 수 있어요.
+- (웹) 키보드 사용자를 위해 ESC/포커스 이동이 자연스러운지 확인해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Modal/Modal.types.ts`의 public 타입들.
+
+#### Modal (Root) — `ModalRootProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `visible` | `boolean` | Yes | - | 모달 노출 상태 | 외부 제어 |
+| `onClose` | `() => void` | Yes | - | 닫기 콜백(외부 상태 false로 전환) | 필수 |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 콘텐츠 최대폭/패딩 프리셋 | |
+| `colorScheme` | `'base' \| 'inverted'` | No | `'base'` | 색상 테마 | |
+| `rounded` | `'none' \| '_2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 라운드 프리셋 | |
+| `closable` | `boolean` | No | `true` | 백드롭/스와이프/백버튼 등으로 닫기 허용 | |
+| `swipeToDismiss` | `boolean` | No | `true` | 스와이프 dismiss 활성화 | `closable`과 함께 작동 |
+| `swipeThreshold` | `number` | No | `100` | 스와이프 dismiss 임계치(px) | |
+| `backdropOpacity` | `number` | No | `0.5`(types) / 구현 기본값은 `0.3` | 백드롭 불투명도 | 구현 기본값과 타입 주석 차이 주의 |
+| `useBackdropBlur` | `boolean` | No | `true` | 백드롭 블러 사용 | `expo-blur` 필요 |
+| `backdropBlurIntensity` | `number` | No | `50` | 블러 강도(0~100) | |
+| `backdropBlurTint` | `'light' \| 'dark'` | No | `'light'` | 블러 tint | |
+| `modalProps` | `Omit<RNModalProps, 'visible' \| 'children' \| 'transparent' \| 'animationType'>` | No | - | RN Modal props override | 일부 props는 내부에서 고정 |
+| `contentStyle` | `StyleProp<ViewStyle>` | No | - | 콘텐츠 스타일 오버라이드 | |
+| `backdropStyle` | `StyleProp<ViewStyle>` | No | - | 백드롭 스타일 오버라이드 | |
+| `onShow` | `() => void` | No | - | 표시 콜백 | |
+| `onDismiss` | `() => void` | No | - | dismiss 콜백 | |
+| `children` | `ReactNode` | Yes | - | 모달 콘텐츠 | |
+
+#### Header / Body / Description / Footer
+
+- `Modal.Header`: `ModalHeaderProps` (`title?`, `showCloseButton?`, `children?`, `titleStyle?`)
+- `Modal.Body`: `ModalBodyProps` (`children`)
+- `Modal.Description`: `ModalDescriptionProps` (`content`, `contentStyle?`, `containerStyle?`)
+- `Modal.Footer`: `ModalFooterProps` (`children`)

@@ -1,0 +1,178 @@
+### (A) One-liner
+
+**`CheckboxCard` is a selection UI where "the entire card acts like a checkbox."**
+For single cards, it works with `checked/defaultChecked/onCheckedChange`, and in groups, `CheckboxCardGroup` context manages multiple selection based on `value`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add CheckboxCard**
+
+```bash title="Track A: add CheckboxCard"
+pnpm dlx @fleet-ui/cli add CheckboxCard
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { CheckboxCard, CheckboxCardGroup } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { CheckboxCard, CheckboxCardGroup } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example: Single)
+
+```tsx title="CheckboxCard (uncontrolled)"
+import { CheckboxCard } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <CheckboxCard
+      title="Save as default address"
+      description="Use this as default shipping address for future orders."
+      defaultChecked={false}
+      onCheckedChange={(checked) => console.log({ checked })}
+    />
+  );
+}
+```
+
+#### D-2. Group Usage: `CheckboxCardGroup` + `value`
+
+In groups, each card is identified by `value`, and the group manages multiple selection with `values/defaultValues/onValuesChange`.
+
+```tsx title="CheckboxCardGroup (controlled)"
+import { useState } from 'react';
+import { CheckboxCard, CheckboxCardGroup } from '@fleet-ui/components';
+
+export function Example() {
+  const [values, setValues] = useState<string[]>(['a']);
+
+  return (
+    <CheckboxCardGroup
+      values={values}
+      onValuesChange={setValues}
+      min={0}
+      max={2}
+      gap="md"
+    >
+      <CheckboxCard value="a" title="Option A" description="Description" />
+      <CheckboxCard value="b" title="Option B" description="Description" />
+      <CheckboxCard value="c" title="Option C" description="Description" />
+    </CheckboxCardGroup>
+  );
+}
+```
+
+#### D-3. Style Changes Based on Selection State (Selected props)
+
+`CheckboxCard` provides these for visual emphasis when selected:
+
+- `selectedColorScheme`: Change colorScheme on selection
+- `selectedVariant`: Change card variant on selection
+- `indicatorSelectedVariant`: Change checkbox indicator variant on selection
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model (Priority: Group > Controlled > Uncontrolled)
+
+Implementation check state priority is as follows:
+
+1) **When Group + value provided**: Use group context (`isSelected(value)`)
+2) **Otherwise** if `checked` exists: controlled
+3) If neither: uncontrolled internal state based on `defaultChecked`
+
+Also, disabled is combined value of:
+
+- Card's own `disabled`
+- Group `disabled`
+- When using group: If `max` is reached and current card is unselected (= cannot add selection), treated as disabled
+
+#### E-2. Reanimated / Shared Value
+
+Uses shared value for card press interaction and color transition.
+
+- press-in: Spring animation `scale` to 0.96, `opacity` to 0.7
+- press-out: `scale/opacity` return to 1
+- On selection state change: Transition background/border color with animation spring
+
+> Caution: Internal opacity animation is used, so layering additional opacity/scale animation externally may appear different than expected.
+
+---
+
+### (F) Accessibility
+
+`CheckboxCard` treats the entire card as checkbox.
+
+- Default role: `accessibilityRole="checkbox"`
+- Label: `accessibilityLabel || title`
+- State passed: `accessibilityState: { checked, disabled }`
+
+Recommended rules:
+- When composing custom header/slot where `title` isn't visible on screen, specifying `accessibilityLabel` is recommended.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/CheckboxCard/CheckboxCard.types.ts`.
+
+#### CheckboxCard — `CheckboxCardProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | Yes | - | Card title (default label) | a11y label default |
+| `description` | `string` | No | - | Card description | |
+| `header` | `ReactNode` | No | - | Header custom area | |
+| `footer` | `ReactNode` | No | - | Footer custom area | |
+| `media` | `ReactNode` | No | - | Media/icon before title | |
+| `left` | `ReactNode` | No | - | Content left slot | |
+| `right` | `ReactNode` | No | - | Content right slot | |
+| `checked` | `boolean` | No | - | Check state (controlled) | May be ignored when using group |
+| `defaultChecked` | `boolean` | No | `false` | Initial check (uncontrolled) | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | Check change callback | Not called directly when using group (use group change) |
+| `value` | `string` | No | - | Identifier within group | Used in `CheckboxCardGroup` |
+| `colorScheme` | `ItemColorScheme` | No | `'neutral'` | Card color scheme (Item-based) | |
+| `variant` | `ItemVariant` | No | `'outlined'` | Card variant (Item-based) | |
+| `size` | `ItemSize` | No | `'md'` | Card size (Item-based) | |
+| `rounded` | `ItemRounded` | No | `'md'` | Corner radius (Item-based) | |
+| `shadow` | `ItemShadow` | No | `'none'` | Shadow (Item-based) | |
+| `indicatorPosition` | `'start' \| 'end'` | No | `'end'` | Checkbox indicator position | |
+| `indicatorVariant` | `CheckboxVariant` | No | `'filled'` | Indicator variant | |
+| `indicatorRounded` | `CheckboxRounded` | No | `'sm'` | Indicator rounded | |
+| `indicatorSelectedVariant` | `CheckboxVariant` | No | `'flat'` | Indicator variant on selection | |
+| `selectedColorScheme` | `ItemColorScheme` | No | - | colorScheme override on selection | |
+| `selectedVariant` | `ItemVariant` | No | - | Card variant override on selection | |
+| `disabled` | `boolean` | No | `false` | Disabled | Combined with group max/min policy |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | Replaces title |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### CheckboxCardGroup — `CheckboxCardGroupProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `values` | `string[]` | No | - | Selected values (controlled) | |
+| `defaultValues` | `string[]` | No | `[]` | Initial selected values (uncontrolled) | |
+| `onValuesChange` | `(values: string[]) => void` | No | - | Selection change callback | |
+| `max` | `number` | No | - | Maximum selection count | Unselected cards become disabled when reached |
+| `min` | `number` | No | `0` | Minimum selection count | Cannot deselect below this |
+| `disabled` | `boolean` | No | `false` | Disable all | |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Gap between cards | |
+| `children` | `ReactNode` | No | - | Cards in group | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
