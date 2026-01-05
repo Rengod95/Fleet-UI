@@ -27,6 +27,7 @@
 		"playground:android": "pnpm --filter playground android",
 		"playground:android:device": "pnpm --filter playground run android:device",
 		"playground:web": "pnpm --filter playground web",
+		"playground:export:web": "pnpm --filter @fleet-ui/core build && pnpm --filter @fleet-ui/components build && pnpm --filter playground exec expo export --platform web",
 		"docs:dev": "pnpm --filter docs dev",
 		"docs:build": "pnpm --filter docs build",
 		"android": "expo run:android",
