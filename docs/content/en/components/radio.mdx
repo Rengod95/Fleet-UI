@@ -1,0 +1,131 @@
+### (A) One-liner
+
+**`Radio` is a radio button component expressing single selection ("already selected value is maintained").**
+It supports controlled/uncontrolled with `selected/defaultSelected`, and enforces "radio semantics" where `onSelect(true)` is only called from unselected state.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Radio"
+pnpm dlx @fleet-ui/cli add Radio
+```
+
+```ts title="Track A: import"
+import { Radio } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Radio } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Radio` uses Reanimated for color transition/inner circle animation.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Controlled Usage in Group)
+
+`Radio` is a "single component," so group/label/description text is composed at app level.
+
+```tsx title="Radio controlled group pattern (app-level)"
+import { useState } from 'react';
+import { View, Text } from 'react-native';
+import { Radio } from '@fleet-ui/components';
+
+export function Example() {
+  const [value, setValue] = useState<'a' | 'b'>('a');
+
+  return (
+    <View style={{ gap: 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Radio
+          selected={value === 'a'}
+          onSelect={() => setValue('a')}
+          accessibilityLabel="Option A"
+        />
+        <Text>Option A</Text>
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Radio
+          selected={value === 'b'}
+          onSelect={() => setValue('b')}
+          accessibilityLabel="Option B"
+        />
+        <Text>Option B</Text>
+      </View>
+    </View>
+  );
+}
+```
+
+#### D-2. "Not Toggle" Radio Rule
+
+Pressing an already selected `Radio` again doesn't change state internally.
+
+- Selected → press again: No change, `onSelect` not called
+- Not selected → press: Selected, `onSelect(true)` called
+
+This behavior differs from checkbox (checkbox toggles), and is designed to maintain radio semantics.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- controlled: If `selected` is provided, use that value as-is
+- uncontrolled: Start with `defaultSelected`, set internal state to `true` on selection (no deselection)
+
+#### E-2. Reanimated / Shared Value
+
+- `progress = withTiming(selected ? 1 : 0)` animates inner circle's `scale/opacity`.
+- Container background/border uses `useAnimatedVariantColor` to get variants result color and transitions with `withTiming`.
+
+---
+
+### (F) Accessibility
+
+`Radio` is `Pressable`-based and sets the following accessibility information:
+
+- `accessibilityRole="radio"`
+- `accessibilityState={{ checked: selected, disabled }}`
+- `accessibilityLabel` is passed via prop (strongly recommended if label text is separate)
+
+> Note: RN doesn't automatically compose radio group (`radiogroup`), so actual group UX (labels/descriptions/focus navigation) is responsibility of screen composition level.
+
+---
+
+### (G) Props Table
+
+> Reference: `RadioProps` from `packages/components/src/Radio/Radio.types.ts`.
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color theme | |
+| `variant` | `'filled' \| 'flat' \| 'outlined'` | No | `'filled'` | Style variant | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow | |
+| `selected` | `boolean` | No | - | Selected state (controlled) | Deselection handled externally |
+| `defaultSelected` | `boolean` | No | `false` | Initial selection (uncontrolled) | No deselection |
+| `onSelect` | `(selected: boolean) => void` | No | - | Selection callback (always `true`) | Only called on false→true |
+| `disabled` | `boolean` | No | `false` | Disabled | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | Recommended |
+| `testID` | `string` | No | - | Test identifier | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override | |

@@ -1,0 +1,179 @@
+### (A) 한줄 요약
+
+**`CheckboxCard`는 “카드 전체가 체크박스처럼 동작”하는 선택 UI예요.**  
+단일 카드에서는 `checked/defaultChecked/onCheckedChange`로 동작하고, 그룹에서는 `CheckboxCardGroup` 컨텍스트를 통해 `value` 기반으로 다중 선택을 관리해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **CheckboxCard 추가**
+
+```bash title="Track A: add CheckboxCard"
+pnpm dlx @fleet-ui/cli add CheckboxCard
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { CheckboxCard, CheckboxCardGroup } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { CheckboxCard, CheckboxCardGroup } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제: 단일)
+
+```tsx title="CheckboxCard (uncontrolled)"
+import { CheckboxCard } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <CheckboxCard
+      title="배송지 기본값으로 저장"
+      description="다음 주문에서 기본 배송지로 사용합니다."
+      defaultChecked={false}
+      onCheckedChange={(checked) => console.log({ checked })}
+    />
+  );
+}
+```
+
+#### D-2. 그룹 사용: `CheckboxCardGroup` + `value`
+
+그룹에서는 각 카드가 `value`로 식별되고, 그룹이 `values/defaultValues/onValuesChange`로 다중 선택을 관리해요.
+
+```tsx title="CheckboxCardGroup (controlled)"
+import { useState } from 'react';
+import { CheckboxCard, CheckboxCardGroup } from '@fleet-ui/components';
+
+export function Example() {
+  const [values, setValues] = useState<string[]>(['a']);
+
+  return (
+    <CheckboxCardGroup
+      values={values}
+      onValuesChange={setValues}
+      min={0}
+      max={2}
+      gap="md"
+    >
+      <CheckboxCard value="a" title="A 옵션" description="설명" />
+      <CheckboxCard value="b" title="B 옵션" description="설명" />
+      <CheckboxCard value="c" title="C 옵션" description="설명" />
+    </CheckboxCardGroup>
+  );
+}
+```
+
+#### D-3. 선택 상태에 따른 스타일 변경(Selected props)
+
+`CheckboxCard`는 선택 상태에서 시각적 강조를 주기 위해 다음을 제공해요.
+
+- `selectedColorScheme`: 선택 시 colorScheme 변경
+- `selectedVariant`: 선택 시 카드 variant 변경
+- `indicatorSelectedVariant`: 선택 시 체크박스 indicator variant 변경
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델(우선순위: Group > Controlled > Uncontrolled)
+
+구현상 체크 상태 결정 우선순위는 아래와 같아요.
+
+1) **Group + value 제공 시**: 그룹 컨텍스트(`isSelected(value)`)를 사용  
+2) **그 외** `checked`가 있으면: controlled  
+3) 둘 다 아니면: `defaultChecked` 기반 uncontrolled 내부 상태
+
+또한 disabled는 다음을 합친 값이에요.
+
+- 카드 자체 `disabled`
+- 그룹 `disabled`
+- 그룹 사용 시: `max`에 도달했고 현재 카드가 미선택이면(= 추가 선택 불가) disabled 처리
+
+#### E-2. Reanimated / Shared Value
+
+카드 press 인터랙션과 컬러 전환을 위해 shared value를 써요.
+
+- press-in: `scale`을 0.96으로, `opacity`를 0.7로 스프링 애니메이션
+- press-out: `scale/opacity`를 1로 복귀
+- 선택 상태 전환 시: background/border 색상을 애니메이션 스프링으로 전환
+
+> 주의: 내부에서 opacity 애니메이션을 사용하므로, 외부에서 추가 opacity/scale 애니메이션을 중첩하면 기대와 다르게 보일 수 있다.
+> 주의: 내부에서 opacity 애니메이션을 사용하므로, 외부에서 추가 opacity/scale 애니메이션을 중첩하면 기대와 다르게 보일 수 있어요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+`CheckboxCard`는 카드 전체를 체크박스로 취급해요.
+
+- 기본 role: `accessibilityRole="checkbox"`
+- 라벨: `accessibilityLabel || title`
+- 상태 전달: `accessibilityState: { checked, disabled }`
+
+권장 규칙:
+- `title`이 화면에 보이지 않는 커스텀 헤더/슬롯 구성을 하면, `accessibilityLabel`을 명시하는 걸 권장해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/CheckboxCard/CheckboxCard.types.ts`의 public 타입들.
+
+#### CheckboxCard — `CheckboxCardProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | Yes | - | 카드 제목(기본 라벨) | a11y 라벨 기본값 |
+| `description` | `string` | No | - | 카드 설명 | |
+| `header` | `ReactNode` | No | - | 헤더 커스텀 영역 | |
+| `footer` | `ReactNode` | No | - | 푸터 커스텀 영역 | |
+| `media` | `ReactNode` | No | - | 타이틀 앞 미디어/아이콘 | |
+| `left` | `ReactNode` | No | - | content 왼쪽 슬롯 | |
+| `right` | `ReactNode` | No | - | content 오른쪽 슬롯 | |
+| `checked` | `boolean` | No | - | 체크 상태(controlled) | 그룹 사용 시 무시될 수 있음 |
+| `defaultChecked` | `boolean` | No | `false` | 초기 체크(uncontrolled) | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | 체크 변경 콜백 | 그룹 사용 시 직접 호출되지 않음(그룹 변경을 사용) |
+| `value` | `string` | No | - | 그룹 내 식별자 | `CheckboxCardGroup`에서 사용 |
+| `colorScheme` | `ItemColorScheme` | No | `'neutral'` | 카드 색상 스킴(Item 기반) | |
+| `variant` | `ItemVariant` | No | `'outlined'` | 카드 variant(Item 기반) | |
+| `size` | `ItemSize` | No | `'md'` | 카드 크기(Item 기반) | |
+| `rounded` | `ItemRounded` | No | `'md'` | 모서리 둥글기(Item 기반) | |
+| `shadow` | `ItemShadow` | No | `'none'` | 그림자(Item 기반) | |
+| `indicatorPosition` | `'start' \| 'end'` | No | `'end'` | 체크박스 인디케이터 위치 | |
+| `indicatorVariant` | `CheckboxVariant` | No | `'filled'` | 인디케이터 variant | |
+| `indicatorRounded` | `CheckboxRounded` | No | `'sm'` | 인디케이터 rounded | |
+| `indicatorSelectedVariant` | `CheckboxVariant` | No | `'flat'` | 선택 시 인디케이터 variant | |
+| `selectedColorScheme` | `ItemColorScheme` | No | - | 선택 시 colorScheme override | |
+| `selectedVariant` | `ItemVariant` | No | - | 선택 시 카드 variant override | |
+| `disabled` | `boolean` | No | `false` | 비활성화 | 그룹 max/min 정책과 합쳐짐 |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 | |
+| `accessibilityLabel` | `string` | No | - | 접근성 라벨 | title 대체 |
+| `testID` | `string` | No | - | 테스트 식별자 | |
+
+#### CheckboxCardGroup — `CheckboxCardGroupProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `values` | `string[]` | No | - | 선택 values(controlled) | |
+| `defaultValues` | `string[]` | No | `[]` | 초기 선택 values(uncontrolled) | |
+| `onValuesChange` | `(values: string[]) => void` | No | - | 선택 변경 콜백 | |
+| `max` | `number` | No | - | 최대 선택 개수 | 도달 시 미선택 카드가 disabled |
+| `min` | `number` | No | `0` | 최소 선택 개수 | 미만으로 해제 불가 |
+| `disabled` | `boolean` | No | `false` | 전체 비활성화 | |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 카드 간 간격 | |
+| `children` | `ReactNode` | No | - | 그룹 내 카드들 | |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 | |

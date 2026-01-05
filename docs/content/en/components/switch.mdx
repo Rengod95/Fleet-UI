@@ -1,0 +1,134 @@
+### (A) One-liner
+
+**`Switch` is a component for expressing and changing on/off toggle state.**
+It supports controlled/uncontrolled with `checked/defaultChecked`, and provides Reanimated-based thumb movement/scale animation and background color transition.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: init"
+pnpm dlx @fleet-ui/cli init
+```
+
+```bash title="Track A: add Switch"
+pnpm dlx @fleet-ui/cli add Switch
+```
+
+```ts title="Track A: import"
+import { Switch } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```bash title="Track B: install packages"
+pnpm add @fleet-ui/core @fleet-ui/components
+```
+
+```ts title="Track B: import"
+import { Switch } from '@fleet-ui/components';
+```
+
+---
+
+### (C) General Props Viewable in Playground (Not Repeated in Docs)
+
+`variant/size/rounded/thumbShadow/thumbShape/colorScheme` combinations can be checked in Playground, so repetitive examples are minimized.
+
+Instead, this document focuses on:
+- controlled/uncontrolled model and `onCheckedChange`
+- `thumbPadding` takes "px" unit directly
+- Accessibility role/state passing method
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Controlled Pattern (Recommended)
+
+```tsx title="Switch controlled"
+import { useState } from 'react';
+import { Switch } from '@fleet-ui/components';
+
+export function Example() {
+  const [checked, setChecked] = useState(false);
+  return (
+    <Switch
+      checked={checked}
+      onCheckedChange={setChecked}
+      accessibilityLabel="Enable notifications"
+    />
+  );
+}
+```
+
+#### D-2. Uncontrolled Pattern
+
+```tsx title="Switch uncontrolled"
+import { Switch } from '@fleet-ui/components';
+
+export function Example() {
+  return <Switch defaultChecked onCheckedChange={(v) => console.log(v)} />;
+}
+```
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- controlled: If `checked` is provided, use that value
+- uncontrolled: Start with `defaultChecked` for internal state, toggle internal state on tap
+
+Tap flow:
+- If disabled, block event and exit
+- Calculate new value `newValue = !checked`
+- If uncontrolled, update internal state
+- Call `onPress`, then call `onCheckedChange(newValue)`
+
+#### E-2. Animation
+
+- `progress = withTiming(checked ? 1 : 0)` controls thumb movement/scale.
+- Background color uses `useAnimatedVariantColor` to get variant result color and transitions with `withTiming`.
+- Thumb movement distance is calculated from size/shape/padding.
+
+---
+
+### (F) Accessibility
+
+`Switch` sets the following:
+
+- `accessibilityRole="switch"`
+- `accessibilityState={{ checked, disabled }}`
+- `accessibilityLabel` is passed via prop (provide if label text is separate)
+
+---
+
+### (G) Props Table
+
+> Reference: `SwitchProps` from `packages/components/src/Switch/Switch.types.ts`.
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'`(types) / impl default may be `'success'` | Color theme | Note default difference |
+| `variant` | `'lined' \| 'filled' \| 'flat'` | No | `'filled'` | Style variant | filled has inner shadow |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md'` | No | `'md'` | Rounded | |
+| `thumbShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Thumb shadow | |
+| `thumbShape` | `'oval' \| 'circle'` | No | `'oval'` | Thumb shape | |
+| `thumbPadding` | `number` | No | size-based | Thumb internal padding (px) | Number (px) |
+| `checked` | `boolean` | No | - | Current state (controlled) | |
+| `defaultChecked` | `boolean` | No | `false` | Initial state (uncontrolled) | |
+| `onCheckedChange` | `(value: boolean) => void` | No | - | State change callback | |
+| `disabled` | `boolean` | No | `false` | Disabled | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Root style override | |
+| `thumbStyle` | `StyleProp<ViewStyle>` | No | - | Thumb style override | |

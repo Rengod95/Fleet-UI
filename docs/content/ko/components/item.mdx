@@ -1,0 +1,182 @@
+### (A) 한줄 요약
+
+**`Item`은 리스트/설정 화면에서 자주 쓰는 “행(row) 단위 레이아웃” 컴포넌트예요.**  
+`ItemMedia / ItemContent / ItemActions` 같은 합성(Compound) 서브컴포넌트로 구조를 나누고, 카드처럼 눌리는 press 인터랙션(스케일/불투명도)을 제공해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Item 추가**
+
+```bash title="Track A: add Item"
+pnpm dlx @fleet-ui/cli add Item
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+} from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+} from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Item basic usage"
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+  IconButton,
+} from '@fleet-ui/components';
+import { ChevronRight, User } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <Item onPress={() => {}}>
+      <ItemMedia mediaType="icon">
+        <User />
+      </ItemMedia>
+
+      <ItemContent>
+        <ItemTitle>계정</ItemTitle>
+        <ItemDescription>프로필/보안 설정</ItemDescription>
+      </ItemContent>
+
+      <ItemActions>
+        <IconButton icon={<ChevronRight />} aria-label="이동" onPress={() => {}} />
+      </ItemActions>
+    </Item>
+  );
+}
+```
+
+#### D-2. 미디어 정렬: `ItemMedia.verticalAlign`
+
+미디어가 아이콘/이미지이고 본문이 여러 줄일 때, 미디어의 세로 정렬을 바꿀 수 있다.
+
+- `top`: 상단 정렬
+- `center`: 중앙 정렬(기본)
+- `bottom`: 하단 정렬
+
+#### D-3. 액션 영역: `ItemActions`
+
+우측에 버튼/스위치/체크박스 같은 조작 요소를 배치할 때 `ItemActions`를 써요.  
+단, 행 전체가 `onPress`로 눌리는 UX와, 우측 액션이 별도로 눌리는 UX가 충돌하지 않도록(이벤트 전파) 앱 레벨에서 정책을 정하는 것을 권장해요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+`Item`은 별도의 controlled/uncontrolled 상태를 갖지 않고, Pressable 인터랙션만 제공한다.
+
+#### E-2. Reanimated / Shared Value
+
+`Item`은 press 인터랙션을 위해 내부 shared value를 써요.
+
+- press-in: `scale = 0.96`, `opacity = 0.7` (스프링)
+- press-out: `scale/opacity = 1` 복귀
+
+> 주의: 외부에서 추가로 scale/opacity 애니메이션을 중첩하면 press 효과가 과장되거나, `overflow: hidden`이 있는 상위 컨테이너에서 잘릴 수 있다.
+
+---
+
+### (F) 접근성(누락 금지)
+
+권장 규칙:
+- (웹) 키보드/포커스 이동이 자연스러운지 확인해요.
+- (공통) 상태 변화가 스크린리더에 충분히 전달되는지 확인해요.
+
+`Item`은 `PressableProps`를 상속하므로 `accessibilityRole`, `accessibilityLabel` 등을 그대로 전달할 수 있다.
+
+권장 규칙:
+- 행 전체가 클릭 가능한 경우 `accessibilityRole="button"`과 라벨을 제공한다.
+- 우측 `ItemActions`에 별도 버튼들이 있다면, 각 버튼에 `aria-label`/`accessibilityLabel`을 제공한다.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Item/Item.types.ts`의 public 타입들.
+
+#### Item — `ItemProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | 색상 테마 | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'fade'` | No | `'flat'` | 시각적 스타일 | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | padding/밀도 프리셋 | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 모서리 둥글기 | |
+| `shadow` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'none'` | 그림자 프리셋 | |
+| `children` | `ReactNode` | No | - | 내부 콘텐츠 | |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 오버라이드 | |
+
+#### ItemMedia — `ItemMediaProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `ItemVariant` | No | `'filled'` | 미디어 배경/스타일 프리셋 |
+| `size` | `ItemSize` | No | `'md'` | 미디어 크기 프리셋 |
+| `mediaType` | `'icon' \| 'image'` | No | `'icon'` | 아이콘/이미지 레이아웃 차이 |
+| `verticalAlign` | `'top' \| 'center' \| 'bottom'` | No | `'center'` | 본문 대비 세로 정렬 |
+| `children` | `ReactNode` | No | - | 미디어 콘텐츠 |
+| `style` | `StyleProp<ViewStyle>` | No | - | 스타일 오버라이드 |
+
+#### ItemContent — `ItemContentProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | 보통 `ItemTitle/ItemDescription` |
+| `style` | `StyleProp<ViewStyle>` | No | - | 스타일 오버라이드 |
+
+#### ItemTitle — `ItemTitleProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | 타이틀 |
+| `size` | `ItemSize` | No | `'md'` | 타이포 스케일 |
+| `style` | `StyleProp<TextStyle>` | No | - | 스타일 오버라이드 |
+
+#### ItemDescription — `ItemDescriptionProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | 설명 |
+| `size` | `ItemSize` | No | `'md'` | 타이포 스케일 |
+| `style` | `StyleProp<TextStyle>` | No | - | 스타일 오버라이드 |
+
+#### ItemActions / Header / Footer
+
+`ItemActionsProps`, `ItemHeaderProps`, `ItemFooterProps`는 모두 `ViewProps` 기반이며 `children`, `style` 오버라이드를 제공한다.

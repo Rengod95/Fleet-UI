@@ -1,0 +1,123 @@
+### (A) One-Line Summary
+
+**`StepIndicator` displays the current position within a multi-step flow using a "dot strip" visualization.**  
+It shows the current step via `activeStep` (0-based), and when `interactive=true`, users can tap specific dots to trigger step navigation.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> **Prerequisite**: Import the unistyles side-effect in your app **entry file**.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add StepIndicator"
+pnpm dlx @fleet-ui/cli add StepIndicator
+```
+
+```ts title="Track A: import"
+import { StepIndicator } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { StepIndicator } from '@fleet-ui/components';
+```
+
+#### Required Dependencies
+
+`StepIndicator` uses Reanimated for animations.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Basic Usage
+
+```tsx title="StepIndicator basic usage"
+import { StepIndicator } from '@fleet-ui/components';
+
+export function Example() {
+  return <StepIndicator step={5} activeStep={2} />;
+}
+```
+
+#### D-2. Interactive Mode
+
+```tsx title="Interactive"
+import { useState } from 'react';
+import { StepIndicator } from '@fleet-ui/components';
+
+export function Example() {
+  const [active, setActive] = useState(0);
+
+  return (
+    <StepIndicator
+      step={5}
+      activeStep={active}
+      interactive
+      onStepChange={setActive}
+      onStepPress={(i) => console.log('pressed', i)}
+    />
+  );
+}
+```
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- `step` is clamped to the range 1–100.
+- `activeStep` is clamped to the range 0–(step-1).
+- **Controlled vs. Uncontrolled**:
+  - **Controlled**: Provide `activeStep`
+  - **Uncontrolled**: Use `defaultActiveStep` to initialize internal state; interactive mode updates internal state automatically
+
+#### E-2. Reanimated / Shared Value
+
+- Uses `activeStepSV` (`SharedValue<number>`) to synchronize the current step with animations.
+- Each dot calculates derived values:
+  - `isActive`: whether it's the current step
+  - `isCompleted`: whether it precedes the current step
+- The active dot expands in width (pill-like), and fill opacity transitions to 1 for active/completed states.
+
+---
+
+### (F) Accessibility
+
+- Root element: `accessibilityRole="progressbar"`
+- `accessibilityValue: { min: 0, max: step-1, now: activeStep }`
+- Default `accessibilityLabel`: `Step {activeStep+1} of {step}`
+
+When interactive:
+- Each dot has `accessibilityRole="button"` and uses `accessibilityState.selected` to convey selection status.
+
+---
+
+### (G) Props Table
+
+> Reference: `StepIndicatorProps` from `packages/components/src/StepIndicator/StepIndicator.types.ts`.
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `step` | `number` | Yes | - | Total number of steps | Clamped 1–100 |
+| `activeStep` | `number` | No | - | Current step (0-based) | Controlled |
+| `defaultActiveStep` | `number` | No | `0` | Initial step (0-based) | Uncontrolled |
+| `onStepChange` | `(step: number) => void` | No | - | Step change callback (0-based) | Useful in interactive mode |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` (types) / `'neutral'` (implementation) | Color theme | Note default discrepancy |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `interactive` | `boolean` | No | `false` | Enable tap-to-change step | |
+| `onStepPress` | `(stepIndex: number) => void` | No | - | Tap callback (0-based) | Only meaningful when interactive |
+| `animated` | `boolean` | No | `true` | Enable animations | |
+| `gap` | `number` | No | Size-based calculation | Gap between dots (px) | |
+| `accessibilityLabel` | `string` | No | `Step {activeStep+1} of {step}` | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |

@@ -6,6 +6,8 @@ node_modules/
 # Build outputs
 dist/
 build/
+.next/
+out/
 *.tsbuildinfo
 
 # Testing
@@ -66,7 +68,7 @@ tmp/
 temp/
 packages/cli/tmp/
 # Private internal notes (do not commit)
-docs/*
+internal-guidelines/*
 # OS
 Thumbs.db
 .Spotlight-V100

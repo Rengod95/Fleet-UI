@@ -1,0 +1,154 @@
+### (A) 한줄 요약
+
+**`ActionButton`은 “아이콘/이미지 같은 콘텐츠 + (선택) 타이틀” 구조의 액션 버튼이에요.**  
+일반 텍스트 버튼(`Button`)보다 “정사각형 콘텐츠 영역 + 캡션 타이틀” 같은 카드형 액션을 만들 때 잘 맞고, press 인터랙션(스프링 스케일)과 접근성 라벨 규칙을 기본으로 제공해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **ActionButton 추가**
+
+```bash title="Track A: add ActionButton"
+pnpm dlx @fleet-ui/cli add ActionButton
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { ActionButton } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { ActionButton } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`ActionButton`은 press 인터랙션 애니메이션을 위해 Reanimated가 필요해요.
+
+```bash title="Recommended runtime deps"
+# Expo라면 npx expo install 사용을 권장
+pnpm add react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="ActionButton basic usage"
+import { ActionButton } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 24, height: 24 }} />;
+}
+
+export function Example() {
+  return (
+    <ActionButton title="새 글" onPress={() => {}}>
+      <DemoIcon />
+    </ActionButton>
+  );
+}
+```
+
+#### D-2. `title`과 `accessibilityLabel` (중요)
+
+`ActionButton`은 `title`이 있으면 이를 기본 접근성 라벨로도 써요.  
+반대로 `title`이 없고(= 화면상 텍스트가 없고) 아이콘/이미지만 표시된다면, 스크린리더 사용자를 위해 `accessibilityLabel`을 함께 제공하는 걸 권장해요.
+
+구현상 개발 모드에서 아래 조건을 감지하면 경고를 출력해요.
+
+- `title`이 없고
+- `accessibilityLabel`도 없을 때
+
+```tsx title="Icon-only a11y (recommended)"
+import { ActionButton } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 24, height: 24 }} />;
+}
+
+export function Example() {
+  return (
+    <ActionButton accessibilityLabel="즐겨찾기" onPress={() => {}}>
+      <DemoIcon />
+    </ActionButton>
+  );
+}
+```
+
+#### D-3. 레이아웃/커스터마이징 포인트
+
+- `extend`: 부모 레이아웃에서 가로로 “늘어나는” 액션 버튼(예: 그리드/행 레이아웃에서 균등 분배)에 써요.
+- `rootStyle` / `contentStyle` / `textStyle`: 루트/콘텐츠/타이틀 스타일을 오버라이드할 때 쓰는 포인트예요. (배열 스타일도 지원해요.)
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+`ActionButton`은 내부적으로 다음 값을 파생해요.
+
+- `isDisabled = Boolean(disabled)`
+- `accessibilityState = { disabled: isDisabled }`
+
+#### E-2. Reanimated / Shared Value
+
+press 인터랙션을 위해 `scale` shared value를 써요.
+
+- press-in: `scale = 0.86`으로 스프링 애니메이션
+- press-out: `scale = 1`로 복귀
+- disabled면 press-in을 무시하고, press 시 `preventDefault()`로 막아요.
+
+> 주의: 외부에서 scale 애니메이션을 또 적용하면(예: 부모 Animated.View에서 scale), press 애니메이션과 곱해져 과하게 작아질 수 있어요. 한쪽(내부/외부)으로 책임을 통일하는 걸 권장해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 기본 role: `accessibilityRole="button"`
+- 라벨: `accessibilityLabel || title`
+- 상태 전달: `accessibilityState: { disabled }`
+
+권장 규칙:
+- 화면상 텍스트(`title`)가 없으면 `accessibilityLabel`을 함께 제공하는 걸 권장해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/ActionButton/ActionButton.types.ts`의 `ActionButtonProps`.  
+> `ActionButtonProps`는 `PressableProps`를 상속한다(단, `children`, `style`은 재정의).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | 색상 테마 | 범용 스타일은 Playground로 확인 |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'faded'` | No | `'flat'` | 시각적 스타일 | 범용 스타일은 Playground로 확인 |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 크기/밀도 | |
+| `extend` | `boolean` | No | `false` | 가로 확장(flex: 1) | 레이아웃 컨테이너 정책에 영향 |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | 그림자 프리셋(콘텐츠 컨테이너에 적용) | |
+| `containerRounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | 루트 컨테이너 라운드 | |
+| `contentRounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | 콘텐츠 컨테이너 라운드 | |
+| `title` | `string` | No | - | 콘텐츠 아래 타이틀 텍스트 | 없으면 `accessibilityLabel` 권장 |
+| `children` | `ReactNode` | No | - | 콘텐츠 영역(아이콘/이미지 등) | |
+| `rootStyle` | `StyleProp<ViewStyle>` | No | - | 루트 컨테이너 스타일 오버라이드 | |
+| `contentStyle` | `StyleProp<ViewStyle>` | No | - | 콘텐츠 컨테이너 스타일 오버라이드 | |
+| `textStyle` | `StyleProp<TextStyle>` | No | - | 타이틀 텍스트 스타일 오버라이드 | |
+| `accessibilityLabel` | `string` | No | - | 접근성 라벨(특히 title이 없을 때 필요) | |
+| `testID` | `string` | No | - | 테스트 식별자 | |
+
+#### PressableProps 상속(요약)
+
+`ActionButtonProps`는 `PressableProps`를 상속하므로 `onPress`, `onPressIn`, `onPressOut`, `disabled` 등 기본 press props를 그대로 지원해요.

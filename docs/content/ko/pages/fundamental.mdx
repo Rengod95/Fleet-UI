@@ -1,0 +1,135 @@
+# Fundamental
+
+이 문서는 Fleet UI 디자인 시스템을 **왜(WHY) 이런 구조로 설계했는지** 정리해요.
+
+## 핵심 규칙 3줄 요약
+
+- **의미(semantic)는 고정**하고, 값 변경은 raw/primitive에서 흡수해요.
+- **컴포넌트는 가능한 semantic 토큰만 소비**해서 변경 비용을 낮춰요.
+- **문서는 레이어로 분리**하고, 하위 레이어는 상위 레이어만 참조해요(역방향 금지).
+
+## 이 문서가 필요한 때(When to read)
+
+아래 상황이면 이 문서를 먼저 읽는 게 좋아요.
+
+- 토큰 문서를 읽는데 `raw/primitive/semantic/theme`이 헷갈려요.
+- “왜 컴포넌트에서 raw 색상을 직접 쓰면 안 되지?”가 납득이 안 돼요.
+- `@fleet-ui/core` 패키지의 구조와 파일 구조를 이해하고 싶어요.
+
+## 내부 제작 프로세스(Internal Production Process)
+
+Fleet UI의 컴포넌트는, 내부적으로 다음과 같은 레이어 구조를 기반으로 LLM과 개발자 모두가 쉽게 이해할 수 있도록 제작 프로세스를 설계했어요.
+
+```text
+Layer0: Principle (WHY/WHAT, 기술 독립)
+  ↓ 참조
+Layer1: Meta Spec (프로젝트 맥락/선언)
+  ↓ 참조
+Layer2: Token/Component Spec (구체 스펙, 구현 가능한 수준)
+  ↓ 참조
+Layer3: Implementation Guide (스택별 구현 패턴)
+```
+
+- layer0: Principle - 해당 디자인 시스템이 가져야만 하는 도메인적 특성 등 원리 원칙이 담긴 일종의 기획문서이자 모든 결정의 상위 기준이에요.
+- layer1: Meta Spec - 프로젝트 맥락/선언. 프로젝트 전체적인 목표와 기술 스택, 리소스 등을 선언해요.
+- layer2: Token/Component Spec - 구체 스펙, 구현 가능한 수준. 토큰과 컴포넌트의 구체적인 스펙과 구현 가능한 수준을 정의해요.
+- layer3: Implementation Guide - layer2를 기반으로 생성한 '스펙 문서'를 실제 코드로 구현하기 위해 필요한 스택별 구현 패턴. 토큰과 컴포넌트를 구체적으로 구현하는 방법과 패턴을 정의해요.
+
+Fleet UI는 이렇게 4계층의 레이어를 컨텍스트로 작성하고, LLM과 개발자인 Rengod이 각 레이어를 참조하여 제작 했어요.
+
+이 문서에서 설명하는 '디자인 시스템'은, 내부적으로 사용한 Layer0의 정보를 매우 간략하게 요약한 것이에요.
+
+## Fleet UI의 디자인 시스템
+
+Fleet UI의 디자인 시스템은 크게 다음과 같이 구성되어 있어요.
+
+- Token System : 디자인 일관성과, 변경 및 확장성을 위해 자체 설계된 토큰 계층 시스템이에요.
+- Variants : 컴포넌트의 디자인을 표현하는 축을 정의해요.
+
+다른 UI SDK와 다르게, Unistyles의 도움을 받았기 때문에, 디자인 시스템 관련 설정파일은 단순 타입스크립트 파일에 불과해요.
+
+또한 제작한 모든 컴포넌트는 기본적으로 자체 정의된 토큰의 이름으로 제작되어 있기 때문에, 토큰 시스템과 컴포넌트는 독립적으로 사용하기 어려워요(불가능 하진 않아요).
+
+단, 토큰 구조가 일반적인 디자인 시스템들과 유사하고 계층적으로 구성되어 있기 때문에, 오히려 변경에 대한 비용을 줄여주고 확장성을 높여줘요.
+
+## 토큰 계층(WHAT의 최소 정의)
+
+Fleet UI는 토큰을 아래와 같이 계층화해요.
+
+```text
+Raw Value → Primitive → Semantic → Theme → (Component Consumption)
+```
+
+- **Raw Value**: 실제 값(색상, 숫자). 변경 빈도가 높고 디자이너 관여가 큼.
+- **Primitive**: 규칙 기반 최소 단위 토큰(예: spacing 스케일, radius 스케일, 색상 팔레트 스케일).
+- **Semantic**: 목적/맥락 기반 토큰(예: 배경/텍스트/보더/액션/상태). 소비자(컴포넌트)가 주로 보는 인터페이스.
+- **Theme**: 런타임에서 사용하는 최종 묶음(예: light/dark). 플랫폼/스택(여기서는 Unistyles)에 맞춰 제공됨.
+
+### 참조 규칙(절대 규칙)
+
+- **하위 레이어만 참조 가능**(역방향 금지)
+- **순환 참조 금지**
+- **레이어 건너뛰기 최소화**(예: semantic이 raw를 직접 참조하는 방식은 지양)
+- **컴포넌트는 가능한 semantic만 소비**해요(primitive/raw 직접 사용은 예외로만).
+
+## 토큰 시스템의 목적(WHY)
+
+토큰 시스템은 “값에 이름을 붙이는 것”이 아니라, **변경과 의사결정 비용을 줄이기 위한 구조**예요.
+
+- **일관성**: 같은 맥락에는 같은 값을 쓰게 만들고, UI 편차를 줄여요.
+- **변경 용이성**: 브랜드/다크모드/리브랜딩 등 변화가 생겨도 수정 범위를 최소화해요.
+- **의사결정 비용 감소**: “이 상황에 무슨 값을 써야 하지?”를 규칙으로 대체해요.
+
+## 컴포넌트와 토큰의 계약(Contract)
+
+컴포넌트는 “토큰 시스템이 제공하는 의미 인터페이스(semantic)”에 의존할수록, 디자인 변경이 더 안전해져요.
+
+- 컴포넌트의 상태(state) 변화는 **semantic 토큰 조합의 변화**로 표현해요.
+  - 예: `default → hover → pressed → disabled`에서 `bg/text/border/shadow`가 어떻게 바뀌는지
+- 컴포넌트 API는 “색 이름(blue/red)” 대신 **의미(colorScheme: primary/error/success…)**에 기반하는 편이 유지보수에 좋아요.
+
+### 예시(1개): “semantic만 소비하면 바뀌어도 안전해요”
+
+예를 들어 Button이 “primary 색을 어디서 가져오지?”를 직접 결정하게 만들면, 변경이 생길 때마다 버튼 코드를 고쳐야 해요.  
+대신 버튼은 **colorScheme(색상 역할)**만 받고, 색은 `theme.colors.*`(semantic)에서 가져오면 돼요.
+
+```ts
+// 개념 예시: 컴포넌트는 색 "이름"이 아니라 colorScheme만 받아요.
+const palette = theme.utils.getPaletteForScheme(theme, colorScheme);
+
+// variant(변형)에 따라 semantic 키만 바꿔요.
+const backgroundColor =
+  variant === 'filled' ? (palette.solid ?? palette.content_inversed) : palette.content_1;
+
+const textColor = variant === 'filled' ? palette.text_inversed : palette.text_1;
+```
+
+이렇게 해두면 “primary 팔레트의 값”이 바뀌어도, 버튼 코드는 그대로 두고 토큰만 바꾸면 돼요.
+
+## Fleet UI의 품질 원칙(Accessibility / Motion)
+
+토큰과 컴포넌트는 결국 사용자 경험을 위한 수단이라서, 아래를 “기본값”으로 둬요.
+
+### Accessibility
+
+- **왜 중요한가요?**: 접근성은 “특정 사용자만”의 문제가 아니라, 모든 사용자의 실패 가능성을 줄여요(야외/저시력/한 손 조작/키보드 사용자 등).
+- **무엇을 확인하나요?**
+  - **role/state/상호작용 패턴**: 컴포넌트는 기본적으로 role/state/상호작용 패턴을 가지고 있어요.
+  - **accessibilityLabel**: 컴포넌트는 기본적으로 accessibilityLabel을 가지고 있어요.
+  - **accessibilityState**: 컴포넌트는 기본적으로 accessibilityState를 가지고 있어요.
+  - **명도 대비**: 텍스트 조합이 WCAG 기준을 만족하도록 토큰을 설계해요.
+  - **터치 타겟**: 모바일에서 최소 터치 영역을 확보해요.
+
+### Motion
+
+- **왜 중요한가요?**: 모션은 “예쁜 장식”이 아니라 상태 변화를 이해시키는 신호예요. 더불어 제한된 스크린 사이즈에서 브랜드와 디자인 퀄리티를 높여주는 가장 중요한 역할을 하기도 해요. 대신 과하면 피로와 혼란을 만들어요.
+- **무엇을 확인하나요?**
+  - **트렌드**: 트렌드에 맞는 애니메이션을 디자인 했어요.
+  - **성능**: 애니메이션은 기본적으로 ui thread에서 동작하도록 설계되었어요. 상태 동기화 등의 작업이 필요한 경우에도, 가능한 최소화된 성능 병목이 발생하도록 했어요.
+  - **일관성**: 컴포넌트간 애니메이션이 서로 너무 다른 스타일로 동작하지 않도록 신경써 제작했어요.
+  - **과잉 회피**: 정보 전달에 도움이 안 되는 모션은 줄여요.
+
+## Next
+
+- [Theming System에서 테마 적용 보기](/fundamental/theming): 런타임에서 테마를 등록/전환/소비하는 흐름을 확인해요.
+- [Token Architecture에서 토큰 구조 보기](/fundamental/token-architecture): 토큰 파이프라인과 파일 구조/변경 절차를 잡아요.

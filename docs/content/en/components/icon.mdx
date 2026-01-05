@@ -1,0 +1,118 @@
+### (A) One-liner
+
+**`Icon` is a wrapper component that renders `lucide-react-native` icons with Fleet UI tokens (colorScheme/size).**
+It provides consistent icon styling with `icon` (component as prop) + `size/colorScheme`, and passes meaning to accessibility tree via `accessibilityLabel`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Icon**
+
+```bash title="Track A: add Icon"
+pnpm dlx @fleet-ui/cli add Icon
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { Icon } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { Icon } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Icon` receives `lucide-react-native` icon component as input. These dependencies are required:
+
+```bash title="Recommended deps"
+pnpm add lucide-react-native
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Icon basic usage"
+import { Icon } from '@fleet-ui/components';
+import { Heart } from 'lucide-react-native';
+
+export function Example() {
+  return <Icon icon={Heart} accessibilityLabel="Like" />;
+}
+```
+
+#### D-2. `colorScheme` vs `color`
+
+- `colorScheme` selects color from theme tokens.
+- When `color` is specified, it **takes priority over `colorScheme`** and renders with that color.
+
+```tsx title="Custom color overrides scheme"
+import { Icon } from '@fleet-ui/components';
+import { AlertTriangle } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <>
+      <Icon icon={AlertTriangle} colorScheme="warning" accessibilityLabel="Warning" />
+      <Icon icon={AlertTriangle} color="#FF00FF" accessibilityLabel="Custom color warning" />
+    </>
+  );
+}
+```
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`Icon` has no internal state/animation (shared value).
+
+Implementation characteristics:
+- `size` is mapped to px values via internal `SIZE_MAP`.
+- Rendering places Lucide icon component inside a `View` wrapper.
+
+---
+
+### (F) Accessibility
+
+Recommended rules:
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+
+`Icon` renders with `accessibilityRole="image"` by default and passes `accessibilityLabel`.
+
+Recommended rules:
+- For **meaning-conveying icons** (state/warning/standalone element of meaningful button), provide `accessibilityLabel`.
+- For **purely decorative icons** (text already conveys meaning), consider patterns where the icon itself isn't exposed to screen readers but included in parent component's accessibility label/role (e.g., parent provides label).
+
+> Note: Current implementation receives `accessibilityLabel` as optional, but documentation/team rules strongly recommend "provide if icon has meaning."
+
+---
+
+### (G) Props Table
+
+> Reference: `IconProps` from `packages/components/src/Icon/Icon.types.ts`.
+> `IconProps` extends `ViewProps`.
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `icon` | `LucideIcon` | Yes | - | Lucide icon component (Component as Prop) | `lucide-react-native` required |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info' \| 'secondary'` | No | `'neutral'` | Token-based color selection | |
+| `size` | `'_2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '_2xl' \| '_3xl' \| '_4xl'` | No | `'md'` | Icon size preset | Maps to px via internal SIZE_MAP |
+| `color` | `string` | No | - | Custom color (takes priority over `colorScheme`) | |
+| `strokeWidth` | `number` | No | `2` | Stroke width | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label (recommended) | Provide recommended for meaningful icons |
+
+#### ViewProps Inheritance (Summary)
+
+`IconProps` extends `ViewProps`, so basic props like `style` are supported.

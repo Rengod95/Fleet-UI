@@ -1,0 +1,170 @@
+# Theming System
+
+Fleet UI uses a theming system based on `react-native-unistyles`. This page organizes **how to register a theme, extract tokens, and combine with variants (HOW)** in one flow.
+
+## Overview
+
+The core of Fleet UI is composing styles centered on "meaning (semantic)," not "values."
+For token hierarchy structure and file pipeline, continue at [View token structure in Token Architecture](/fundamental/token-architecture).
+
+## What You Can Do on This Page (3 Things)
+
+- **Create theme-based StyleSheet**: Extract tokens with `StyleSheet.create((theme) => ...)` pattern.
+- **Compose styles with variants**: Make styles predictable with `colorScheme / variant / size ...` axes.
+- **Understand dark mode/theme switching**: Grasp how Unistyles applies themes.
+
+## Ready-to-Use Example (theme-based StyleSheet)
+
+Prerequisite: You must call `import '@fleet-ui/core/unistyles'` once in your app **entry file** to register the theme.
+
+```tsx
+import { Text, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+
+const styles = StyleSheet.create((theme) => ({
+  container: {
+    backgroundColor: theme.colors.neutral.content_1,
+    padding: theme.spacing[4],
+    borderRadius: theme.rounded.md,
+  },
+  title: {
+    ...theme.typography.body1,
+    color: theme.colors.neutral.text_1,
+    fontWeight: theme.text.fontWeight.semibold,
+  },
+}));
+
+export function Example() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Hello Fleet UI</Text>
+    </View>
+  );
+}
+```
+
+## Fleet UI Theme Interface (What's Inside?)
+
+`@fleet-ui/core` theme is organized along these axes. (Type definition: `packages/core/src/types.ts`)
+
+| Axis (property) | Layer | When to use |
+| --- | --- | --- |
+| `colors.*` | semantic | Extract background/text/border/state/action colors based on meaning |
+| `typography` | semantic | Extract "purpose"-based typo combinations like `h1~`, `body~`, `caption~` |
+| `spacing` | primitive | Extract spacing scales for padding/gap |
+| `rounded` | primitive | Extract radius scale |
+| `shadows` | semantic | Extract purpose-based shadows like card/button |
+| `gradients` | semantic | Extract gradient tokens |
+| `zIndex` | primitive | Extract layering scale |
+| `text` | primitive | Extract atomic values like fontWeight/letterSpacing only when needed |
+| `utils` | runtime | Use when safely creating `colorScheme × variant` combinations (see below) |
+
+## When Do You Need `theme.utils`?
+
+In components, you often need to pick a palette based on `colorScheme` and calculate `bg/text/border` based on `variant`.
+Instead of "adding switch statements every time a scheme is added," you can create safe calculations with `utils`.
+(Implementation reference: `packages/cli/registry/core/utils/variants.ts`)
+
+### `paletteHasSolid(palette)`
+
+- **When to use**: When you need "emphasis background (solid)" for variants like `filled`, but not all palettes have `solid`.
+- **What it does**: Safely checks whether `solid` is provided.
+- **Alternative**: If `solid` is missing, branch to alternative tokens like `content_inversed`.
+
+### `getPaletteForScheme(theme, colorScheme)`
+
+- **When to use**: When you need to map a value like `colorScheme="primary"` to a palette.
+- **What it does**: Maps `theme.colors.primary/error/...` in one place.
+
+### `getColorSchemePaletteEntries(theme)`
+
+- **When to use**: When you want to auto-generate `compoundVariants` for "all supported colorSchemes."
+- **What it does**: Creates entries in `[(scheme, palette)]` form for iteration.
+
+### `getIconColor(theme, colorScheme, variant)`
+
+- **When to use**: When icon color differs by `variant` (e.g., filled uses `text_inversed`, outlined uses `text_1`).
+- **What it does**: Calculates safe icon color including `paletteHasSolid`.
+
+## Theme Switching and Dark Mode
+
+By default, [AdaptiveThemes](https://www.unistyl.es/v3/guides/theming/#adaptive-themes) from Unistyles automatically detects system theme (dark/light) changes.
+If you want to forcibly disable system theme changes, set `adaptiveThemes: false`.
+
+```ts
+// core/unistyles.ts
+StyleSheet.configure({
+  settings: {
+    adaptiveThemes: false,
+  },
+});
+```
+
+### Force Specific Theme
+
+To lock light/dark in user settings or force a specific theme, refer to [Unistyles theme setup guide](https://www.unistyl.es/v3/guides/theming/#_top).
+
+## Variants System (Starting with Terms)
+
+Fleet UI components compose styles by combining props axes. Documentation uses these identifiers as-is.
+
+- **`colorScheme` (color role)**: Select "meaning" like `primary/neutral/error/...`.
+- **`variant` (variation)**: Select "expression method" like `filled/outlined/flat/ghost/...`.
+- **`size`**: Select size axis for padding/height/typo, etc.
+- **`rounded` / `shadow`**: Select curvature/shadow axes.
+
+When multiple axes meet and "values differ by combination," use `compoundVariants`.
+
+### Creating `compoundVariants` with Iteration-based Approach
+
+Instead of manually extending the array every time a new `colorScheme` is added, you can auto-generate by iterating with `theme.utils.getColorSchemePaletteEntries(theme)`.
+
+```ts
+const containerCompoundVariants = theme.utils
+  .getColorSchemePaletteEntries(theme)
+  .flatMap(([scheme, palette]) => [
+    { colorScheme: scheme, variant: 'filled', styles: { backgroundColor: palette.solid ?? palette.content_inversed } },
+    { colorScheme: scheme, variant: 'outlined', styles: { borderColor: palette.solid ?? palette.content_inversed } },
+  ]);
+```
+
+## Style Composition (Priority)
+
+When a component supports both base styles (StyleSheet) and external `style` prop, "priority" matters.
+
+- **Recommended**: Base styles → (optional) animation styles → user style
+  Putting user style last allows consumers to safely override.
+
+```tsx
+<Pressable style={[styles.container, props.style]} />
+```
+
+### Using Reanimated Animated Style Together
+
+Same principle applies with Reanimated: maintain **static styles + animatedStyle + user style** order.
+
+```tsx
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+<AnimatedPressable style={[buttonStyles.container, animatedStyle, style]} />
+```
+
+Also, if you need to use "color determined by variant" in an animation environment, use patterns like `useAnimatedVariantColor` to safely read style values.
+
+## Anti-patterns (Common Mistakes)
+
+- **Modifying themes by changing token keys**: Since components reference token keys like a contract, changing keys can break things.
+  - **Recommended**: Keep keys (meaning) and only change values.
+- **Hardcoding (color codes/px)**: Putting hardcoded values instead of theme tokens breaks consistency and ease of change.
+  - **Recommended**: Use `theme.colors / theme.typography / theme.spacing / theme.rounded` first.
+- **Consuming raw/primitive directly, skipping semantic**: Increases change cost.
+  - **Recommended**: Consume semantic first where possible, only go down to primitive as exception.
+
+## Next
+
+- [View installation flow in Install](/getting-started/install): Check entry import / deps / troubleshooting again.
+- [View token structure in Token Architecture](/fundamental/token-architecture): Grasp token pipeline and change points.
+
+## See also
+
+- [Read Fundamental](/fundamental): First grasp why (WHY) layers/token hierarchy are needed.

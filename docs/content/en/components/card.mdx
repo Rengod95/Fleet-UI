@@ -1,0 +1,110 @@
+### (A) One-liner
+
+**`Card` is a container component that visually groups content to create "sections/blocks."**
+It determines background/border tone with `variant`/`colorScheme` combination, and controls padding/minHeight density with `size`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Card**
+
+```bash title="Track A: add Card"
+pnpm dlx @fleet-ui/cli add Card
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { Card } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { Card } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Card basic usage"
+import { Card, Typo } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Card>
+      <Typo>Card content</Typo>
+    </Card>
+  );
+}
+```
+
+#### D-2. `variant` / `colorScheme` Meaning (Concept)
+
+`Card` determines background/border tone with `variant` and `colorScheme` combination.
+
+- `variant="base"`: Default background (content_1)
+- `variant="fade"`: One step lighter background (content_2) + subtle border
+- `variant="outlined"`: Transparent background + default border
+- `variant="flat"`: Light background (content_2)
+
+> Actual color values are determined by theme palette, so to change product tone, adjusting at token/theme layer is recommended.
+
+#### D-3. `size` is "padding + minHeight" Preset
+
+`Card`'s `size` isn't just a simple scale—it affects internal padding and min height (minHeight).
+On screens where layout density matters (list vs detail), maintaining consistency based on `size` is recommended.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`Card` is close to a "pure container" without internal state or Reanimated animation.
+Instead, it provides visual combinations through style variants (variants/compoundVariants).
+
+Implementation characteristics:
+- `colorScheme + variant` combination is processed with `compoundVariants` to determine background/border.
+- `overflow: 'hidden'` is applied by default so internal content doesn't extend beyond rounded area.
+
+---
+
+### (F) Accessibility
+
+Points to check:
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+
+`Card` is provided with `accessibilityRole="none"` since it's basically a "layout container," not an interactive element.
+
+Recommended rules:
+- If the card itself is click/tap-able UI, wrap `Card` with `Pressable` (or use a separate interaction component) and give that element role/label/state.
+- For simple content grouping purposes, use `Card` as-is.
+
+---
+
+### (G) Props Table
+
+> Reference: `CardProps` from `packages/components/src/Card/Card.types.ts`.
+> `CardProps` extends `ViewProps` (however, `children` is redefined).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'base' \| 'fade' \| 'outlined' \| 'flat'` | No | `'base'` | Background/border style preset | Check general styles in Playground |
+| `rounded` | `'none' \| '_2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '_2xl' \| 'full'` | No | `'md'` | Corner radius | |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | padding/minHeight preset | Layout density control |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | Semantic color role | |
+| `fullWidth` | `boolean` | No | `true` | Expand to width 100% | If false, `alignSelf: 'flex-start'` |
+| `shadow` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| 'smooth_lg' \| 'inner'` | No | `'none'` | Shadow preset | Note visual difference when combined with `overflow: hidden` |
+| `children` | `ReactNode` | No | - | Card internal content | |
+
+#### ViewProps Inheritance (Summary)
+
+`CardProps` extends `ViewProps`, so basic layout props like `style` are supported.

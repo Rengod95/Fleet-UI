@@ -1,0 +1,64 @@
+# Quick Start
+
+Fleet UI provides **2 installation tracks (Track A / Track B)**.
+This page helps you quickly choose "the right track for your team."
+
+For installation/setup, proceed step-by-step at [Start Installing with Install](/getting-started/install).
+
+---
+
+## Common Prerequisites (Both Tracks)
+
+Fleet UI is **react-native-unistyles** based, so **Unistyles setup** is required.
+That's why you use **`@fleet-ui/core`** which includes Fleet UI's base theme/tokens/configuration together.
+
+Track A also installs `@fleet-ui/core` locally at project root. So you can modify it directly within the project if needed.
+
+---
+
+## Which Track Should You Choose?
+
+## One-Line Track Definitions
+
+- **Track A (Local Install)**: Use CLI to bring code into your project, then modify/override it "like your own code." (like Shadcn UI)
+- **Track B (Package Install)**: Install via package manager, update through version upgrades.
+
+## How to Choose
+
+Track A is easier to manage in most cases. Answer these questions—usually you'll have a conclusion in 1-2 steps.
+
+1) **Do you need to frequently modify component/token implementations?**
+→ Yes: **Track A** / No: Go to next question.
+
+2) **Is installation/update/CI stability your top priority?**
+→ Yes: **Track B** / No: Go to next question.
+
+3) **Do multiple apps/packages need to share the same UI via versioning?**
+→ Yes: **Track B** / No: Go to next question.
+
+4) **Is keeping code in the project (ownership) and quickly experimenting/modifying more comfortable?**
+→ Yes: **Track A** / No: Choose **Track B** first.
+
+---
+
+## Quick Selection Criteria
+
+### Recommend Track A (Local Install, Source Ownership)
+
+- Need to **quickly customize components/tokens**
+- Want to directly change file structure/styles/behavior to match project conventions
+- Prefer "bringing UI base code to our project to manage" rather than "adopting an SDK"
+
+### Recommend Track B (Package Install)
+
+- Token overriding alone (e.g., radius/shadow/colors/typography) can match most styles
+- Installation/update/CI stability is top priority
+- Prefer **using via theme/props combinations** over code copying
+- Large team where "standard install → version upgrade" model is operationally advantageous
+
+---
+
+## Next Steps
+
+- [Install with Track A](/getting-started/install#track-a-cli-based-local-install)
+- [Install with Track B](/getting-started/install#track-b-npm-package-install)

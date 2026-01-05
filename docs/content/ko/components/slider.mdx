@@ -1,0 +1,165 @@
+### (A) 한줄 요약
+
+**`Slider`는 하나(또는 두 개)의 Thumb를 드래그해 값을 조절하는 컴포넌트예요.**  
+`thumbCount=1`은 일반 슬라이더, `thumbCount=2`는 범위(range) 슬라이더, `thumbCount=0`은 thumb 없는 “프로그레스 바 모드”로 사용할 수 있어요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Slider"
+pnpm dlx @fleet-ui/cli add Slider
+```
+
+```ts title="Track A: import"
+import { Slider } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Slider } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Slider`는 `react-native-gesture-handler`와 Reanimated를 써요.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-gesture-handler react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 단일 Thumb 슬라이더
+
+```tsx title="Single thumb"
+import { Slider } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Slider
+      thumbCount={1}
+      min={0}
+      max={100}
+      step={1}
+      defaultValue={[30]}
+      onValueChange={(v) => console.log(v)} // [number]
+    />
+  );
+}
+```
+
+#### D-2. 범위 슬라이더(두 개 Thumb)
+
+```tsx title="Range (dual thumbs)"
+import { Slider } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Slider
+      thumbCount={2}
+      min={0}
+      max={100}
+      step={5}
+      minStepsBetweenThumbs={1}
+      defaultValue={[20, 80]}
+      onValueChange={(v) => console.log(v)} // [min, max]
+    />
+  );
+}
+```
+
+#### D-3. Thumb 숨김(프로그레스 바처럼)
+
+```tsx title="Progress-like mode"
+import { Slider } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Slider
+      thumbCount={0}
+      defaultValue={[60]}
+      disabled
+      accessibilityLabel="진행률"
+    />
+  );
+}
+```
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델(중요)
+
+`Slider`는 현재 구현 기준으로 **controlled prop(value)이 없고**, 내부 상태(uncontrolled)만 가져요.
+
+- 값은 `number[]` 배열로 유지돼요.
+  - `thumbCount=1` → `[value0]`
+  - `thumbCount=2` → `[value0, value1]`
+- `defaultValue`가 없으면:
+  - dual thumb: `[0, 100]`
+  - single thumb: `[min]`
+
+콜백:
+- 드래그 중 업데이트는 `throttleMs`로 스로틀되고(`updateValue`)
+- 드래그 종료 시 최종 값은 항상 커밋되고(`commitValue`) 스로틀 없이 `onValueChange`가 호출돼요.
+
+#### E-2. 제스처/애니메이션(요약)
+
+- Thumb 드래그: `Gesture.Pan()`으로 translationX 기반 위치를 계산
+- `positionToValueWorklet`에서 `step` 단위로 스냅
+- 드래그 중 시각 효과:
+  - trackScale/ thumbScale spring
+  - velocity 기반 inertiaOffset으로 트랙이 살짝 따라오는 느낌
+- 두 thumb 모드에서는 `minStepsBetweenThumbs`를 기준으로 최소 거리 제한
+
+---
+
+### (F) 접근성(누락 금지)
+
+루트는 다음을 설정해요.
+
+- `accessibilityRole="adjustable"`
+- `accessibilityValue={{ min, max, now: internalValue[0] }}`
+- `accessibilityState={{ disabled }}`
+- `accessibilityLabel` 기본값은 `'Slider'`(override 권장)
+
+> 참고: 현재 구현은 `accessibilityValue.now`에 첫 번째 값만 노출해요. 범위 슬라이더(2 thumb)라면 앱 레벨에서 보조 텍스트/레이블로 “현재 범위”를 함께 제공하는 것을 권장해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Slider/Slider.types.ts`의 `SliderProps`.
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | 색상 테마 | |
+| `trackVariant` | `'lined' \| 'flat'` | No | `'flat'` | 트랙 스타일 | |
+| `thumbVariant` | `'circle' \| 'oval' \| 'line'` | No | `'circle'` | Thumb 스타일 | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md'` | No | `'md'` | 트랙 라운드 | |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 크기(트랙/Thumb 크기) | |
+| `thumbShadow` | `'md' \| 'lg'` | No | `'md'` | Thumb 그림자 | |
+| `trackShadow` | `'none' \| 'base'` | No | `'base'` | 트랙 내부 그림자 | |
+| `thumbCount` | `0 \| 1 \| 2` | No | `1` | Thumb 개수 | 0이면 thumb 숨김 |
+| `defaultValue` | `number[]` | No | single: `[min]`, dual: `[0, 100]` | 초기 값 | 배열 기반 |
+| `min` | `number` | No | `0` | 최소 값 | |
+| `max` | `number` | No | `100` | 최대 값 | |
+| `step` | `number` | No | `1` | 스텝 단위 | 스냅 간격 |
+| `minStepsBetweenThumbs` | `number` | No | `0` | 두 thumb 간 최소 step 간격 | range 모드 |
+| `throttleMs` | `number` | No | `200` | 드래그 중 콜백 스로틀(ms) | |
+| `disabled` | `boolean` | No | `false` | 비활성화 | |
+| `onValueChange` | `(value: number[]) => void` | No | - | 값 변경 콜백 | 드래그 중+종료 모두 호출 |
+| `trackLength` | `number` | No | - | 트랙 길이(px) | 미지정 시 100% |
+| `accessibilityLabel` | `string` | No | `'Slider'` | 접근성 라벨 | |
+| `testID` | `string` | No | - | 테스트 식별자 | |

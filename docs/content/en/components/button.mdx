@@ -1,0 +1,201 @@
+### (A) One-liner
+
+`Button` is the basic interaction component for triggering user actions. It's designed to safely combine **feature/state-centered props** like `leftIcon / rightIcon`, `loading`, `fullWidth`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Button**
+
+```bash title="Track A: add Button"
+pnpm dlx @fleet-ui/cli add Button
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { Button } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { Button } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Button` requires Reanimated for press interaction animation.
+
+```bash title="Recommended runtime deps"
+# For Expo, npx expo install is recommended
+pnpm add react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+> `Button` itself doesn't require Expo modules like `expo-blur`/`expo-image`/`expo-linear-gradient`.
+
+---
+
+### (D) Core Features & Usage
+
+### 1) Basic Usage
+
+```tsx title="Basic"
+import { Button } from '@fleet-ui/components';
+
+export function Example() {
+  return <Button onPress={() => console.log('pressed')}>Continue</Button>;
+}
+```
+
+#### 2) Icon Slots: `leftIcon` / `rightIcon`
+
+- Use to attach icons to text buttons for clearer "meaning/direction."
+- When `loading=true`, **leftIcon area is replaced with loader**.
+
+```tsx title="Left / Right Icon"
+import { Button } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 16, height: 16 }} />;
+}
+
+export function Example() {
+  return (
+    <>
+      <Button leftIcon={<DemoIcon />}>Back</Button>
+      <Button rightIcon={<DemoIcon />}>Next</Button>
+    </>
+  );
+}
+```
+
+#### 3) Loading: `loading` (Important)
+
+When `loading=true`:
+
+- Click is blocked (disabled behavior)
+- `ActivityIndicator` is displayed in left area
+- `busy: true` is passed to accessibility state
+
+```tsx title="Loading"
+import { Button } from '@fleet-ui/components';
+
+export function Example() {
+  return <Button loading>Saving...</Button>;
+}
+```
+
+#### 4) Full Width: `fullWidth`
+
+```tsx title="Full Width"
+import { Button } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+export function Example() {
+  return (
+    <View style={{ gap: 12 }}>
+      <Button fullWidth>Continue</Button>
+      <Button fullWidth variant="ghost">Later</Button>
+    </View>
+  );
+}
+```
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`Button` processes "press" interaction with **Reanimated shared value**.
+
+### State Model
+
+- External input: `disabled`, `loading`
+- Internal derived state:
+  - `isDisabled = Boolean(disabled || loading)`
+  - `accessibilityState = { disabled: isDisabled, busy: loading }`
+
+So `loading=true` isn't just showing a loader—it's a **state that blocks interaction (press)**.
+
+### Shared Value Flow (Concept)
+
+- `scale` / `opacity` shared values change on press-in/out.
+- press-in:
+  - `scale = 0.94` / `opacity = 0.86` via spring animation
+- press-out:
+  - `scale = 1` / `opacity = 1` on return
+- In disabled (or loading) state, press-in is ignored and `opacity` is additionally lowered.
+
+> Tip: If you apply another scale animation externally, it multiplies with press animation and may shrink excessively. In such cases, set `shadow="none"` and unify animation to one side, or minimize external animation wrapping Button.
+
+---
+
+### (F) Accessibility
+
+- Default role: `accessibilityRole="button"`
+- Label resolution priority:
+  - `aria-label` → `accessibilityLabel` (PressableProps) → `children` (if string)
+- State passed:
+  - `accessibilityState: { disabled, busy }`
+
+### Icon-only Button (Recommended Rule)
+
+When rendering only an icon, provide `aria-label` for screen readers/web.
+
+```tsx title="Icon-only a11y"
+import { Button } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Button aria-label="Favorite" onPress={() => {}}>
+      ★
+    </Button>
+  );
+}
+```
+
+---
+
+### (G) Props Table (ButtonProps)
+
+> Reference: `ButtonProps` from `packages/components/src/Button/Button.types.ts`.
+
+### Button-specific Props
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Semantic color role | Check general styles in Playground |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'ghost' \| 'faded'` | No | `'filled'` | Button visual style | Check general styles in Playground |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size/density | Check general styles in Playground |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset | Check general styles in Playground |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Round preset | Check general styles in Playground |
+| `fullWidth` | `boolean` | No | `false` | Expand to width 100% | Use with container per layout policy |
+| `loading` | `boolean` | No | `false` | Loading state + block interaction | `accessibilityState.busy=true` |
+| `leftIcon` | `ReactNode` | No | - | Left icon slot | Replaced by loader when `loading=true` |
+| `rightIcon` | `ReactNode` | No | - | Right icon slot | Hidden when `loading=true` |
+| `children` | `ReactNode` | No | - | Button label (text/element) | String can also be used as auto-label |
+| `aria-label` | `string` | Cond. | - | Accessibility label for icon-only buttons | Especially important on Web |
+| `testID` | `string` | No | - | Test identifier | Maps to `data-testid` on Web |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style override | Composited with animation style |
+
+### PressableProps Inheritance (Common)
+
+`ButtonProps` extends `PressableProps` (however, `children` and `style` are redefined in Button).
+
+Common examples:
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `onPress` | `(event) => void` | No | - | Click/tap handler |
+| `onPressIn` | `(event) => void` | No | - | Press start |
+| `onPressOut` | `(event) => void` | No | - | Press end |
+| `disabled` | `boolean` | No | - | Disabled (if `loading=true`, also treated as disabled internally) |
+| `accessibilityLabel` | `string` | No | - | Accessibility label (priority after aria-label) |
+
+> Other `PressableProps` are also supported as-is. (Details may vary by RN/Expo version)

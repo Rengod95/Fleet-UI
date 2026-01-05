@@ -1,0 +1,182 @@
+### (A) One-liner
+
+**`Menu` is a compound component that shows a dropdown when pressing a trigger (button, etc.), and provides item selection/check functionality.**
+`Menu.Trigger` manages open state (controlled/uncontrolled), outside click close, and close on select, while `Menu.Dropdown/DropdownItem/DropdownCheckItem` compose the menu UI.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Menu"
+pnpm dlx @fleet-ui/cli add Menu
+```
+
+```ts title="Track A: import"
+import { Menu } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Menu } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Menu` uses RN `Modal` + Reanimated for dropdown display/animation. Also uses `react-native-worklets` for worklet scheduling.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-gesture-handler react-native-worklets react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Menu basic usage"
+import { Menu, Button } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Menu.Trigger
+      dropdown={
+        <Menu.Dropdown header={<Menu.Header>Sort</Menu.Header>}>
+          <Menu.DropdownItem onPress={() => {}}>Latest</Menu.DropdownItem>
+          <Menu.DropdownItem onPress={() => {}}>Popular</Menu.DropdownItem>
+        </Menu.Dropdown>
+      }
+    >
+      <Button>Open Menu</Button>
+    </Menu.Trigger>
+  );
+}
+```
+
+#### D-2. CheckItem: `Menu.DropdownCheckItem`
+
+`DropdownCheckItem` internally toggles `checked` state and calls `onCheckedChange(next)`.
+Also, when `closeOnSelect=true`, menu closes after checking.
+
+```tsx title="Menu check items"
+import { useState } from 'react';
+import { Menu, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <Menu.Trigger
+      dropdown={
+        <Menu.Dropdown>
+          <Menu.DropdownCheckItem checked={checked} onCheckedChange={setChecked}>
+            Option A
+          </Menu.DropdownCheckItem>
+        </Menu.Dropdown>
+      }
+    >
+      <Button>Options</Button>
+    </Menu.Trigger>
+  );
+}
+```
+
+#### D-3. Close Policy
+
+- `closeOnOutsidePress`: Close when pressing overlay (outside area) (default true)
+- `closeOnSelect`: Close on item selection (default true)
+
+If menu has UX where multiple items need to be checked consecutively like "settings toggles," consider `closeOnSelect={false}`.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model (Trigger)
+
+`Menu.Trigger` supports both controlled/uncontrolled.
+
+- controlled: If `open` exists, `isOpen = open`
+- uncontrolled: Start internal state with `defaultOpen`, toggle internally with `setInternalOpen`
+
+Also uses separate `modalVisible` state to maintain `Modal` until close animation completes.
+
+#### E-2. Reanimated / Shared Value
+
+Dropdown display animation is processed with these shared values:
+
+- `opacity`: 0 → 1 (open), 1 → 0 (close)
+- `scaleX/scaleY`: 0 → 1 transition (with delay)
+
+On close, modal is hidden in animation completion callback.
+
+---
+
+### (F) Accessibility
+
+- Dropdown container: `accessibilityRole="menu"` (`Menu.Dropdown`)
+- Menu items: `accessibilityRole="menuitem"` (`Menu.DropdownItem/DropdownCheckItem`)
+- Trigger modal scope:
+  - `accessibilityViewIsModal`
+  - `importantForAccessibility="yes"`
+  - Close support via `onAccessibilityEscape`
+
+Recommended rules:
+- If item text is string, it's automatically used as label, but provide `accessibilityLabel` when using custom children.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/Menu/Menu.types.ts`.
+
+#### Menu.Trigger — `MenuTriggerProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `open` | `boolean` | No | - | Open state (controlled) | |
+| `defaultOpen` | `boolean` | No | `false` | Initial open (uncontrolled) | |
+| `onOpen` | `() => void` | No | - | Open callback | |
+| `onClose` | `() => void` | No | - | Close callback | |
+| `children` | `ReactNode` | Yes | - | Trigger element (button, etc.) | onPress can be injected internally |
+| `dropdown` | `ReactNode` | Yes | - | Dropdown (`Menu.Dropdown`) | |
+| `placement` | `MenuPlacement` | No | `'bottom-start'` | Placement position | Includes screen boundary correction |
+| `closeOnOutsidePress` | `boolean` | No | `true` | Close on outside click | |
+| `closeOnSelect` | `boolean` | No | `true` | Close on item selection | Passed via context |
+
+#### Menu.Dropdown — `MenuDropdownProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `header` | `ReactNode` | No | - | Header (`Menu.Header` recommended) |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Dropdown size |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Rounded |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Shadow |
+| `children` | `ReactNode` | Yes | - | Items |
+
+#### Menu.DropdownItem — `MenuDropdownItemProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | No | - | Left slot |
+| `right` | `ReactNode` | No | - | Right slot (`Menu.DropdownIcon` recommended) |
+| `children` | `ReactNode` | Yes | - | Text/content |
+
+#### Menu.DropdownCheckItem — `MenuDropdownCheckItemProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | No | - | Left slot | |
+| `right` | `ReactNode` | No | - | Right slot | |
+| `checked` | `boolean` | No | `false` | Check state | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | Check change callback | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color on check | |
+| `children` | `ReactNode` | Yes | - | Text/content | |
+
+#### Menu.Header / Menu.DropdownIcon
+
+- `Menu.Header`: `MenuHeaderProps` (`children`, `style`)
+- `Menu.DropdownIcon`: `MenuDropdownIconProps` (`icon`, `size?`, `color?`, `strokeWidth?`)

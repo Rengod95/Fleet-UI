@@ -1,0 +1,155 @@
+### (A) 한줄 요약
+
+**`Chip`은 짧은 라벨/상태를 표시하거나, 클릭 가능한 “필터/태그” 형태의 액션을 만드는 컴포넌트예요.**  
+`onPress`가 있을 때만 press 애니메이션을 적용하고, `onClose`가 제공되면 우측에 close 버튼을 노출해 “삭제 가능한 칩” 패턴을 지원해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Chip 추가**
+
+```bash title="Track A: add Chip"
+pnpm dlx @fleet-ui/cli add Chip
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { Chip } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { Chip } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Chip`은 close 아이콘과 press 인터랙션 애니메이션을 위해 아래 의존성이 필요해요.
+
+```bash title="Recommended runtime deps"
+# Expo라면 npx expo install 사용을 권장
+pnpm add lucide-react-native react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Chip basic usage"
+import { Chip } from '@fleet-ui/components';
+
+export function Example() {
+  return <Chip onPress={() => {}}>추천</Chip>;
+}
+```
+
+#### D-2. 삭제 가능한 칩: `onClose`
+
+`onClose`를 제공하면 우측에 close 버튼이 표시되고, **`rightIcon`은 무시**된다(loading이 아닐 때).
+
+```tsx title="Closable chip"
+import { Chip } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Chip onPress={() => {}} onClose={() => console.log('close')}>
+      React Native
+    </Chip>
+  );
+}
+```
+
+> close 버튼 press는 `event.stopPropagation()`으로 상위 press를 막아요. 즉 close를 눌러도 `onPress`가 실행되지 않게 설계돼요.
+
+#### D-3. 아이콘-only: `iconOnly`
+
+`iconOnly=true`는 텍스트 없이 아이콘만 렌더링하는 패턴이에요. 이 경우 **`aria-label` 또는 `accessibilityLabel`이 필요**해요.
+
+```tsx title="Icon-only chip (a11y required)"
+import { Chip } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 16, height: 16 }} />;
+}
+
+export function Example() {
+  return (
+    <Chip iconOnly aria-label="Favorite" onPress={() => {}}>
+      <DemoIcon />
+    </Chip>
+  );
+}
+```
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- `isDisabled = Boolean(disabled || loading)` (로딩 중에는 상호작용 차단)
+- `isInteractive = Boolean(onPress)` (onPress가 없으면 “클릭 불가 칩”으로 취급)
+
+구현상 `disabled={isDisabled || !isInteractive}`로 Pressable을 비활성화하므로, `onPress`가 없으면 시각적으로는 칩이 렌더링돼도 “누를 수 없는 요소”가 돼요.
+
+#### E-2. Reanimated / Shared Value
+
+`Chip`은 press 애니메이션을 내부 shared value로 처리해요(단, `onPress`가 있을 때만).
+
+- press-in: `scale = 0.95`, `opacity = 0.6` (스프링)
+- press-out: `scale/opacity = 1` 복귀
+
+disabled(또는 loading) 상태에서는 press를 막고, opacity를 추가로 낮춰요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 기본 role: `accessibilityRole="button"` (`onPress`가 있을 때)
+- 라벨 결정 우선순위:
+  - `'aria-label'` → `accessibilityLabel`(PressableProps) → 문자열 `children`
+- 상태 전달:
+  - `accessibilityState: { disabled, busy }`
+
+권장 규칙:
+- `iconOnly=true`이면 `aria-label`(웹) 또는 `accessibilityLabel`을 제공하는 걸 권장해요.
+- close 버튼은 내부적으로 `accessibilityLabel="Close"`를 제공해요. 앱에서 국제화가 필요하면 컴포넌트를 래핑하거나 대체하는 방식을 고려해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Chip/Chip.types.ts`의 `ChipProps`.  
+> `ChipProps`는 `PressableProps`를 상속해요(단, `children`, `style`은 재정의돼요).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | 색상 테마 | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'ghost' \| 'faded'` | No | `'filled'` | 시각적 스타일 | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기/밀도 | |
+| `shadow` | `ChipShadow` | No | `'none'` | 그림자 프리셋 | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'full'` | 모서리 둥글기 | |
+| `inverted` | `boolean` | No | `false` | 스타일 반전(선택 상태 등에 유용) | |
+| `loading` | `boolean` | No | `false` | 로딩 상태(상호작용 차단) | `busy=true` |
+| `iconOnly` | `boolean` | No | `false` | 텍스트 없이 아이콘만 렌더링 | 라벨 필수(권장) |
+| `leftIcon` | `ReactNode` | No | - | 좌측 아이콘 | `iconOnly`면 무시 |
+| `rightIcon` | `ReactNode` | No | - | 우측 아이콘 | `onClose`가 있으면 무시 |
+| `children` | `ReactNode` | No | - | 칩 콘텐츠 | 문자열이면 라벨로 사용 가능 |
+| `onClose` | `() => void` | No | - | close 버튼 표시 + 콜백 | `onPress`와 분리됨 |
+| `aria-label` | `string` | No | - | 접근성 라벨(아이콘-only에서 필요) | Web에서 특히 중요 |
+| `testID` | `string` | No | - | 테스트 식별자 | close는 <code>&#36;&#123;testID&#125;-close</code> |
+| `style` | `PressableProps['style']` | No | - | 컨테이너 스타일 오버라이드 | |
+
+#### PressableProps 상속(요약)
+
+`ChipProps`는 `PressableProps`를 상속하므로 `onPress`, `onPressIn`, `onPressOut`, `disabled`, `accessibilityLabel` 등을 그대로 지원해요.

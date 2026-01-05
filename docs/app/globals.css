@@ -1,0 +1,269 @@
+@import "tailwindcss";
+@import "../styles/fleet-ui-theme.css";
+@import "tw-animate-css";
+
+@font-face {
+	font-family: 'SUIT Variable';
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url('/assets/SUIT-Variable.woff2') format('woff2-variations');
+}
+
+:root {
+	/* override generated font stack */
+	--fleet-font-sans: var(--font-manrope), 'SUIT Variable', system-ui, -apple-system, sans-serif;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+	--font-sans: var(--fleet-font-sans);
+	--font-mono: var(--fleet-font-mono);
+
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-border: var(--border);
+	--color-primary: var(--primary);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-5: var(--chart-5);
+	--color-chart-4: var(--chart-4);
+	--color-chart-3: var(--chart-3);
+	--color-chart-2: var(--chart-2);
+	--color-chart-1: var(--chart-1);
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-destructive: var(--destructive);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--radius-2xl: calc(var(--radius) + 8px);
+	--radius-3xl: calc(var(--radius) + 12px);
+	--radius-4xl: calc(var(--radius) + 16px);
+}
+
+html,
+body {
+	height: 100%;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+	}
+  body {
+    @apply bg-background font-sans text-foreground;
+	}
+}
+
+@layer components {
+	/* Docs prose: shadcn docs-like, without typography plugin dependency */
+	.docs-prose {
+		@apply max-w-none text-foreground;
+		font-size: var(--fleet-typo-body2-font-size);
+		line-height: 28px;
+		font-weight: var(--fleet-typo-body2-font-weight);
+		letter-spacing: var(--fleet-typo-body2-letter-spacing);
+	}
+
+	.docs-prose h1 {
+		@apply scroll-m-20;
+		font-size: var(--fleet-typo-h2Strong-font-size);
+		line-height: var(--fleet-typo-h2Strong-line-height);
+		font-weight: var(--fleet-typo-h2Strong-font-weight);
+		letter-spacing: var(--fleet-typo-h2Strong-letter-spacing);
+	}
+	.docs-prose h2 {
+		@apply scroll-m-20 mt-10 border-none;
+		font-size: var(--fleet-typo-h4Strong-font-size);
+		line-height: var(--fleet-typo-h4Strong-line-height);
+		font-weight: var(--fleet-typo-h4Strong-font-weight);
+		letter-spacing: var(--fleet-typo-h4Strong-letter-spacing);
+		color: var(--color-neutral-700);
+	}
+	.docs-prose h3 {
+		@apply scroll-m-20 mt-8;
+		font-size: var(--fleet-typo-h6Strong-font-size);
+		line-height: var(--fleet-typo-h6Strong-line-height);
+		font-weight: var(--font-weight-bold);
+		letter-spacing: var(--fleet-typo-h6Strong-letter-spacing);
+		color: var(--color-neutral-700);
+	}
+
+	.docs-prose h4 {
+		@apply scroll-m-20 mt-8;
+		font-size: var(--fleet-typo-body1Strong-font-size);
+		line-height: var(--fleet-typo-body1Strong-line-height);
+		letter-spacing: var(--fleet-typo-body1Strong-letter-spacing);
+		font-weight: var(--fleet-typo-body1Strong-font-weight);
+	}
+
+	.docs-prose p {
+		@apply my-4 text-muted-foreground;
+	}
+	.docs-prose hr {
+		/* MDX의 `---` 구분선: 위/아래 간격을 동일하게 유지 */
+		@apply my-12 border-t border-border;
+	}
+	/* `---` 다음에 heading이 바로 오는 케이스는 마진이 과해지지 않게 보정 */
+	.docs-prose h1 {
+		@apply mt-4 mb-2;
+	}
+	.docs-prose h2 {
+		@apply mt-10 mb-2;
+	}
+	.docs-prose  h3 {
+		@apply mt-8 mb-2;
+	}
+	.docs-prose h4 {
+		@apply mt-6 mb-4;
+	}
+	.docs-prose a {
+		@apply underline underline-offset-4 decoration-muted-foreground/40 hover:decoration-muted-foreground;
+	}
+	.docs-prose a.docs-heading-anchor {
+		@apply no-underline;
+	}
+	.docs-prose a.docs-heading-anchor:hover {
+		@apply underline underline-offset-4 decoration-muted-foreground/40;
+	}
+	.docs-prose code {
+		@apply rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground;
+	}
+	.docs-prose pre {
+		@apply mt-4;
+	}
+	.docs-prose pre code {
+		@apply bg-transparent p-0;
+	}
+	.docs-prose ul {
+		@apply mb-4 mt-3 list-disc pl-5 text-muted-foreground;
+	}
+	.docs-prose li {
+		@apply mt-1;
+	}
+	.docs-prose table {
+		@apply mt-6 w-full text-sm;
+	}
+	.docs-prose thead {
+		@apply bg-muted;
+	}
+	.docs-prose th {
+		@apply px-3 py-2 text-left font-medium text-foreground;
+	}
+	.docs-prose td {
+		@apply border-t border-border/20 px-3 py-2 align-top text-muted-foreground;
+	}
+}
+
+@layer components {
+	/* rehype-pretty-code (Shiki) */
+	pre[data-theme] {
+		@apply relative overflow-x-auto rounded-xl bg-muted p-4;
+		font-size: var(--fleet-typo-body2-font-size);
+		line-height: var(--fleet-typo-body2-line-height);
+	}
+
+	pre[data-theme] code {
+		@apply font-mono;
+		letter-spacing: 0;
+	}
+
+	/* use shiki CSS variables (rehype-pretty-code) */
+	code[data-theme] span {
+		color: var(--shiki-light);
+		background-color: var(--shiki-light-bg);
+	}
+	.dark code[data-theme] span {
+		color: var(--shiki-dark);
+		background-color: var(--shiki-dark-bg);
+	}
+
+	/* Line padding */
+	pre [data-line] {
+		@apply block;
+	}
+
+	/* Highlighted line / chars */
+	pre [data-highlighted-line] {
+		@apply bg-foreground/5;
+	}
+	pre [data-highlighted-chars] {
+		@apply rounded bg-foreground/10;
+	}
+
+	/* Copy button injected by @rehype-pretty/transformers */
+	pre button[data-rehype-pretty-code-copy-button] {
+		@apply absolute right-2 top-2 rounded-md bg-card px-2 py-1 text-xs text-muted-foreground opacity-0 transition-opacity;
+	}
+	pre:hover button[data-rehype-pretty-code-copy-button] {
+		@apply opacity-100;
+	}
+}
+
+@layer utilities {
+	/* Fleet typography utilities (generated CSS vars) */
+	.text-fleet-h1 { font-size: var(--fleet-typo-h1-font-size); line-height: var(--fleet-typo-h1-line-height); font-weight: var(--fleet-typo-h1-font-weight); letter-spacing: var(--fleet-typo-h1-letter-spacing); }
+	.text-fleet-h1Strong { font-size: var(--fleet-typo-h1Strong-font-size); line-height: var(--fleet-typo-h1Strong-line-height); font-weight: var(--fleet-typo-h1Strong-font-weight); letter-spacing: var(--fleet-typo-h1Strong-letter-spacing); }
+	.text-fleet-h1Weak { font-size: var(--fleet-typo-h1Weak-font-size); line-height: var(--fleet-typo-h1Weak-line-height); font-weight: var(--fleet-typo-h1Weak-font-weight); letter-spacing: var(--fleet-typo-h1Weak-letter-spacing); }
+
+	.text-fleet-h2 { font-size: var(--fleet-typo-h2-font-size); line-height: var(--fleet-typo-h2-line-height); font-weight: var(--fleet-typo-h2-font-weight); letter-spacing: var(--fleet-typo-h2-letter-spacing); }
+	.text-fleet-h2Strong { font-size: var(--fleet-typo-h2Strong-font-size); line-height: var(--fleet-typo-h2Strong-line-height); font-weight: var(--fleet-typo-h2Strong-font-weight); letter-spacing: var(--fleet-typo-h2Strong-letter-spacing); }
+	.text-fleet-h2Weak { font-size: var(--fleet-typo-h2Weak-font-size); line-height: var(--fleet-typo-h2Weak-line-height); font-weight: var(--fleet-typo-h2Weak-font-weight); letter-spacing: var(--fleet-typo-h2Weak-letter-spacing); }
+
+	.text-fleet-h3 { font-size: var(--fleet-typo-h3-font-size); line-height: var(--fleet-typo-h3-line-height); font-weight: var(--fleet-typo-h3-font-weight); letter-spacing: var(--fleet-typo-h3-letter-spacing); }
+	.text-fleet-h3Strong { font-size: var(--fleet-typo-h3Strong-font-size); line-height: var(--fleet-typo-h3Strong-line-height); font-weight: var(--fleet-typo-h3Strong-font-weight); letter-spacing: var(--fleet-typo-h3Strong-letter-spacing); }
+	.text-fleet-h3Weak { font-size: var(--fleet-typo-h3Weak-font-size); line-height: var(--fleet-typo-h3Weak-line-height); font-weight: var(--fleet-typo-h3Weak-font-weight); letter-spacing: var(--fleet-typo-h3Weak-letter-spacing); }
+
+	.text-fleet-h4 { font-size: var(--fleet-typo-h4-font-size); line-height: var(--fleet-typo-h4-line-height); font-weight: var(--fleet-typo-h4-font-weight); letter-spacing: var(--fleet-typo-h4-letter-spacing); }
+	.text-fleet-h4Strong { font-size: var(--fleet-typo-h4Strong-font-size); line-height: var(--fleet-typo-h4Strong-line-height); font-weight: var(--fleet-typo-h4Strong-font-weight); letter-spacing: var(--fleet-typo-h4Strong-letter-spacing); }
+	.text-fleet-h4Weak { font-size: var(--fleet-typo-h4Weak-font-size); line-height: var(--fleet-typo-h4Weak-line-height); font-weight: var(--fleet-typo-h4Weak-font-weight); letter-spacing: var(--fleet-typo-h4Weak-letter-spacing); }
+
+	.text-fleet-h5 { font-size: var(--fleet-typo-h5-font-size); line-height: var(--fleet-typo-h5-line-height); font-weight: var(--fleet-typo-h5-font-weight); letter-spacing: var(--fleet-typo-h5-letter-spacing); }
+	.text-fleet-h5Strong { font-size: var(--fleet-typo-h5Strong-font-size); line-height: var(--fleet-typo-h5Strong-line-height); font-weight: var(--fleet-typo-h5Strong-font-weight); letter-spacing: var(--fleet-typo-h5Strong-letter-spacing); }
+	.text-fleet-h5Weak { font-size: var(--fleet-typo-h5Weak-font-size); line-height: var(--fleet-typo-h5Weak-line-height); font-weight: var(--fleet-typo-h5Weak-font-weight); letter-spacing: var(--fleet-typo-h5Weak-letter-spacing); }
+
+	.text-fleet-h6 { font-size: var(--fleet-typo-h6-font-size); line-height: var(--fleet-typo-h6-line-height); font-weight: var(--fleet-typo-h6-font-weight); letter-spacing: var(--fleet-typo-h6-letter-spacing); }
+	.text-fleet-h6Strong { font-size: var(--fleet-typo-h6Strong-font-size); line-height: var(--fleet-typo-h6Strong-line-height); font-weight: var(--fleet-typo-h6Strong-font-weight); letter-spacing: var(--fleet-typo-h6Strong-letter-spacing); }
+	.text-fleet-h6Weak { font-size: var(--fleet-typo-h6Weak-font-size); line-height: var(--fleet-typo-h6Weak-line-height); font-weight: var(--fleet-typo-h6Weak-font-weight); letter-spacing: var(--fleet-typo-h6Weak-letter-spacing); }
+
+	.text-fleet-body1 { font-size: var(--fleet-typo-body1-font-size); line-height: var(--fleet-typo-body1-line-height); font-weight: var(--fleet-typo-body1-font-weight); letter-spacing: var(--fleet-typo-body1-letter-spacing); }
+	.text-fleet-body1Strong { font-size: var(--fleet-typo-body1Strong-font-size); line-height: var(--fleet-typo-body1Strong-line-height); font-weight: var(--fleet-typo-body1Strong-font-weight); letter-spacing: var(--fleet-typo-body1Strong-letter-spacing); }
+	.text-fleet-body1Weak { font-size: var(--fleet-typo-body1Weak-font-size); line-height: var(--fleet-typo-body1Weak-line-height); font-weight: var(--fleet-typo-body1Weak-font-weight); letter-spacing: var(--fleet-typo-body1Weak-letter-spacing); }
+
+	.text-fleet-body2 { font-size: var(--fleet-typo-body2-font-size); line-height: var(--fleet-typo-body2-line-height); font-weight: var(--fleet-typo-body2-font-weight); letter-spacing: var(--fleet-typo-body2-letter-spacing); }
+	.text-fleet-body2Strong { font-size: var(--fleet-typo-body2Strong-font-size); line-height: var(--fleet-typo-body2Strong-line-height); font-weight: var(--fleet-typo-body2Strong-font-weight); letter-spacing: var(--fleet-typo-body2Strong-letter-spacing); }
+	.text-fleet-body2Weak { font-size: var(--fleet-typo-body2Weak-font-size); line-height: var(--fleet-typo-body2Weak-line-height); font-weight: var(--fleet-typo-body2Weak-font-weight); letter-spacing: var(--fleet-typo-body2Weak-letter-spacing); }
+
+	.text-fleet-body3 { font-size: var(--fleet-typo-body3-font-size); line-height: var(--fleet-typo-body3-line-height); font-weight: var(--fleet-typo-body3-font-weight); letter-spacing: var(--fleet-typo-body3-letter-spacing); }
+	.text-fleet-body3Strong { font-size: var(--fleet-typo-body3Strong-font-size); line-height: var(--fleet-typo-body3Strong-line-height); font-weight: var(--fleet-typo-body3Strong-font-weight); letter-spacing: var(--fleet-typo-body3Strong-letter-spacing); }
+	.text-fleet-body3Weak { font-size: var(--fleet-typo-body3Weak-font-size); line-height: var(--fleet-typo-body3Weak-line-height); font-weight: var(--fleet-typo-body3Weak-font-weight); letter-spacing: var(--fleet-typo-body3Weak-letter-spacing); }
+
+	.text-fleet-caption1 { font-size: var(--fleet-typo-caption1-font-size); line-height: var(--fleet-typo-caption1-line-height); font-weight: var(--fleet-typo-caption1-font-weight); letter-spacing: var(--fleet-typo-caption1-letter-spacing); }
+	.text-fleet-caption1Strong { font-size: var(--fleet-typo-caption1Strong-font-size); line-height: var(--fleet-typo-caption1Strong-line-height); font-weight: var(--fleet-typo-caption1Strong-font-weight); letter-spacing: var(--fleet-typo-caption1Strong-letter-spacing); }
+	.text-fleet-caption1Weak { font-size: var(--fleet-typo-caption1Weak-font-size); line-height: var(--fleet-typo-caption1Weak-line-height); font-weight: var(--fleet-typo-caption1Weak-font-weight); letter-spacing: var(--fleet-typo-caption1Weak-letter-spacing); }
+	.text-fleet-caption2 { font-size: var(--fleet-typo-caption2-font-size); line-height: var(--fleet-typo-caption2-line-height); font-weight: var(--fleet-typo-caption2-font-weight); letter-spacing: var(--fleet-typo-caption2-letter-spacing); }
+	.text-fleet-caption2Strong { font-size: var(--fleet-typo-caption2Strong-font-size); line-height: var(--fleet-typo-caption2Strong-line-height); font-weight: var(--fleet-typo-caption2Strong-font-weight); letter-spacing: var(--fleet-typo-caption2Strong-letter-spacing); }
+	.text-fleet-caption2Weak { font-size: var(--fleet-typo-caption2Weak-font-size); line-height: var(--fleet-typo-caption2Weak-line-height); font-weight: var(--fleet-typo-caption2Weak-font-weight); letter-spacing: var(--fleet-typo-caption2Weak-letter-spacing); }
+
+	.text-fleet-button { font-size: var(--fleet-typo-button-font-size); line-height: var(--fleet-typo-button-line-height); font-weight: var(--fleet-typo-button-font-weight); letter-spacing: var(--fleet-typo-button-letter-spacing); }
+}

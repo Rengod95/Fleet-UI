@@ -1,0 +1,104 @@
+### (A) 한줄 요약
+
+**`State`는 성공/오류/경고 같은 “결과 상태(result state)”를 한 화면 블록으로 보여주는 컴포넌트예요.**  
+기본 아이콘/타이틀/설명/액션 버튼을 제공하고, 필요하면 `asset/title/description/button`을 커스텀 노드로 대체할 수 있어요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add State"
+pnpm dlx @fleet-ui/cli add State
+```
+
+```ts title="Track A: import"
+import { State } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { State } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 기본 사용(권장 패턴)
+
+```tsx title="State basic usage"
+import { State } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <State
+      variant="success"
+      title="완료"
+      description="요청이 정상 처리되었습니다."
+      button={<State.Button onPress={() => {}}>홈으로</State.Button>}
+    />
+  );
+}
+```
+
+#### D-2. 커스텀 asset/title/description
+
+`asset`, `title`, `description`은 ReactNode를 받을 수 있어요. (문자열이면 기본 타이포 스타일로 렌더)
+
+`variant="ghost"`는 기본 아이콘 프레임을 아예 렌더하지 않으므로, 이미지/일러스트 기반 상태 화면에 적합해요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+`State`는 내부 상태나 애니메이션(shared value)을 가지지 않는 정적 프리젠테이션 컴포넌트예요.
+
+`State.Button`은 `loading`일 때:
+- `disabled`로 취급되어 클릭이 막히고
+- `ActivityIndicator`를 렌더링해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 루트: `accessibilityRole="summary"` (상태 요약 블록)
+- 타이틀(문자열일 때): `accessibilityRole="header"`
+- 버튼: `accessibilityRole="button"`, `accessibilityState={{ disabled, busy }}`
+  - `busy`는 `loading=true`일 때 true
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/State/State.types.ts`의 public 타입들.
+
+#### State — `StateProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `'error' \| 'warning' \| 'info' \| 'success' \| 'neutral' \| 'ghost'` | No | `'neutral'` | 상태 variant |
+| `asset` | `ReactNode` | No | - | 상단 비주얼(아이콘/이미지 등) |
+| `title` | `ReactNode` | No | - | 타이틀 |
+| `description` | `ReactNode` | No | - | 설명 |
+| `button` | `ReactNode` | No | - | 하단 액션(보통 `State.Button`) |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 |
+| `titleStyle` | `StyleProp<TextStyle>` | No | - | 타이틀 스타일 오버라이드 |
+| `descriptionStyle` | `StyleProp<TextStyle>` | No | - | 설명 스타일 오버라이드 |
+
+#### State.Button — `StateButtonProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | 버튼 라벨 |
+| `onPress` | `() => void` | No | - | 클릭 핸들러 |
+| `disabled` | `boolean` | No | `false` | 비활성화 |
+| `loading` | `boolean` | No | `false` | 로딩 상태(= disabled + busy) |
+| `style` | `StyleProp<ViewStyle>` | No | - | 스타일 오버라이드 |
+| `testID` | `string` | No | - | 테스트 식별자 |

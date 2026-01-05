@@ -1,0 +1,134 @@
+### (A) 한줄 요약
+
+**`Checkbox`는 boolean 선택 상태를 표현/토글하는 기본 입력 컴포넌트예요.**  
+`checked`(controlled) 또는 `defaultChecked`(uncontrolled)로 동작하고, press 인터랙션과 체크 아이콘 전환을 Reanimated로 애니메이션 처리해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Checkbox 추가**
+
+```bash title="Track A: add Checkbox"
+pnpm dlx @fleet-ui/cli add Checkbox
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { Checkbox } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { Checkbox } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Checkbox`는 체크 아이콘과 인터랙션 애니메이션을 위해 아래 의존성이 필요해요.
+
+```bash title="Recommended runtime deps"
+# Expo라면 npx expo install 사용을 권장
+pnpm add lucide-react-native react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Checkbox (uncontrolled)"
+import { Checkbox } from '@fleet-ui/components';
+
+export function Example() {
+  return <Checkbox defaultChecked onCheckedChange={(v) => console.log(v)} />;
+}
+```
+
+#### D-2. Controlled 패턴
+
+```tsx title="Checkbox (controlled)"
+import { useState } from 'react';
+import { Checkbox } from '@fleet-ui/components';
+
+export function Example() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <Checkbox
+      checked={checked}
+      onCheckedChange={setChecked}
+      accessibilityLabel="약관 동의"
+    />
+  );
+}
+```
+
+> 구현상 `onPress`와 `onCheckedChange` 둘 다 제공하는 경우, 내부에서는 `onPress`를 먼저 호출한 뒤 `onCheckedChange(newChecked)`를 호출한다.
+> 구현상 `onPress`와 `onCheckedChange` 둘 다 제공하면, 내부에서는 `onPress`를 먼저 호출한 뒤 `onCheckedChange(newChecked)`를 호출해요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- `checked`가 제공되면 controlled 모드로 동작해요.
+- 그렇지 않으면 `defaultChecked`로 초기화된 내부 상태를 써요.
+
+disabled인 경우:
+- press 시 `preventDefault()`로 이벤트를 막고 상태를 바꾸지 않아요.
+
+#### E-2. Reanimated / Shared Value
+
+`Checkbox`는 두 가지 애니메이션을 써요.
+
+- press 인터랙션: `scale` shared value로 press-in/out 스프링
+  - press-in: `scale = 0.7`
+  - press-out: `scale = 1`
+- 체크 아이콘 전환: `progress` derived value(0↔1)로 아이콘 스케일/opacity 애니메이션
+
+또한 배경/보더 색상은 unistyles의 animated variant color를 사용해 스프링으로 전환해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 기본 role: `accessibilityRole="checkbox"`
+- 상태 전달: `accessibilityState: { checked, disabled }`
+- `accessibilityLabel`은 가능한 한 제공하는 걸 권장해요(특히 체크박스만 단독으로 배치되는 경우).
+
+> 참고: 이 구현은 `mixed`(indeterminate) 상태를 public prop으로 제공하지 않아요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Checkbox/Checkbox.types.ts`의 `CheckboxProps`.  
+> `CheckboxProps`는 `PressableProps`를 상속해요(단, `children`, `style`은 재정의돼요).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | 컬러 스킴 | |
+| `variant` | `'filled' \| 'flat' \| 'outlined'` | No | `'filled'` | 스타일 variant | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기 | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | 그림자 프리셋 | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'sm'` | 모서리 둥글기 | |
+| `checked` | `boolean` | No | - | 체크 상태(controlled) | |
+| `defaultChecked` | `boolean` | No | `false` | 초기 체크(uncontrolled) | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | 체크 변경 콜백 | |
+| `disabled` | `boolean` | No | `false` | 비활성화 | |
+| `accessibilityLabel` | `string` | No | - | 접근성 라벨 | |
+| `testID` | `string` | No | - | 테스트 식별자 | |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 오버라이드 | |
+
+#### PressableProps 상속(요약)
+
+`CheckboxProps`는 `PressableProps`를 상속하므로 `onPress`, `onPressIn`, `onPressOut` 등 press 관련 props를 그대로 지원해요.

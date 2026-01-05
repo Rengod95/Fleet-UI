@@ -1,0 +1,395 @@
+# Install
+
+Fleet UI offers **Track A / Track B** installation tracks.
+To choose the right track, check [Choose a Track in Quick Start](/getting-started/quick-start) first.
+
+## TL;DR
+
+Follow these steps to quickly get to a "theme is applied" state:
+
+1) **Choose a track**: [Choose a Track in Quick Start](/getting-started/quick-start)
+2) **Add side-effect import in entry file**
+   - Track A: `import '@fleet-ui/local/core/unistyles';`
+   - Track B: `import '@fleet-ui/core/unistyles';`
+3) **Install required runtime deps**: `react-native-unistyles`, `react-native-reanimated`, `react-native-gesture-handler`, `react-native-worklets`
+4) **For Track A**: `init → add → doctor`
+5) **For Track B**: `install packages → entry import → install peerDeps → check Babel`
+
+## Table of Contents
+- [Common Prerequisites](#common-prerequisites)
+- [Track A (CLI Based Local Install)](#track-a-cli-based-local-install)
+  - [init](#1-init-install-core--auto-setup-aliasconfig)
+  - [add](#3-add-components)
+  - [doctor](#5-doctor-recommended)
+- [Track B (NPM package install)](#track-b-npm-package-install)
+- [Troubleshooting](#troubleshooting)
+---
+
+## Common Prerequisites
+
+Setting up these 3 things first for both tracks will reduce time spent wandering during installation.
+
+### Find Your Entry File
+
+Unistyles configuration must be registered at app startup. So you need to import `@fleet-ui/core/unistyles` (or Track A's local path) in your **entry file**.
+
+**Reference: [Unistyles Configuration](https://www.unistyl.es/v3/start/configuration#set-configuration)**
+
+- **Expo Router (recommended)**: Usually `app/_layout.tsx` is the entry file.
+- **react-navigation/native (recommended)**: Usually `App.tsx` or `index.tsx` is the entry file.
+- **Custom entry like `main.ts`?** → That file is your entry file.
+
+> Track A's `fleet-ui init` attempts to auto-detect the entry file and insert the import (default is Expo Router's `app/_layout.tsx`).
+
+**Completion criteria**: Team has agreed on which entry file to use, and you can open that file directly.
+
+### Import Path (alias) Differs by Track
+
+Track A uses aliases with `local` suffix. You can also modify the alias within your project if needed.
+
+- Track A (CLI Based Local Install)
+
+```ts
+import '@fleet-ui/local/core/unistyles';
+```
+
+- Track B (Package Manager Based Install)
+
+```ts
+import '@fleet-ui/core/unistyles';
+```
+
+**Completion criteria**: One of the above imports is in your entry file "exactly once."
+
+---
+
+### Required Runtime Dependencies
+
+Fleet UI assumes runtime dependencies commonly used together in React Native apps.
+
+#### 1. Common to All Tracks
+
+These 4 are **needed in almost all environments**, and missing them can affect behavior.
+
+- pnpm
+
+```bash
+pnpm add react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets
+```
+
+- yarn
+
+```bash
+yarn add react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets
+```
+
+- npm
+
+```bash
+npm install react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets
+```
+
+- bun
+
+```bash
+bun add react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets
+```
+
+- Expo
+
+```bash
+npx expo install react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets
+```
+
+#### 2. Often Needed / Per-Component (Optional)
+
+These dependencies **may be needed depending on component/environment**.
+
+- (Commonly often) `react-native-safe-area-context`, `react-native-svg`
+- (Mainly in Expo environments) `expo-blur`, `expo-image`, `expo-linear-gradient`
+
+> Note: When running `fleet-ui init`/`fleet-ui doctor` in Track A, warnings may appear including "optional dependencies." Even if warnings appear, install based on **whether the component you're currently using needs it**.
+
+**Completion criteria**: The 4 required runtime deps are installed and the app is ready to run.
+
+---
+
+
+## Track A (CLI Based Local Install)
+
+### Overview
+
+```txt
+<project-root>/
+├─ app/
+│  └─ _layout.tsx
+├─ fleet-ui/
+│  ├─ core/
+│  └─ components/
+└─ fleet-ui.json
+```
+
+---
+
+### 1. init (Install core + Auto-setup alias/config)
+
+```bash
+pnpm dlx @fleet-ui/cli init
+```
+
+`init` automatically performs these tasks:
+
+- Create `fleet-ui.json` (records paths/alias/entry file)
+- Auto-insert `@fleet-ui/local/core/unistyles` import in entry
+- Set up TypeScript alias (`tsconfig.json` paths)
+- Set up Babel alias (`module-resolver`)
+- Align Unistyles plugin's `autoProcessImports`
+- Provide install commands if required/dev dependencies are missing
+
+**Completion criteria**: `fleet-ui.json` is created, and `@fleet-ui/local/core/unistyles` import is in the entry file.
+
+Options (when needed):
+
+```bash
+# Example: Running from a different project root
+pnpm dlx @fleet-ui/cli init --cwd ./apps/my-app
+
+# Example: Change installation paths
+pnpm dlx @fleet-ui/cli init --core-dir src/fleet-ui/core --components-dir src/fleet-ui/components
+
+# Example: Change alias prefix
+pnpm dlx @fleet-ui/cli init --alias @fleet-ui/local
+```
+
+---
+
+### 2. Verify "Normal State" After init
+
+#### 2.1. Check if Entry Import is In Place
+
+For Expo Router:
+
+```ts
+// app/_layout.tsx
+import '@fleet-ui/local/core/unistyles';
+```
+
+#### 2.2. Check if TypeScript paths (alias) are In Place
+
+`tsconfig.json` (conceptual example):
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@fleet-ui/local/*": ["fleet-ui/*"]
+    }
+  }
+}
+```
+
+> This setting is for **types/editor**, and runtime (Metro/Babel) also needs separate configuration.
+
+#### 2.3. Check if Babel Config is Correct (runtime alias + reanimated + unistyles)
+
+The keys in `babel.config.js` (or `babel.config.cjs`) are 3 things:
+
+1) `module-resolver` to resolve alias at runtime
+2) `react-native-unistyles/plugin`'s `autoProcessImports` includes `@fleet-ui/local`
+3) **`react-native-reanimated/plugin` is last in plugins array**
+
+Conceptual example:
+
+```js
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: [
+      [
+        'module-resolver',
+        {
+          alias: {
+            '@fleet-ui/local': './fleet-ui',
+          },
+        },
+      ],
+      ['react-native-unistyles/plugin', { autoProcessImports: ['@fleet-ui/local'] }],
+      'react-native-reanimated/plugin',
+    ],
+  };
+};
+```
+
+> In Track A, `init` patches this config on a best-effort basis.
+
+---
+
+### 3. Add Components
+
+Pick and add only the components you need.
+
+```bash
+pnpm dlx @fleet-ui/cli add Button Modal
+```
+
+What `add` does (summary):
+
+- Copy component source from registry
+- Best-effort align internal imports to `@fleet-ui/local/core` base
+- Update target directory's `index.ts` (barrel)
+
+---
+
+### 4. Per-Component Optional Dependencies (Common Examples)
+
+Below are representative examples of "deps that may be additionally needed when using this component."
+
+| Component | Potentially Needed Dependencies |
+| --- | --- |
+| `Modal`, `ImageCard` | `expo-blur` |
+| `IconButton`, `ImageCard` | `expo-image` |
+| `Swiper`, `ImageCard` | `expo-linear-gradient` |
+| (Commonly often) | `react-native-safe-area-context`, `react-native-svg` |
+
+Installation example (Expo recommended):
+
+```bash
+npx expo install expo-blur expo-image expo-linear-gradient react-native-safe-area-context react-native-svg
+```
+
+> Note: If you want to reduce Expo module dependencies, you can operate with alternative options when adding components.
+
+---
+
+### 5. doctor (Recommended)
+
+```bash
+pnpm dlx @fleet-ui/cli doctor
+```
+
+What `doctor` mainly checks:
+
+- `fleet-ui.json` exists
+- Entry import exists
+- tsconfig alias exists
+- babel alias + unistyles autoProcessImports exists
+- Required/dev dependencies missing
+
+---
+
+## Track B (NPM package install)
+
+> Goal: Prioritize installation/update stability, absorb changes through package version upgrades.
+
+### 1. Install Packages
+
+```bash
+pnpm add @fleet-ui/core @fleet-ui/components
+```
+
+### 2. Add Entry Import (Required)
+
+```ts
+import '@fleet-ui/core/unistyles';
+```
+
+### 3. Install peerDependencies (Required)
+
+In package track, runtime dependencies are declared as peerDependencies, so you must install them directly in your app.
+
+```bash
+pnpm add react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets
+pnpm add react-native-safe-area-context react-native-svg
+```
+
+If using components with Expo-based features (Blur/Image/Gradient, etc.):
+
+```bash
+pnpm add expo-blur expo-image expo-linear-gradient
+```
+
+> For Expo projects, `npx expo install` is recommended instead of `pnpm add`.
+
+---
+
+### 4. Check Babel Config (Especially Reanimated)
+
+Package track doesn't mean Reanimated setup is automatically done.
+
+- `react-native-reanimated/plugin` may be needed in `babel.config.js`
+- **Must be last in plugins array**
+
+Minimal example:
+
+```js
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: ['react-native-reanimated/plugin'],
+  };
+};
+```
+
+If you already have other plugins:
+
+```js
+plugins: [
+  // ...existing plugins...
+  'react-native-reanimated/plugin',
+]
+```
+
+---
+
+## Troubleshooting
+
+### 1) "unistyles not applied / theme not working"
+
+**Symptom**: Theme is not applied (colors/typography look like defaults).
+
+**Common cause**: Side-effect import is missing from entry file.
+
+**Solution (checklist)**: Check from top to bottom.
+
+- Is your entry file correct? (For Expo Router, usually `app/_layout.tsx`)
+- Is the side-effect import in the entry file?
+  - Track A: `import '@fleet-ui/local/core/unistyles';`
+  - Track B: `import '@fleet-ui/core/unistyles';`
+- Is the import placed "after rendering"? (Recommended to put at file top.)
+
+### 2) "Cannot find @fleet-ui/local/* module" (Track A)
+
+**Symptom**: Says it can't find `@fleet-ui/local/*` module.
+
+**Common cause**: Alias setup is set for only types or runtime, not both.
+
+**Solution (checklist)**: Check these 3 in order.
+
+- Is `paths` set in `tsconfig.json`?
+- Is `module-resolver` alias in `babel.config.js`?
+- Does `react-native-unistyles/plugin`'s `autoProcessImports` include `@fleet-ui/local`?
+
+### 3) "Reanimated-related error / app crashes immediately"
+
+**Symptom**: Reanimated-related error occurs or app crashes immediately.
+
+**Common cause**: Reanimated Babel plugin is missing or not last in plugins array.
+
+**Solution (checklist)**:
+
+- Is `react-native-reanimated/plugin` in `babel.config.js`?
+- Is it **last in the plugins array**?
+
+### 4) "Cannot find specific expo module (expo-blur/expo-image/expo-linear-gradient)"
+
+**Symptom**: Says it can't find `expo-blur`/`expo-image`/`expo-linear-gradient` module.
+
+**Common cause**: Added a component that uses that module but didn't install the dependency.
+
+**Solution (checklist)**:
+
+- Check if that component actually uses that dependency (see table above)
+- For Expo, `npx expo install <dep>` is recommended

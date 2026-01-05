@@ -1,0 +1,156 @@
+### (A) One-liner
+
+**`ImageCard` is a card component that places blur/gradient overlay on a background image, with text/action/footer slots on top.**
+Choose content area direction with `variant="vertical" | "horizontal"`, and fine-tune layout ratio with `aspectRatio`/`contentRatio`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add ImageCard**
+
+```bash title="Track A: add ImageCard"
+pnpm dlx @fleet-ui/cli add ImageCard
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { ImageCard } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { ImageCard } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`ImageCard` uses these Expo modules internally:
+
+- `expo-image` (background image)
+- `expo-blur` (blur overlay)
+- `expo-linear-gradient` (gradient overlay)
+
+```bash title="Required deps (Expo)"
+npx expo install expo-image expo-blur expo-linear-gradient
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="ImageCard basic usage"
+import { ImageCard } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <ImageCard
+      source={{ uri: 'https://example.com/image.jpg' }}
+      title="Title"
+      description="Description"
+      width={320}
+      aspectRatio="16:9"
+      accessibilityLabel="Promotion card"
+    />
+  );
+}
+```
+
+#### D-2. Layout: `variant` + `contentRatio`
+
+- `variant="vertical"`: Content positioned at bottom (vertical card)
+- `variant="horizontal"`: Content positioned on right (horizontal card)
+
+`contentRatio` is the ratio occupied by content overlay (Front Layer).
+- vertical: Height-based ratio (e.g., 0.34 → bottom 34%)
+- horizontal: Width-based ratio (e.g., 0.44 → right 44%)
+
+```tsx title="Horizontal variant with custom contentRatio"
+import { ImageCard } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <ImageCard
+      variant="horizontal"
+      contentRatio={0.5}
+      source={{ uri: 'https://example.com/image.jpg' }}
+      title="Horizontal Card"
+      width={360}
+      aspectRatio={16 / 9}
+    />
+  );
+}
+```
+
+#### D-3. Slot Structure (Top/Action/Footer)
+
+- `topContent`: Positioned absolute at image top (badge/tag)
+- `action`: Action area for buttons/icons
+- `footer`: Bottom footer (stats/additional actions)
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`ImageCard` doesn't use Reanimated shared value.
+Instead, it internally constructs a "3-layer structure" to create the layout.
+
+- **Container Layer**: Outer frame (padding/border/shadow/rounded)
+- **Back Layer**: Background image (`expo-image`)
+- **Front Layer**: Blur (`BlurView`) + gradient (`LinearGradient`) + content slots
+
+Also parses `aspectRatio` internally when it's a string.
+
+- Only `'width:height'` format is supported (e.g., `'4:3'`, `'16:9'`)
+- On parse failure, outputs warning and falls back to default ratio (1).
+
+---
+
+### (F) Accessibility
+
+Recommended rules:
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+
+`ImageCard` passes `accessibilityLabel` to root container.
+
+Recommended rules:
+- If card is a "meaningful content group," provide `accessibilityLabel` (e.g., "Promotion card: 50% off").
+- If there are button/icon actions inside card, provide separate labels for each action.
+
+---
+
+### (G) Props Table
+
+> Reference: `ImageCardProps` from `packages/components/src/ImageCard/ImageCard.types.ts`.
+> `ImageCardProps` extends `ViewProps` (however, `children` is not used).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `source` | `ImageSource` | Yes | - | Background image source (expo-image) | `expo-image` required |
+| `contentFit` | `ImageContentFit` | No | `'cover'` | Image resize mode | |
+| `imageProps` | `Omit<ExpoImageProps, 'source' \| 'contentFit'>` | No | - | expo-image additional props | |
+| `variant` | `'vertical' \| 'horizontal'` | No | `'vertical'` | Layout direction | |
+| `aspectRatio` | `number \| string` | No | - | Card aspect ratio | String is `'w:h'` format |
+| `contentRatio` | `number` | No | `0.42`(vertical) / `0.5`(horizontal) | Content area ratio (0~1) | Actual implementation default follows internal constant |
+| `width` | <code>number &#124; &#96;&#36;&#123;number&#125;%&#96;</code> | No | - | Card width | |
+| `height` | `number` | No | - | Card height | Usually aspectRatio recommended |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'`(types) / impl default may be `'lg'` | Shadow preset | Note difference between impl default and type annotation |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | Round preset | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Typo scale | |
+| `topContent` | `ReactNode` | No | - | Top slot (absolute) | |
+| `title` | `string` | No | - | Title text | |
+| `description` | `string` | No | - | Description text | |
+| `action` | `ReactNode` | No | - | Action slot | |
+| `footer` | `ReactNode` | No | - | Footer slot | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | image is <code>&#36;&#123;testID&#125;-image</code> |
+| `textColorInverted` | `boolean` | No | `false` | Text color inversion | Current implementation uses fixed dark scope |

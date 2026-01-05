@@ -1,0 +1,129 @@
+### (A) One-Line Summary
+
+**`Swiper` is a slide-to-confirm component where users swipe left-to-right to "confirm/execute an action".**  
+The background and text transition based on drag progress, and `onSwipeSuccess` is called when the threshold is crossed.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> **Prerequisite**: Import the unistyles side-effect in your app **entry file**.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Swiper"
+pnpm dlx @fleet-ui/cli add Swiper
+```
+
+```ts title="Track A: import"
+import { Swiper } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Swiper } from '@fleet-ui/components';
+```
+
+#### Required Dependencies
+
+`Swiper` uses the following dependencies:
+
+- `react-native-gesture-handler`, `react-native-reanimated` (swipe/animation)
+- `expo-linear-gradient` (when `variant="gradient"`)
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-gesture-handler react-native-reanimated react-native-unistyles
+```
+
+```bash title="Expo only (for gradient)"
+npx expo install expo-linear-gradient
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Basic Usage
+
+```tsx title="Swiper basic usage"
+import { Swiper } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Swiper
+      placeholder="Swipe right to confirm"
+      actionTitle="Done!"
+      onSwipeSuccess={() => console.log('success')}
+      onSwipeCancel={() => console.log('cancel')}
+    />
+  );
+}
+```
+
+#### D-2. Gradient Variant
+
+When `variant="gradient"`, you can provide a `customGradient` or use the theme's gradient tokens.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- `translateX` (SharedValue): thumb's horizontal translation
+- `isCompleting`: guard during completion animation (prevents duplicate completion)
+- `isDragging`: whether dragging is in progress (used for thumb scale, etc.)
+- `thresholdValue`: completion threshold clamped to 0–1
+
+#### E-2. Completion Logic
+
+On drag end:
+- Progress is calculated as `progress = translateX / maxTranslate`
+- Completion is triggered if `progress >= threshold` or `velocityX > 500 && progress > 0.7`
+
+On completion:
+- Thumb animates to the end with `withTiming`
+- Completion callback is invoked
+- Resets to 0 after 300ms (ready for reuse)
+
+On cancel:
+- `translateX` returns to 0 and `onSwipeCancel` is called
+
+---
+
+### (F) Accessibility
+
+`Swiper` exposes the root as `accessibilityRole="button"` and allows screen readers to trigger completion via the "activate" action.
+
+- `accessibilityActions={[{ name: 'activate' }]}`
+- `onAccessibilityAction`: if "activate", performs best-effort completion animation and calls success callback
+- Label priority:
+  - `aria-label` (web) → `accessibilityLabel` → `placeholder` (string)
+
+---
+
+### (G) Props Table
+
+> Reference: `SwiperProps` from `packages/components/src/Swiper/Swiper.types.ts`.
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | Color theme | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'gradient'` | No | `'filled'` | Style variant | gradient requires expo-linear-gradient |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | Border radius | |
+| `thumbShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Thumb shadow | |
+| `disabled` | `boolean` | No | `false` | Disable interaction | |
+| `placeholder` | `string` | No | - | Center guidance text | |
+| `actionTitle` | `string` | No | `'Action!'` | Text over progress background | |
+| `icon` | `ReactNode` | No | - | Thumb icon | Default: chevrons icon |
+| `threshold` | `number` | No | `0.7` | Completion threshold (0–1) | Clamped internally |
+| `onSwipeSuccess` | `() => void \| Promise<void>` | No | - | Completion callback | |
+| `onSwipeStart` | `() => void` | No | - | Start callback | |
+| `onSwipeCancel` | `() => void` | No | - | Cancel callback | |
+| `customGradient` | `{ colors: [string, string, ...string[]]; locations?: [number, number, ...number[]] }` | No | - | Custom gradient | For gradient variant |
+| `aria-label` | `string` | No | - | Accessibility label (web) | |
+| `testID` | `string` | No | - | Test identifier | data-testid on web |

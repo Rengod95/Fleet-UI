@@ -1,0 +1,124 @@
+### (A) 한줄 요약
+
+**`StepIndicator`는 여러 단계 중 현재 위치를 “점(dot) 스트립”으로 표시하는 컴포넌트예요.**  
+`activeStep`(0-based)로 현재 단계를 표시하고, `interactive=true`이면 사용자가 특정 점을 탭해 단계 이동을 트리거할 수 있어요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add StepIndicator"
+pnpm dlx @fleet-ui/cli add StepIndicator
+```
+
+```ts title="Track A: import"
+import { StepIndicator } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { StepIndicator } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`StepIndicator`는 Reanimated를 써요.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 기본 사용
+
+```tsx title="StepIndicator basic usage"
+import { StepIndicator } from '@fleet-ui/components';
+
+export function Example() {
+  return <StepIndicator step={5} activeStep={2} />;
+}
+```
+
+#### D-2. Interactive 모드
+
+```tsx title="Interactive"
+import { useState } from 'react';
+import { StepIndicator } from '@fleet-ui/components';
+
+export function Example() {
+  const [active, setActive] = useState(0);
+
+  return (
+    <StepIndicator
+      step={5}
+      activeStep={active}
+      interactive
+      onStepChange={setActive}
+      onStepPress={(i) => console.log('pressed', i)}
+    />
+  );
+}
+```
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- `step`은 1~100 범위로 clamp돼요.
+- `activeStep`은 0~(step-1) 범위로 clamp돼요.
+- controlled/uncontrolled:
+  - controlled: `activeStep` 제공 시
+  - uncontrolled: `defaultActiveStep`로 내부 상태를 시작하고, interactive에서 내부 상태를 갱신
+
+#### E-2. Reanimated / Shared Value
+
+- `activeStepSV`(`SharedValue<number>`)를 사용해 현재 단계를 애니메이션으로 동기화해요.
+- 각 dot은 derived value로:
+  - `isActive`: 현재 step인지
+  - `isCompleted`: 현재보다 이전 step인지
+  를 계산해요.
+- 활성 dot은 폭이 늘어나고(“pill”처럼), fill opacity가 활성/완료 상태에서 1로 전환돼요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 루트: `accessibilityRole="progressbar"`
+- `accessibilityValue: { min: 0, max: step-1, now: activeStep }`
+- `accessibilityLabel` 기본값: `Step {activeStep+1} of {step}`
+
+interactive일 때:
+- 각 점은 `accessibilityRole="button"`이며, `accessibilityState.selected`로 현재 선택 상태를 전달해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/StepIndicator/StepIndicator.types.ts`의 `StepIndicatorProps`.
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `step` | `number` | Yes | - | 총 단계 수 | 1~100 clamp |
+| `activeStep` | `number` | No | - | 현재 단계(0-based) | controlled |
+| `defaultActiveStep` | `number` | No | `0` | 초기 단계(0-based) | uncontrolled |
+| `onStepChange` | `(step: number) => void` | No | - | 단계 변경 콜백(0-based) | interactive에서 유용 |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'`(types) / 구현 기본값은 `'neutral'` | 색상 테마 | 기본값 차이 주의 |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기 | |
+| `interactive` | `boolean` | No | `false` | 탭으로 단계 변경 | |
+| `onStepPress` | `(stepIndex: number) => void` | No | - | 탭 콜백(0-based) | interactive에서만 의미 |
+| `animated` | `boolean` | No | `true` | 애니메이션 사용 | |
+| `gap` | `number` | No | size 기반 계산 | 점 간 간격(px) | |
+| `accessibilityLabel` | `string` | No | `Step {activeStep+1} of {step}` | 접근성 라벨 | |
+| `testID` | `string` | No | - | 테스트 식별자 | |

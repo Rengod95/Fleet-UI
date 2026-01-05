@@ -1,0 +1,123 @@
+### (A) One-liner
+
+**`Section` is a layout component that divides the screen into "header (title/subtitle/right action) + body."**
+It groups information in block units on document/settings/list screens, and provides right actions (text/icon) in a consistent pattern.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Section"
+pnpm dlx @fleet-ui/cli add Section
+```
+
+```ts title="Track A: import"
+import { Section } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Section } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Basic Pattern (Composing with String Props Only)
+
+When `title/subtitle/right` are strings, they're rendered using default Typography internally.
+
+```tsx title="Section basic usage"
+import { Section, Button } from '@fleet-ui/components';
+import { View, Text } from 'react-native';
+
+export function Example() {
+  return (
+    <Section
+      title="Payment Method"
+      subtitle="Please select your default payment method."
+      right={<Section.RightTypo onPress={() => {}}>Change</Section.RightTypo>}
+    >
+      <View>
+        <Text>Content</Text>
+      </View>
+    </Section>
+  );
+}
+```
+
+#### D-2. Right Action: Text vs Icon
+
+- Text action: `Section.RightTypo`
+- Icon action: `Section.RightIcon` (when interactive, `aria-label` or `accessibilityLabel` required)
+
+`SectionHeader` internally creates `RightIcon` when there's no `right` but only `rightIcon`.
+
+#### D-3. Layout Control: `titleRatio`, `subtitlePosition`
+
+- `titleRatio`: Ratio (0-100) that title area occupies in header. Right area uses remaining ratio.
+- `subtitlePosition`: Position subtitle above title (`top`) or below (`bottom`, default)
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`Section` itself is a layout component without internal state.
+
+However, when right actions (`RightTypo`, `RightIcon`) are "interactive" (= when `onPress` or `onPressIn/out` is provided), they provide press feedback animation internally.
+
+- press-in: scale/opacity spring (`scale=0.8`, `opacity=0.7`)
+- press-out: return
+
+---
+
+### (F) Accessibility
+
+`Section` is a layout component, so accessibility is mainly important for "right actions."
+
+- `Section.RightTypo`:
+  - If interactive, sets `accessibilityRole="button"` and `accessibilityState.disabled`.
+- `Section.RightIcon`:
+  - If interactive, sets `accessibilityRole="button"` + `accessibilityLabel`.
+  - In dev mode, outputs warning if interactive but missing label.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/Section/Section.types.ts`.
+
+#### Section — `SectionProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `ReactNode` | No | - | Header title |
+| `subtitle` | `ReactNode` | No | - | Header subtitle |
+| `right` | `ReactNode` | No | - | Header right area (priority) |
+| `rightIcon` | `ReactNode` | No | - | Header right icon (used only when no `right`) |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size preset |
+| `gap` | `keyof FleetTheme['spacing'] \| number` | No | `3` | Vertical gap between header internal elements |
+| `padding` | `keyof FleetTheme['spacing'] \| number` | No | `0` | Header/body common horizontal padding |
+| `contentSpacing` | `keyof FleetTheme['spacing'] \| number` | No | `5` | Header-body gap and body top padding |
+| `titleRatio` | `number` | No | `70` | Title area ratio in header |
+| `subtitlePosition` | `'top' \| 'bottom'` | No | `'bottom'` | Subtitle position |
+| `headerStyle` | `ViewProps['style']` | No | - | Header style |
+| `contentStyle` | `ViewProps['style']` | No | - | Body style |
+| `children` | `ReactNode` | No | - | Body content |
+| `testID` | `string` | No | - | Test identifier |
+
+#### Subcomponents
+
+- `Section.Header`: `SectionHeaderProps`
+- `Section.Title`: `SectionTitleProps` (`size?`, `children`, `testID?` + TextProps)
+- `Section.Subtitle`: `SectionSubtitleProps` (`size?`, `children`, `testID?` + TextProps)
+- `Section.RightTypo`: `SectionRightTypoProps` (`size?`, `style?`, `containerStyle?`, `textProps?` + PressableProps)
+- `Section.RightIcon`: `SectionRightIconProps` (`size?`, `icon`, `aria-label?`, `style?` + PressableProps)

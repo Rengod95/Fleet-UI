@@ -1,0 +1,124 @@
+### (A) One-Line Summary
+
+**`TabBar` is a horizontal tab component that displays multiple tabs, indicates the current selection, and triggers tab switching.**  
+The selection index (`selectedPage`) is controlled externally, while the component synchronizes indicator animations and scroll position (to keep the active tab visible) internally.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> **Prerequisite**: Import the unistyles side-effect in your app **entry file**.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add TabBar"
+pnpm dlx @fleet-ui/cli add TabBar
+```
+
+```ts title="Track A: import"
+import { TabBar } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { TabBar } from '@fleet-ui/components';
+```
+
+#### Required Dependencies
+
+`TabBar` uses Reanimated + worklets for scroll/indicator synchronization.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-worklets react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Basic Usage
+
+```tsx title="TabBar basic usage"
+import { useState } from 'react';
+import { TabBar } from '@fleet-ui/components';
+
+export function Example() {
+  const [page, setPage] = useState(0);
+
+  return (
+    <TabBar
+      selectedPage={page}
+      items={['Home', 'Search', 'Saved', 'Settings']}
+      onSelect={setPage}
+    />
+  );
+}
+```
+
+#### D-2. Disabled Tabs
+
+- `disabledIndices`: disable specific indices
+- `isItemDisabled(item, index)`: compute disabled state based on item
+
+#### D-3. Custom Accessibility Labels
+
+For string items, the string is used as the label by default. For ReactNode items, provide labels explicitly:
+
+- `accessibilityLabels[index]` (highest priority)
+- `getItemAccessibilityLabel(item, index)`
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+`selectedPage` is an externally controlled value. Internally, this is synchronized to `dragProgress` (SharedValue) to calculate indicator animations and scroll position.
+
+On tab click:
+- On UI thread: `dragProgress = withSpring(index)` moves the indicator first
+- On JS thread: `onSelect(index)` is called so external state follows
+- A guard (~800ms) prevents immediate `selectedPage` updates from overwriting the spring animation
+
+#### E-2. Indicator Calculation
+
+- Collects item layout (x/width) + text layout (width) to calculate indicator left/width (or scaleX)
+- `variant='underlined'` uses scaleX-based animation; other variants use direct left/width calculation
+
+---
+
+### (F) Accessibility
+
+Each tab item (`TabBarItem`) has:
+- `accessibilityRole="tab"`
+- `accessibilityState={{ selected, disabled }}`
+- `accessibilityLabel` is passed from the parent
+
+> Note: The root doesn't explicitly have `tablist` role. If needed, add a container role at the screen level.
+
+---
+
+### (G) Props Table
+
+> Reference: `TabBarProps` from `packages/components/src/TabBar/TabBar.types.ts`.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `selectedPage` | `number` | Yes | - | Current selection index (controlled) |
+| `items` | `(string \| ReactNode)[]` | Yes | - | Tab items |
+| `onSelect` | `(index: number) => void` | No | - | Tab selection callback |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'primary'` | Color theme |
+| `variant` | `'underlined' \| 'filled' \| 'faded' \| 'flat' \| 'ghost'` | No | `'filled'` | Style variant |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Border radius |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow |
+| `indicatorShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Indicator shadow |
+| `indicatorPadding` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Visual padding between indicator and container |
+| `getItemAccessibilityLabel` | `(item, index) => string \| undefined` | No | - | Compute item accessibility label |
+| `accessibilityLabels` | `(string \| undefined)[]` | No | - | Item accessibility labels array (highest priority) |
+| `hitSlop` | `PressableProps['hitSlop']` | No | - | Override default tab hitSlop |
+| `disabledIndices` | `number[]` | No | - | List of disabled indices |
+| `isItemDisabled` | `(item, index) => boolean` | No | - | Compute disabled state function |

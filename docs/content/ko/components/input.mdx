@@ -1,0 +1,167 @@
+### (A) 한줄 요약
+
+**`Input`은 텍스트 입력을 위한 기본 폼 컴포넌트예요.**  
+`value/onChangeText`(controlled, 제어형) 또는 `defaultValue`(uncontrolled, 비제어형) 패턴을 지원하고, `description/errorMessage`, `startContent/endContent`, `isClearable` 같은 “폼 UX” 중심 props(속성)를 제공해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Input 추가**
+
+```bash title="Track A: add Input"
+pnpm dlx @fleet-ui/cli add Input
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { Input } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { Input } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Input`은 아이콘(클리어 버튼)과 Reanimated 기반 시각 피드백을 써요.
+
+```bash title="Recommended runtime deps"
+pnpm add lucide-react-native react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Input basic usage"
+import { Input } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Input
+      label="이메일"
+      placeholder="name@example.com"
+      description="로그인에 사용할 이메일을 입력해요."
+    />
+  );
+}
+```
+
+#### D-2. Controlled 패턴
+
+```tsx title="Input (controlled)"
+import { useState } from 'react';
+import { Input } from '@fleet-ui/components';
+
+export function Example() {
+  const [value, setValue] = useState('');
+
+  return (
+    <Input
+      label="닉네임"
+      value={value}
+      onChangeText={setValue}
+      placeholder="2~12자"
+    />
+  );
+}
+```
+
+#### D-3. 에러/검증: `errorMessage`, `isInvalid`
+
+- `errorMessage`가 있으면 에러 텍스트가 표시돼요.
+- `isInvalid=true`면 입력 래퍼가 **좌우 흔들림(shake)** 애니메이션을 실행해요.
+
+```tsx title="Input with error"
+import { Input } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Input
+      label="비밀번호"
+      secureTextEntry
+      isInvalid
+      errorMessage="비밀번호는 8자 이상이어야 합니다."
+    />
+  );
+}
+```
+
+#### D-4. 슬롯: `startContent` / `endContent` + 클리어 버튼
+
+- `startContent` / `endContent`로 입력 좌우에 아이콘/버튼 등을 배치할 수 있어요.
+- `isClearable=true`이고 값이 있으며, `isDisabled/isReadOnly`가 아니면 clear 버튼(X)이 표시돼요.
+- clear 버튼을 누르면 내부적으로 값을 `''`로 바꾸고 `onClear()`를 호출해요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- controlled(제어형) 여부: `value`가 있으면 controlled, 없으면 `defaultValue` 기반 내부 상태를 써요
+- `editable = !isDisabled && !isReadOnly`
+- 에러 색상 역할: `evaluatedColorScheme = isInvalid ? 'error' : colorScheme`
+
+> 참고: `InputProps` 타입의 기본값과 실제 구현 기본값이 다를 수 있어요.  
+> 예: 구현에서는 `isClearable` 기본값이 `true`일 수 있어요.
+
+#### E-2. Reanimated / Shared Value
+
+구현에서는 아래 shared value가 쓰일 수 있어요.
+
+- `underlineScale`: `variant="underlined"`에서 포커스 시 underline 바가 펼쳐지는 애니메이션
+- `isInvalid`일 때 입력 래퍼를 좌우로 흔드는 shake 애니메이션
+- wrapper 배경/보더 색상을 variant color 값으로 `withTiming` 전환
+
+---
+
+### (F) 접근성(누락 금지)
+
+`Input`은 RN `TextInputProps`를 상속해서, `accessibilityLabel`/`accessibilityHint` 같은 접근성 props를 그대로 전달할 수 있어요.
+
+권장 규칙:
+- 시각적 `label`이 있어도 스크린리더에서 명확히 들리는지 확인해요(`accessibilityLabel` 또는 `label`/`placeholder` 조합).
+- 에러 상태에서는 `errorMessage`가 화면에 보이므로, 필요하면 `accessibilityHint`로 “오류 이유/다음 행동”을 보강해요.
+- 아이콘만 있는 endContent(예: clear 버튼)를 쓴다면, 스크린리더 라벨이 누락되지 않게 확인해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Input/Input.types.ts`의 `InputProps`.  
+> `InputProps`는 `TextInputProps`를 상속해요(단, `style`은 제외).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'filled' \| 'flat' \| 'bordered' \| 'underlined' \| 'faded'` | No | `'bordered'` | 입력 스타일 variant | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | 색상 테마 | `isInvalid`면 error로 평가될 수 있음 |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 높이/타이포 스케일 | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'inner'` | No | `'none'` | 그림자 프리셋 | |
+| `radius` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | 모서리 둥글기 | |
+| `label` | `string` | No | - | 라벨 텍스트 | |
+| `labelPlacement` | `'inside' \| 'outside' \| 'outside-left'` | No | `'inside'` | 라벨 위치 | 현재 구현에서는 별도 분기 적용이 제한적일 수 있음 |
+| `description` | `string` | No | - | 하단 설명 텍스트 | `errorMessage`가 있으면 숨김 |
+| `errorMessage` | `string` | No | - | 하단 에러 텍스트 | 제공 시 invalid UX에 사용 |
+| `startContent` | `ReactNode` | No | - | 입력 시작 슬롯 | |
+| `endContent` | `ReactNode` | No | - | 입력 끝 슬롯 | |
+| `isClearable` | `boolean` | No | `false`(types) | clear 버튼 표시 여부 | 구현 기본값은 `true`일 수 있음 |
+| `isInvalid` | `boolean` | No | `false` | invalid 상태 | shake/색상 전환 |
+| `isDisabled` | `boolean` | No | `false` | 비활성화 | `editable=false` |
+| `isReadOnly` | `boolean` | No | `false` | 읽기 전용 | `editable=false` |
+| `fullWidth` | `boolean` | No | `true` | width 100% 여부 | |
+| `onClear` | `() => void` | No | - | clear 버튼 콜백 | |
+
+#### TextInputProps 상속(요약)
+
+`InputProps`는 `TextInputProps`를 상속하므로 `value`, `defaultValue`, `onChangeText`, `placeholder`, `secureTextEntry` 같은 RN 표준 입력 props를 그대로 지원해요.

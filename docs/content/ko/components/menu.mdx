@@ -1,0 +1,182 @@
+### (A) 한줄 요약
+
+**`Menu`는 트리거(버튼 등)를 눌러 드롭다운을 표시하고, 항목 선택/체크를 제공하는 합성(Compound) 컴포넌트예요.**  
+`Menu.Trigger`가 열림 상태(controlled/uncontrolled), 바깥 클릭 닫힘, 선택 시 닫힘을 관리하고, `Menu.Dropdown/DropdownItem/DropdownCheckItem`이 메뉴 UI를 구성해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Menu"
+pnpm dlx @fleet-ui/cli add Menu
+```
+
+```ts title="Track A: import"
+import { Menu } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Menu } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Menu`는 드롭다운 표시/애니메이션을 위해 RN `Modal` + Reanimated를 써요. 또한 워클릿 스케줄링을 위해 `react-native-worklets`를 써요.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-reanimated react-native-gesture-handler react-native-worklets react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Menu basic usage"
+import { Menu, Button } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Menu.Trigger
+      dropdown={
+        <Menu.Dropdown header={<Menu.Header>정렬</Menu.Header>}>
+          <Menu.DropdownItem onPress={() => {}}>최신순</Menu.DropdownItem>
+          <Menu.DropdownItem onPress={() => {}}>인기순</Menu.DropdownItem>
+        </Menu.Dropdown>
+      }
+    >
+      <Button>메뉴 열기</Button>
+    </Menu.Trigger>
+  );
+}
+```
+
+#### D-2. CheckItem: `Menu.DropdownCheckItem`
+
+`DropdownCheckItem`은 내부적으로 `checked` 상태를 토글하고 `onCheckedChange(next)`를 호출해요.  
+또한 `closeOnSelect=true`이면 체크 후 메뉴가 닫혀요.
+
+```tsx title="Menu check items"
+import { useState } from 'react';
+import { Menu, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [checked, setChecked] = useState(false);
+
+  return (
+    <Menu.Trigger
+      dropdown={
+        <Menu.Dropdown>
+          <Menu.DropdownCheckItem checked={checked} onCheckedChange={setChecked}>
+            옵션 A
+          </Menu.DropdownCheckItem>
+        </Menu.Dropdown>
+      }
+    >
+      <Button>옵션</Button>
+    </Menu.Trigger>
+  );
+}
+```
+
+#### D-3. 닫힘 정책
+
+- `closeOnOutsidePress`: 오버레이(바깥 영역) 누르면 닫기 (기본 true)
+- `closeOnSelect`: 항목 선택 시 닫기 (기본 true)
+
+메뉴가 “설정 토글”처럼 여러 개 연속으로 체크해야 하는 UX라면, `closeOnSelect={false}`를 고려해요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델(Trigger)
+
+`Menu.Trigger`는 controlled/uncontrolled를 모두 지원해요.
+
+- controlled: `open`이 있으면 `isOpen = open`
+- uncontrolled: `defaultOpen`으로 내부 상태를 시작하고, 내부에서 `setInternalOpen`으로 토글
+
+또한 닫힘 애니메이션이 끝날 때까지 `Modal`을 유지하기 위해 `modalVisible`이라는 별도 상태를 둬요.
+
+#### E-2. Reanimated / Shared Value
+
+드롭다운 표시 애니메이션은 다음 shared value로 처리해요.
+
+- `opacity`: 0 → 1 (open), 1 → 0 (close)
+- `scaleX/scaleY`: 0 → 1로 전환(딜레이 포함)
+
+닫힘 시에는 애니메이션 완료 콜백에서 모달을 숨겨요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 드롭다운 컨테이너: `accessibilityRole="menu"` (`Menu.Dropdown`)
+- 메뉴 아이템: `accessibilityRole="menuitem"` (`Menu.DropdownItem/DropdownCheckItem`)
+- Trigger 모달 스코프:
+  - `accessibilityViewIsModal`
+  - `importantForAccessibility="yes"`
+  - `onAccessibilityEscape`로 닫기 지원
+
+권장 규칙:
+- 아이템 텍스트가 문자열이면 자동으로 라벨로 사용되지만, 커스텀 children을 쓰는 경우 `accessibilityLabel`을 제공해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Menu/Menu.types.ts`의 public 타입들.
+
+#### Menu.Trigger — `MenuTriggerProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `open` | `boolean` | No | - | 열림 상태(controlled) | |
+| `defaultOpen` | `boolean` | No | `false` | 초기 열림(uncontrolled) | |
+| `onOpen` | `() => void` | No | - | 열림 콜백 | |
+| `onClose` | `() => void` | No | - | 닫힘 콜백 | |
+| `children` | `ReactNode` | Yes | - | 트리거 요소(버튼 등) | 내부에서 onPress를 주입할 수 있음 |
+| `dropdown` | `ReactNode` | Yes | - | 드롭다운(`Menu.Dropdown`) | |
+| `placement` | `MenuPlacement` | No | `'bottom-start'` | 배치 위치 | 화면 경계 보정 포함 |
+| `closeOnOutsidePress` | `boolean` | No | `true` | 바깥 클릭 닫기 | |
+| `closeOnSelect` | `boolean` | No | `true` | 항목 선택 시 닫기 | 컨텍스트로 전달 |
+
+#### Menu.Dropdown — `MenuDropdownProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `header` | `ReactNode` | No | - | 헤더(`Menu.Header` 권장) |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 드롭다운 크기 |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 라운드 |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 그림자 |
+| `children` | `ReactNode` | Yes | - | 아이템들 |
+
+#### Menu.DropdownItem — `MenuDropdownItemProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | No | - | 좌측 슬롯 |
+| `right` | `ReactNode` | No | - | 우측 슬롯(`Menu.DropdownIcon` 권장) |
+| `children` | `ReactNode` | Yes | - | 텍스트/콘텐츠 |
+
+#### Menu.DropdownCheckItem — `MenuDropdownCheckItemProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | No | - | 좌측 슬롯 | |
+| `right` | `ReactNode` | No | - | 우측 슬롯 | |
+| `checked` | `boolean` | No | `false` | 체크 상태 | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | 체크 변경 콜백 | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | 체크 시 색상 | |
+| `children` | `ReactNode` | Yes | - | 텍스트/콘텐츠 | |
+
+#### Menu.Header / Menu.DropdownIcon
+
+- `Menu.Header`: `MenuHeaderProps` (`children`, `style`)
+- `Menu.DropdownIcon`: `MenuDropdownIconProps` (`icon`, `size?`, `color?`, `strokeWidth?`)

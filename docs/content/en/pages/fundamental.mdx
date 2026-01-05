@@ -1,0 +1,135 @@
+# Fundamental
+
+This document explains **why (WHY) Fleet UI's design system is structured this way**.
+
+## 3-Line Summary
+
+- **Lock semantic meaning**, absorb value changes at raw/primitive layers.
+- **Components consume only semantic tokens** where possible to reduce change costs.
+- **Documentation is layered**—lower layers only reference upper layers (no reverse references).
+
+## When to Read This
+
+Read this document first if:
+
+- You're reading token docs and `raw/primitive/semantic/theme` is confusing.
+- "Why shouldn't I use raw colors directly in components?" doesn't make sense.
+- You want to understand the structure and file organization of `@fleet-ui/core`.
+
+## Internal Production Process
+
+Fleet UI components are built on a layer structure designed so both LLMs and developers can easily understand:
+
+```text
+Layer0: Principle (WHY/WHAT, tech-independent)
+  ↓ reference
+Layer1: Meta Spec (project context/declarations)
+  ↓ reference
+Layer2: Token/Component Spec (concrete specs, implementable level)
+  ↓ reference
+Layer3: Implementation Guide (stack-specific implementation patterns)
+```
+
+- **Layer0: Principle** — Domain characteristics the design system must have; a planning document and top-level standard for all decisions.
+- **Layer1: Meta Spec** — Project context/declarations. Declares overall project goals, tech stack, resources, etc.
+- **Layer2: Token/Component Spec** — Concrete specs at an implementable level. Defines specific specs for tokens and components.
+- **Layer3: Implementation Guide** — Stack-specific implementation patterns needed to implement "spec documents" generated from Layer2 into actual code.
+
+Fleet UI was created by writing these 4 layers as context, then referencing each layer with LLM and developer Rengod.
+
+The "design system" explained in this document is a very brief summary of Layer0 information used internally.
+
+## Fleet UI Design System
+
+Fleet UI's design system consists of:
+
+- **Token System**: A self-designed token hierarchy system for design consistency, changeability, and extensibility.
+- **Variants**: Defines the axes that express component design.
+
+Unlike other UI SDKs, with Unistyles' help, design system configuration files are just simple TypeScript files.
+
+Also, all components are built using our own token names, so the token system and components are difficult to use independently (though not impossible).
+
+However, since the token structure is similar to common design systems and hierarchically organized, it actually reduces change costs and increases extensibility.
+
+## Token Hierarchy (Minimal Definition of WHAT)
+
+Fleet UI hierarchizes tokens like this:
+
+```text
+Raw Value → Primitive → Semantic → Theme → (Component Consumption)
+```
+
+- **Raw Value**: Actual values (colors, numbers). High change frequency, heavy designer involvement.
+- **Primitive**: Rule-based minimal unit tokens (e.g., spacing scale, radius scale, color palette scale).
+- **Semantic**: Purpose/context-based tokens (e.g., background/text/border/action/state). The interface consumers (components) mainly see.
+- **Theme**: Final bundle used at runtime (e.g., light/dark). Provided to match the platform/stack (here, Unistyles).
+
+### Reference Rules (Absolute Rules)
+
+- **Only reference lower layers** (no reverse direction)
+- **No circular references**
+- **Minimize layer skipping** (e.g., semantic directly referencing raw is discouraged)
+- **Components consume only semantic where possible** (primitive/raw direct use is exception only).
+
+## Purpose of Token System (WHY)
+
+Token system isn't "giving names to values"—it's a **structure to reduce change and decision-making costs**.
+
+- **Consistency**: Same context uses same values, reducing UI variation.
+- **Ease of change**: Even when brand/dark mode/rebranding changes happen, modification scope is minimized.
+- **Reduced decision cost**: "What value should I use in this situation?" is replaced by rules.
+
+## Contract Between Components and Tokens
+
+The more components depend on the "semantic interface provided by the token system," the safer design changes become.
+
+- Component state changes are expressed as **semantic token combination changes**.
+  - Example: In `default → hover → pressed → disabled`, how `bg/text/border/shadow` change
+- Component APIs based on **meaning (colorScheme: primary/error/success…)** rather than "color names (blue/red)" are better for maintenance.
+
+### Example: "If you only consume semantic, you're safe even when things change"
+
+For example, if Button decides "where to get primary color" directly, you'd have to modify button code every time there's a change.
+Instead, Button only receives **colorScheme (color role)**, and gets colors from `theme.colors.*` (semantic).
+
+```ts
+// Conceptual example: Component only receives colorScheme, not color "name".
+const palette = theme.utils.getPaletteForScheme(theme, colorScheme);
+
+// Only change semantic keys based on variant.
+const backgroundColor =
+  variant === 'filled' ? (palette.solid ?? palette.content_inversed) : palette.content_1;
+
+const textColor = variant === 'filled' ? palette.text_inversed : palette.text_1;
+```
+
+This way, even if "primary palette values" change, you can leave button code as-is and just change tokens.
+
+## Fleet UI Quality Principles (Accessibility / Motion)
+
+Tokens and components are ultimately means for user experience, so the below are set as "defaults."
+
+### Accessibility
+
+- **Why is this important?**: Accessibility isn't just a "certain users" problem—it reduces failure probability for all users (outdoors/low vision/one-handed operation/keyboard users, etc.).
+- **What to check?**
+  - **role/state/interaction patterns**: Components have role/state/interaction patterns by default.
+  - **accessibilityLabel**: Components have accessibilityLabel by default.
+  - **accessibilityState**: Components have accessibilityState by default.
+  - **Luminance contrast**: Tokens are designed so text combinations meet WCAG standards.
+  - **Touch targets**: Minimum touch area is secured on mobile.
+
+### Motion
+
+- **Why is this important?**: Motion isn't "pretty decoration"—it's a signal to help understand state changes. Plus, it plays the most important role in elevating brand and design quality on limited screen size. But too much creates fatigue and confusion.
+- **What to check?**
+  - **Trends**: Animations are designed to match trends.
+  - **Performance**: Animations are designed to run on the UI thread by default. Even when state sync is needed, performance bottlenecks are minimized where possible.
+  - **Consistency**: Care was taken so animations between components don't operate in too different styles.
+  - **Avoid excess**: Motion that doesn't help convey information is reduced.
+
+## Next
+
+- [View theme application in Theming System](/fundamental/theming): Check the flow of registering/switching/consuming themes at runtime.
+- [View token structure in Token Architecture](/fundamental/token-architecture): Grasp the token pipeline and file structure/change procedures.

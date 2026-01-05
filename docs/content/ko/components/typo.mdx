@@ -1,0 +1,89 @@
+### (A) 한줄 요약
+
+**`Typo`는 Fleet UI의 semantic typography 토큰(`theme.typography`)을 그대로 매핑해 렌더링하는 텍스트 컴포넌트예요.**  
+`variant`로 타이포 스케일을 선택하고, `colorScheme + colorWeight`로 텍스트 색을 토큰 기반으로 지정해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Typo"
+pnpm dlx @fleet-ui/cli add Typo
+```
+
+```ts title="Track A: import"
+import { Typo } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Typo } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 기본 사용
+
+```tsx title="Typo basic"
+import { Typo } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <>
+      <Typo variant="h3Strong">타이틀</Typo>
+      <Typo variant="body2" colorScheme="neutral" colorWeight={3}>
+        본문 설명 텍스트
+      </Typo>
+    </>
+  );
+}
+```
+
+#### D-2. `extend`: 너비를 부모에 맞춰 늘리기
+
+`extend=false`(기본)일 때는 내용 크기만큼만 차지하도록 렌더링되고,  
+`extend=true`이면 `width: 100%`로 부모 너비를 채워 레이아웃 정렬(예: `textAlign: 'center'`)에 유리해요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+`Typo`는 내부 상태/애니메이션(shared value)이 없어요.  
+unistyles variants로 `theme.typography[variant]`와 색상 토큰을 스타일로 매핑해 RN `Text`를 렌더링해요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+권장 규칙:
+- (웹) 키보드/포커스 이동이 자연스러운지 확인해요.
+- (공통) 상태 변화가 스크린리더에 충분히 전달되는지 확인해요.
+
+`Typo`는 `TextProps`를 그대로 상속하므로, 앱 레벨에서 필요한 접근성 속성을 직접 전달하면 돼요.
+
+- 예: `accessibilityRole="header"` (섹션 제목), `accessibilityLabel`, `numberOfLines`, `ellipsizeMode` 등
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Typo/Typo.types.ts`의 `TypoProps`.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `keyof SemanticTypography` | No | `'body2'` | 타이포 variant(토큰 key) |
+| `extend` | `boolean` | No | `false` | 가로 폭을 부모에 맞춰 확장 |
+| `colorScheme` | `'neutral' \| 'primary' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | 색상 스킴 |
+| `colorWeight` | `1 \| 2 \| 3 \| 4` | No | `1` | 텍스트 색상 강도(palette text_1~text_4) |
+| `children` | `ReactNode` | Yes | - | 텍스트 콘텐츠 |
+
+`TypoProps`는 `TextProps`를 상속해요. (예: `numberOfLines`, `ellipsizeMode`, `selectable`, `accessibilityRole` 등)

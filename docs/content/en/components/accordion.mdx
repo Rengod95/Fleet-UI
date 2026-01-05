@@ -1,0 +1,187 @@
+### (A) One-liner
+
+**`Accordion` is a component that shows multiple sections with "collapse/expand" functionality.**
+Choose behavior model with `type="single" | "multiple"`, and compose UI with `Accordion.Item / Header / Content` compound structure.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Accordion**
+
+```bash title="Track A: add Accordion"
+pnpm dlx @fleet-ui/cli add Accordion
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { Accordion } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { Accordion } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Accordion` requires these dependencies for header icon (default Chevron) and interaction animation.
+
+```bash title="Recommended runtime deps"
+# For Expo, npx expo install is recommended
+pnpm add lucide-react-native react-native-reanimated react-native-gesture-handler
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Accordion basic usage (single)"
+import { Accordion } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Accordion type="single" defaultValue="item-1" collapsible>
+      <Accordion.Item value="item-1">
+        <Accordion.Header>Shipping Info</Accordion.Header>
+        <Accordion.Content>Shipping takes 2-3 days.</Accordion.Content>
+      </Accordion.Item>
+
+      <Accordion.Item value="item-2">
+        <Accordion.Header>Refund Policy</Accordion.Header>
+        <Accordion.Content>Refund is available within 7 days of purchase.</Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  );
+}
+```
+
+#### D-2. State Model Based on `type` (Important)
+
+`Accordion`'s "open state" type differs based on **single / multiple**.
+
+- **single**: Only one opens
+  - uncontrolled: `defaultValue?: string`
+  - controlled: `value?: string`, `onValueChange?: (value: string) => void`
+- **multiple**: Multiple can open simultaneously
+  - uncontrolled: `defaultValue?: string[]`
+  - controlled: `value?: string[]`, `onValueChange?: (value: string[]) => void`
+
+> When `type="single"` with `collapsible=true`, "close all" is possible. In this case, `onValueChange` can pass **empty string (`''`)** (representing closed state).
+> Define this value interpretation rule once in your app and unify.
+
+#### D-3. `Accordion.Item`'s `value` is "State Key"
+
+`Accordion.Item`'s `value: string` is a **unique key** that identifies open state.
+
+- Both controlled/uncontrolled calculate "is open" based on `value`.
+- In `type="multiple"`, judged by whether included in "array of open values."
+
+#### D-4. Header Icon/Slots: `leftIcon`, `rightIcon`
+
+`Accordion.Header`:
+- Renders left slot with `leftIcon`
+- If no `rightIcon`, renders default icon (ChevronDown) that rotates based on open state
+- Can hide default icon with `rightIcon={false}`
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+`Accordion` propagates state with **root context + item context**.
+
+- Values managed at Root (`Accordion`):
+  - `expandedValues: string[]` (list of currently open item values)
+  - `toggleItem(value: string)` (toggle open/close)
+- Values derived at Item (`Accordion.Item`):
+  - `isExpanded: boolean` (whether own `value` is included in `expandedValues`)
+  - `isDisabled: boolean` (`Accordion.Item`'s `disabled`)
+
+#### E-2. Reanimated / Shared Value
+
+`Accordion` animation is mainly in 2 areas:
+
+- **Header**: press-in/out scale/opacity + Chevron rotation
+  - `rotation` shared value transitions 0↔180 degrees with `withTiming`.
+- **Content**: After measuring content height, animates `height` with `withTiming`
+  - Stores measured `animatedHeight` via `onLayout`, and transitions `height/opacity` with time animation based on `isExpanded`.
+
+> Caution: Content "measures" actual height internally to animate, so when content changes dynamically (e.g., height change after image loading), consider **layout re-measurement timing**.
+
+---
+
+### (F) Accessibility
+
+`Accordion.Header` basically serves button role.
+
+- Default role: `accessibilityRole="button"`
+- Label rules:
+  - If `accessibilityLabel` exists, use it
+  - If not and `children` is string, use `children` as label
+- State passed:
+  - `accessibilityState: { expanded, disabled }`
+
+Item disabled is handled with `Accordion.Item disabled`, and Header blocks press and lowers `opacity`.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/Accordion/Accordion.types.ts`.
+> `AccordionProps` extends `ViewProps`, and `AccordionHeaderProps` extends `PressableProps`.
+
+#### Accordion (Root) — `AccordionProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `type` | `'single' \| 'multiple'` | Yes | - | Expansion mode selection | State type differs |
+| `collapsible` | `boolean` | No | `false` | Allow "close all" in single mode | Meaningless in multiple (always closable) |
+| `defaultValue` | `string` or `string[]` | No | - | Uncontrolled mode initial value | Type determined by `type` |
+| `value` | `string` or `string[]` | No | - | Controlled mode value | Type determined by `type` |
+| `onValueChange` | `(value: string) => void` or `(value: string[]) => void` | No | - | Value change callback | In single, closed can be `''` |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | Demo available in Playground |
+| `variant` | `'ghost' \| 'outlined' \| 'flat' \| 'faded'` | No | `'ghost'` | Visual style | Demo available in Playground |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size/density | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Corner radius | |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Gap between items | |
+| `children` | `ReactNode` | Yes | - | `Accordion.Item` and other child elements | |
+
+#### Accordion Item — `AccordionItemProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `value` | `string` | Yes | - | Item unique key | State identifier |
+| `disabled` | `boolean` | No | `false` | Disabled state | Header press block + a11y disabled |
+| `headerContentGap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | - | Gap between Header and Content | Affects style/rounded/shadow application |
+| `children` | `ReactNode` | Yes | - | `Accordion.Header`, `Accordion.Content` | |
+
+#### Accordion Header — `AccordionHeaderProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `leftIcon` | `ReactNode` | No | - | Left icon slot | |
+| `rightIcon` | `ReactNode \| false` | No | - | Right icon slot (default Chevron) / `false` to hide | |
+| `children` | `ReactNode` | Yes | - | Header content (usually title string) | String also used as a11y label |
+
+#### Accordion Content — `AccordionContentProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | Content | String is wrapped with `Text` internally (line break/display may vary by children type) |
+
+#### RN Props Inheritance (Summary)
+
+- `AccordionProps` extends `ViewProps` (e.g., `style`, etc.).
+- `AccordionHeaderProps` extends `PressableProps` (e.g., `onPress`, `disabled`, `accessibilityLabel`, etc.).
+  However, `children` is redefined in component.

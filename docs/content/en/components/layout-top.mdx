@@ -1,0 +1,133 @@
+### (A) One-liner
+
+**`LayoutTop` is a component that layouts "title/subtitle/asset/right action" at the top of the screen in a consistent manner.**
+It unifies title typography with size presets, and adjusts top section layout with `paddingTop/paddingBottom` (token or number) and `rightAlignment`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add LayoutTop**
+
+```bash title="Track A: add LayoutTop"
+pnpm dlx @fleet-ui/cli add LayoutTop
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { LayoutTop } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { LayoutTop } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="LayoutTop basic usage"
+import { LayoutTop } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <LayoutTop
+      size="md"
+      paddingTop="md"
+      paddingBottom="md"
+      title={<LayoutTop.TitleTypo>Payment</LayoutTop.TitleTypo>}
+      subtitleBottom={
+        <LayoutTop.SubtitleTypo>Please confirm your payment info.</LayoutTop.SubtitleTypo>
+      }
+    />
+  );
+}
+```
+
+#### D-2. Asset/Right Action: `asset`, `right`
+
+```tsx title="Asset + Right"
+import { LayoutTop, IconButton } from '@fleet-ui/components';
+import { Settings } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <LayoutTop
+      asset={<LayoutTop.Asset>{/* image/icon */}</LayoutTop.Asset>}
+      title={<LayoutTop.TitleTypo>Home</LayoutTop.TitleTypo>}
+      right={<IconButton icon={<Settings />} aria-label="Settings" onPress={() => {}} />}
+      rightAlignment="end"
+    />
+  );
+}
+```
+
+#### D-3. Padding: Preset vs Number
+
+`paddingTop/paddingBottom` support both:
+
+- Preset: `'none' | 'sm' | 'md' | 'lg'`
+- Number: Arbitrary px value (number)
+
+When giving a number, internal variants are processed as `custom`, and actual value is applied with inline style.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`LayoutTop` has no internal state/animation (shared value).
+Instead, it passes `size` via context to match default typo scale for `TitleTypo/SubtitleTypo`.
+
+Implementation characteristics:
+- `LayoutTop.TitleTypo`/`SubtitleTypo` can override context size with `size` prop.
+- `rightAlignment` only affects right column's vertical alignment (justifyContent).
+
+---
+
+### (F) Accessibility
+
+Recommended rules:
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+
+`LayoutTop` itself is a simple layout container. Accessibility is mainly responsibility of "elements rendered inside."
+
+Recommended rules:
+- If it's actual page title, use text with `accessibilityRole="header"` in `title` area (or assign header role at parent).
+- If putting icon-only button in `right`, provide `aria-label`/`accessibilityLabel`.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/LayoutTop/LayoutTop.types.ts`.
+
+#### LayoutTop — `LayoutTopProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `asset` | `ReactNode` | No | - | Top asset area | |
+| `subtitleTop` | `ReactNode` | No | - | Subtitle above title | |
+| `title` | `ReactNode` | No | - | Main title | Usually `LayoutTop.TitleTypo` recommended |
+| `subtitleBottom` | `ReactNode` | No | - | Subtitle below title | |
+| `right` | `ReactNode` | No | - | Right action area | |
+| `rightAlignment` | `'start' \| 'center' \| 'end'` | No | `'end'`(types) / impl default may be `'center'` | Right vertical alignment | Note difference between impl default and type annotation |
+| `paddingTop` | `'none' \| 'sm' \| 'md' \| 'lg' \| number` | No | `'none'` | Top padding | If number, px |
+| `paddingBottom` | `'none' \| 'sm' \| 'md' \| 'lg' \| number` | No | `'md'` | Bottom padding | If number, px |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Default typo scale | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+
+#### Subcomponents
+
+- `LayoutTop.Asset`: `LayoutTopAssetProps` (`children`, `style`)
+- `LayoutTop.TitleTypo`: `LayoutTopTitleTypoProps` (`size?`, `children`, `style` + TextProps)
+- `LayoutTop.SubtitleTypo`: `LayoutTopSubtitleTypoProps` (`size?`, `children`, `style` + TextProps)

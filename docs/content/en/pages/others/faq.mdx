@@ -1,0 +1,37 @@
+# FAQ
+
+Common setup/build issues collected here. If you have a problem, check these questions first.
+
+---
+
+## Unistyles not applied (theme not working)
+
+**Common cause**: `@fleet-ui/*/core/unistyles` import is missing from entry file.
+
+**Solution**:
+
+- Track A: `import '@fleet-ui/local/core/unistyles';`
+- Track B: `import '@fleet-ui/core/unistyles';`
+
+---
+
+## App crashes with Reanimated-related error
+
+**Common cause**: `react-native-reanimated/plugin` is missing or not last in plugins array.
+
+**Solution**:
+
+- Check if `react-native-reanimated/plugin` is in `babel.config.js`.
+- Check if it's the **last** in plugins array.
+
+---
+
+## Cannot find `@fleet-ui/local/*` module (Track A)
+
+**Common cause**: Alias setup is set for only types or runtime, not both.
+
+**Solution**:
+
+- Check if `paths` is set in `tsconfig.json`.
+- Check if `module-resolver` alias is in `babel.config.js`.
+- Check if `react-native-unistyles/plugin`'s `autoProcessImports` includes `@fleet-ui/local`.

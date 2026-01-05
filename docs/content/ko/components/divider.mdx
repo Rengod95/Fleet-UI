@@ -1,0 +1,110 @@
+### (A) 한줄 요약
+
+**`Divider`는 콘텐츠 영역을 시각적으로 구분하는 수평 구분선 컴포넌트예요.**  
+얇은 라인(`variant="line"`)과 섹션 분리용 두꺼운 디바이더(`variant="thick"`)를 제공하고, `horizontalMargin/verticalMargin`으로 레이아웃 여백을 조절할 수 있어요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Divider 추가**
+
+```bash title="Track A: add Divider"
+pnpm dlx @fleet-ui/cli add Divider
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { Divider } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { Divider } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="Divider basic usage"
+import { Divider } from '@fleet-ui/components';
+
+export function Example() {
+  return <Divider />;
+}
+```
+
+#### D-2. 섹션 분리: `variant="thick"`
+
+```tsx title="Section divider"
+import { Divider } from '@fleet-ui/components';
+
+export function Example() {
+  return <Divider variant="thick" size="md" verticalMargin="lg" />;
+}
+```
+
+#### D-3. 좌우 여백: `horizontalMargin`
+
+`horizontalMargin`이 `none`이 아니면, 내부에서 `width: 'auto'`로 전환돼서 “패딩처럼 보이는” 구분선을 만들 수 있어요.
+
+```tsx title="Divider with horizontal margin"
+import { Divider } from '@fleet-ui/components';
+
+export function Example() {
+  return <Divider horizontalMargin="md" />;
+}
+```
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+`Divider`는 내부 상태/애니메이션(shared value)을 갖지 않아요.  
+대신 `variant + size` 조합을 `compoundVariants`로 해석해 실제 높이(두께)를 결정해요.
+
+구현상 예시:
+- `variant="line"` + `size="sm"` → `StyleSheet.hairlineWidth`
+- `variant="thick"` + `size="md"` → 약 15px
+
+---
+
+### (F) 접근성(누락 금지)
+
+권장 규칙:
+- (웹) 키보드/포커스 이동이 자연스러운지 확인해요.
+- (공통) 상태 변화가 스크린리더에 충분히 전달되는지 확인해요.
+
+`Divider`는 장식/구분 목적이므로 접근성 트리에 올라가지 않도록 설정해요.
+
+- `accessibilityRole="none"`
+- `importantForAccessibility="no"`
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Divider/Divider.types.ts`의 `DividerProps`.  
+> `DividerProps`는 `ViewProps`를 상속해요.
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'line' \| 'thick'` | No | `'line'` | 디바이더 스타일 | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 두께 프리셋 | variant에 따라 실제 px가 달라짐 |
+| `horizontalMargin` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | 좌우 여백 | `none`이 아니면 width가 auto로 전환 |
+| `colorScheme` | `'base' \| 'inverted'` | No | `'base'` | 테마 반전(ScopedTheme) | |
+| `verticalMargin` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'none'` | 상하 여백 | |
+| `testID` | `string` | No | - | 테스트 식별자 | |
+
+#### ViewProps 상속(요약)
+
+`DividerProps`는 `ViewProps`를 상속하므로 `style` 등 기본 레이아웃 props를 지원해요.

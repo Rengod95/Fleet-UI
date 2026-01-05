@@ -1,0 +1,177 @@
+### (A) One-liner
+
+**`Toast` is an overlay component that briefly shows short feedback messages at the top/bottom of the screen.**
+`ToastProvider` manages single toast state and timer, and display/hide can be triggered with `useToast()` or global controller (`toast/showToast`).
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Toast"
+pnpm dlx @fleet-ui/cli add Toast
+```
+
+```ts title="Track A: import"
+import { ToastProvider, useToast, toast, showToast, hideToast } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { ToastProvider, useToast, toast, showToast, hideToast } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Toast` may use gesture/animation/safe area.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-gesture-handler react-native-reanimated react-native-safe-area-context react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Provider Installation (Required)
+
+Place `ToastProvider` once at top level (e.g., App root).
+
+```tsx title="ToastProvider"
+import { ToastProvider } from '@fleet-ui/components';
+
+export function AppRoot() {
+  return (
+    <ToastProvider defaultPosition="top" defaultDuration={4000}>
+      {/* ... app ... */}
+    </ToastProvider>
+  );
+}
+```
+
+#### D-2. Hook Usage: `useToast()`
+
+```tsx title="useToast"
+import { Button } from '@fleet-ui/components';
+import { useToast } from '@fleet-ui/components';
+
+export function Example() {
+  const { show, hide } = useToast();
+
+  return (
+    <Button
+      onPress={() => {
+        const handle = show({
+          title: 'Saved',
+          description: 'Changes have been applied.',
+          colorScheme: 'success',
+        });
+        // Can close with handle.hide()
+      }}
+    >
+      Save
+    </Button>
+  );
+}
+```
+
+#### D-3. Global Call: `toast/showToast`
+
+For layers where context access is difficult (e.g., service), global controller can be used.
+
+```ts title="showToast"
+import { showToast, hideToast } from '@fleet-ui/components';
+
+export function notify() {
+  const h = showToast({ title: 'Done', duration: 1500 });
+  // h?.hide() or hideToast(h?.id)
+}
+```
+
+> Caution: Global controller only works after Provider is mounted and handler is connected.
+
+#### D-4. Message Templates (Success/Failure/Warning)
+
+Toast is most useful when users can immediately know "what to do next." Follow these patterns where possible.
+
+- **Success**: What was completed + what to do next (if any)
+  - Example: `title="Saved"`, `description="Changes have been applied."`
+- **Failure/Error**: What failed + reason (if known) + next action
+  - Example: `title="Save failed"`, `description="Check your network and try again."`
+- **Warning**: Impact + options (if needed)
+  - Example: `title="Login required"`, `description="Login to continue."`
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. Provider State Model
+
+- Provider internal state is `toast: ToastInternalState | null` single slot.
+- `show(options)` creates new id (<code>toast-&#36;&#123;Date.now()&#125;</code>), clears existing timer, then overwrites state with new toast.
+- If `duration > 0`, auto-close is scheduled with `setTimeout(() => hide(id), duration)`.
+- `hide(id?)` ignores if id differs to prevent "accidentally closing different toast."
+
+#### E-2. Toast Animation/Gesture
+
+`Toast` itself animates with Reanimated shared value:
+
+- enter/exit: translateY (opposite direction), opacity, scale
+- When dragToDismiss=true, `Gesture.Pan()` reduces opacity/scale based on vertical drag progress,
+  - If `displacement > closeThreshold` or `velocity > 500`, judged as close.
+
+---
+
+### (F) Accessibility
+
+- Toast card: `accessibilityRole="alert"` (read as important notification)
+- Close button should have `IconButton`'s `aria-label="Close toast"` (web accessibility)
+
+Recommendations:
+
+- Provide clear `title/description` for important errors/warnings.
+- If user can resolve immediately, provide action with immediately executable measure via `action`.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/Toast/Toast.types.ts`.
+
+#### ToastProvider — `ToastProviderProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | App content |
+| `defaultPosition` | `'top' \| 'bottom'` | No | `'top'` | Default position |
+| `defaultDuration` | `number` | No | `4000` | Default duration (ms) |
+
+#### Toast content — `ToastShowOptions` (passed to show)
+
+| Option | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `string` | No | - | Title |
+| `description` | `string` | No | - | Description |
+| `icon` | `ReactNode` | No | - | Icon |
+| `colorScheme` | `'neutral' \| 'primary' \| 'success' \| 'warning' \| 'error' \| 'info'` | No | - | Color theme |
+| `variant` | `'filled' \| 'flat' \| 'faded'` | No | - | Style variant |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Size |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | - | Rounded |
+| `position` | `'top' \| 'bottom'` | No | provider default | Display position |
+| `insets` | `number \| { top?: number; bottom?: number; horizontal?: number }` | No | - | Margin (added to safe area) |
+| `safeArea` | `boolean` | No | `true` | Use safe area |
+| `duration` | `number` | No | provider default | Auto-close (ms), 0/falsey keeps showing |
+| `closable` | `boolean` | No | - | Show close button |
+| `dragToDismiss` | `boolean` | No | `true` | Drag to close |
+| `closeThreshold` | `number` | No | `48` | Drag threshold (px) |
+| `onPress` | `() => void` | No | - | Toast body click |
+| `action` | `{ label: string; onPress: () => void }` | No | - | Action button |
+| `onShow` | `() => void` | No | - | Show callback |
+| `onClose` | `() => void` | No | - | Close callback |
+| `testID` | `string` | No | - | Test identifier |

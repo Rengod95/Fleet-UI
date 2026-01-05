@@ -1,0 +1,89 @@
+### (A) One-Line Summary
+
+**`Typo` is a text component that directly maps Fleet UI's semantic typography tokens (`theme.typography`) for rendering.**  
+Select the typography scale with `variant`, and specify text color token-based using `colorScheme + colorWeight`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> **Prerequisite**: Import the unistyles side-effect in your app **entry file**.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Typo"
+pnpm dlx @fleet-ui/cli add Typo
+```
+
+```ts title="Track A: import"
+import { Typo } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Typo } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Basic Usage
+
+```tsx title="Typo basic"
+import { Typo } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <>
+      <Typo variant="h3Strong">Title</Typo>
+      <Typo variant="body2" colorScheme="neutral" colorWeight={3}>
+        Body description text
+      </Typo>
+    </>
+  );
+}
+```
+
+#### D-2. `extend`: Expand Width to Parent
+
+When `extend=false` (default), the component only takes up as much space as its content.  
+When `extend=true`, it renders with `width: 100%` to fill the parent width, which is useful for layout alignment (e.g., `textAlign: 'center'`).
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`Typo` has no internal state or animations (shared values).  
+It uses unistyles variants to map `theme.typography[variant]` and color tokens to styles, then renders an RN `Text` component.
+
+---
+
+### (F) Accessibility
+
+Recommended practices:
+- (Web) Ensure keyboard/focus navigation is natural
+- (General) Verify state changes are properly conveyed to screen readers
+
+`Typo` inherits `TextProps` directly, so pass accessibility attributes at the app level as needed.
+
+- Examples: `accessibilityRole="header"` (section title), `accessibilityLabel`, `numberOfLines`, `ellipsizeMode`, etc.
+
+---
+
+### (G) Props Table
+
+> Reference: `TypoProps` from `packages/components/src/Typo/Typo.types.ts`.
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `keyof SemanticTypography` | No | `'body2'` | Typography variant (token key) |
+| `extend` | `boolean` | No | `false` | Expand width to fill parent |
+| `colorScheme` | `'neutral' \| 'primary' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color scheme |
+| `colorWeight` | `1 \| 2 \| 3 \| 4` | No | `1` | Text color intensity (palette text_1–text_4) |
+| `children` | `ReactNode` | Yes | - | Text content |
+
+`TypoProps` extends `TextProps`. (e.g., `numberOfLines`, `ellipsizeMode`, `selectable`, `accessibilityRole`, etc.)

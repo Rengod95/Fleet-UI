@@ -1,0 +1,148 @@
+### (A) 한줄 요약
+
+**`IconButton`은 아이콘(또는 이미지)만으로 액션을 트리거하는 버튼이에요.**  
+`icon`(ReactNode) 또는 `src`(이미지)로 콘텐츠를 제공하고, press 인터랙션 애니메이션과 `loading`/`disabled` 상태, 그리고 icon-only 접근성 라벨 규칙을 기본으로 제공해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **IconButton 추가**
+
+```bash title="Track A: add IconButton"
+pnpm dlx @fleet-ui/cli add IconButton
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { IconButton } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { IconButton } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`IconButton`은 내부에서 이미지 렌더링을 위해 `expo-image`를 써요. 사용하려면 아래 의존성이 필요해요.
+
+```bash title="Recommended runtime deps"
+# Expo라면 npx expo install 사용을 권장
+pnpm add expo-image react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="IconButton basic usage"
+import { IconButton } from '@fleet-ui/components';
+import { Heart } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <IconButton
+      icon={<Heart />}
+      aria-label="좋아요"
+      onPress={() => {}}
+    />
+  );
+}
+```
+
+#### D-2. 이미지 아이콘: `src`
+
+`src`를 제공하면 `expo-image`로 이미지를 렌더링해요.
+
+```tsx title="IconButton with image src"
+import { IconButton } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <IconButton
+      src="https://example.com/icon.png"
+      aria-label="프로필"
+      onPress={() => {}}
+    />
+  );
+}
+```
+
+#### D-3. `icon` vs `src` 우선순위
+
+구현의 동작은 아래와 같아요.
+
+- `loading=true`이면 로더가 최우선 표시돼요.
+- 그 다음 `src`가 있으면 이미지를 렌더링해요.
+- 그 다음 `icon`이 있으면 아이콘을 렌더링해요.
+
+> 개발 모드에서 `icon`과 `src`가 동시에 제공되면 경고 로그를 출력해요(사용 의도를 명확히 하라는 가이드).
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- `isDisabled = Boolean(disabled || loading)`
+- `accessibilityState = { disabled: isDisabled, busy: loading }`
+
+즉, `loading=true`는 단순 UI가 아니라 **상호작용을 차단**하는 상태다.
+즉, `loading=true`는 단순 UI가 아니라 **상호작용을 차단**하는 상태예요.
+
+#### E-2. Reanimated / Shared Value
+
+press 인터랙션을 위해 내부 shared value를 써요.
+
+- press-in: `scale = 1.2`, `opacity = 0.6` (스프링)
+- press-out: `scale/opacity = 1` 복귀
+
+> 주의: scale이 “커지는” 인터랙션이므로, 부모 컨테이너에 `overflow: hidden`이 있으면 눌렀을 때 가장자리가 잘릴 수 있다.
+> 주의: scale이 “커지는” 인터랙션이므로, 부모 컨테이너에 `overflow: hidden`이 있으면 눌렀을 때 가장자리가 잘릴 수 있어요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+- 기본 role: `accessibilityRole="button"`
+- 라벨 우선순위: `aria-label` → `accessibilityLabel`
+- 상태 전달: `accessibilityState: { disabled, busy }`
+
+권장 규칙:
+- icon-only 버튼이므로 **라벨을 항상 제공하는 걸 권장**해요(`aria-label` 권장).
+- `loading=true`일 때도 라벨은 유지되어야 하고, 스크린리더는 `busy` 상태를 전달받아요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/IconButton/IconButton.types.ts`의 `IconButtonProps`.  
+> `IconButtonProps`는 `PressableProps`를 상속해요(단, `style`, `children`은 재정의돼요).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'ghost'` | No | `'filled'` | 시각적 스타일 | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | 색상 테마 | |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기 프리셋 | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'full'` | 모서리 둥글기 | |
+| `src` | `string \| ImageSource` | No | - | 이미지 소스(우선순위 높음) | `expo-image` 필요 |
+| `icon` | `ReactNode` | No | - | 아이콘 노드 | `src`가 있으면 무시될 수 있음 |
+| `iconSize` | `number` | No | - | 아이콘 크기(px) | 미지정 시 size 프리셋으로 계산 |
+| `iconColor` | `string` | No | - | 아이콘 색상(현재 구현에서는 주석 처리) | 필요 시 확장 고려 |
+| `loading` | `boolean` | No | `false` | 로딩 표시 + 상호작용 차단 | `busy=true` |
+| `aria-label` | `string` | No | - | 접근성 라벨(필수 권장) | Web에서 특히 중요 |
+| `testID` | `string` | No | - | 테스트 식별자 | loader는 <code>&#36;&#123;testID&#125;-loader</code> |
+| `style` | `PressableProps['style']` | No | - | 컨테이너 스타일 | |
+
+#### PressableProps 상속(요약)
+
+`IconButtonProps`는 `PressableProps`를 상속하므로 `onPress`, `onPressIn`, `onPressOut`, `disabled`, `accessibilityLabel` 등을 그대로 지원해요.

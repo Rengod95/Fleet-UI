@@ -1,4 +1,4 @@
-import '@fleet-ui/local/core/unistyles';
+import '@fleet-ui/core/unistyles';
 import { ToastProvider } from '@fleet-ui/components';
 // import '@fleet-ui/core';
 import { Stack } from 'expo-router';

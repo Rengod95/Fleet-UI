@@ -1,0 +1,110 @@
+### (A) One-liner
+
+**`Divider` is a horizontal separator component that visually divides content areas.**
+It provides thin line (`variant="line"`) and thick divider for section separation (`variant="thick"`), and layout margins can be adjusted with `horizontalMargin/verticalMargin`.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add Divider**
+
+```bash title="Track A: add Divider"
+pnpm dlx @fleet-ui/cli add Divider
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { Divider } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { Divider } from '@fleet-ui/components';
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="Divider basic usage"
+import { Divider } from '@fleet-ui/components';
+
+export function Example() {
+  return <Divider />;
+}
+```
+
+#### D-2. Section Separation: `variant="thick"`
+
+```tsx title="Section divider"
+import { Divider } from '@fleet-ui/components';
+
+export function Example() {
+  return <Divider variant="thick" size="md" verticalMargin="lg" />;
+}
+```
+
+#### D-3. Left/Right Margin: `horizontalMargin`
+
+When `horizontalMargin` is not `none`, it internally switches to `width: 'auto'` so you can create a separator that "looks like it has padding."
+
+```tsx title="Divider with horizontal margin"
+import { Divider } from '@fleet-ui/components';
+
+export function Example() {
+  return <Divider horizontalMargin="md" />;
+}
+```
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+`Divider` has no internal state/animation (shared value).
+Instead, `variant + size` combination is interpreted with `compoundVariants` to determine actual height (thickness).
+
+Implementation examples:
+- `variant="line"` + `size="sm"` → `StyleSheet.hairlineWidth`
+- `variant="thick"` + `size="md"` → approx. 15px
+
+---
+
+### (F) Accessibility
+
+Recommended rules:
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+
+`Divider` is set to not appear in accessibility tree since it's for decoration/separation purposes.
+
+- `accessibilityRole="none"`
+- `importantForAccessibility="no"`
+
+---
+
+### (G) Props Table
+
+> Reference: `DividerProps` from `packages/components/src/Divider/Divider.types.ts`.
+> `DividerProps` extends `ViewProps`.
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'line' \| 'thick'` | No | `'line'` | Divider style | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Thickness preset | Actual px varies by variant |
+| `horizontalMargin` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Left/right margin | If not `none`, width switches to auto |
+| `colorScheme` | `'base' \| 'inverted'` | No | `'base'` | Theme inversion (ScopedTheme) | |
+| `verticalMargin` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'none'` | Top/bottom margin | |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### ViewProps Inheritance (Summary)
+
+`DividerProps` extends `ViewProps`, so basic layout props like `style` are supported.

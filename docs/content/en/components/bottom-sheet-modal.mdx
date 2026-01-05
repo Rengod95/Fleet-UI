@@ -1,0 +1,217 @@
+### (A) One-liner
+
+**`BottomSheetModal` is a compound component that provides a modal (bottom sheet) rising from the bottom of the screen.**
+Root controls visibility state with `visible`, and internal subcomponents (`Header/Body/BodyDescription/Action/Footer`) compose the layout.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add BottomSheetModal**
+
+```bash title="Track A: add BottomSheetModal"
+pnpm dlx @fleet-ui/cli add BottomSheetModal
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { BottomSheetModal } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { BottomSheetModal } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`BottomSheetModal` internally wraps `@gorhom/bottom-sheet`. These dependencies are required (usually including Reanimated/gesture-handler setup).
+
+```bash title="Recommended runtime deps"
+# For Expo, npx expo install is recommended
+pnpm add @gorhom/bottom-sheet react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="BottomSheetModal basic usage"
+import { useState } from 'react';
+import { View, Text } from 'react-native';
+import { BottomSheetModal, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <View>
+      <Button onPress={() => setOpen(true)}>Open Bottom Sheet</Button>
+
+      <BottomSheetModal
+        visible={open}
+        onDismiss={() => setOpen(false)}
+        size="lg"
+        detached
+      >
+        <BottomSheetModal.Header title="Title" subtitle="Description" />
+        <BottomSheetModal.Body>
+          <Text>Content area</Text>
+        </BottomSheetModal.Body>
+        <BottomSheetModal.Action
+          layout="horizontal"
+          showPrimary
+          showSecondary
+          primaryButtonProps={{ children: 'Confirm' }}
+          secondaryButtonProps={{ children: 'Cancel' }}
+        />
+      </BottomSheetModal>
+    </View>
+  );
+}
+```
+
+#### D-2. `visible` + `onDismiss`: External Control Model (Important)
+
+`BottomSheetModal` controls visibility with `visible` at root.
+
+- When `visible=true`, `present()` is called internally.
+- When `visible=false`, dismiss is attempted internally.
+- In `onDismiss`, you **must set state to false**.
+
+> Caution: `onDismiss` is closer to a **contract that must be called for the modal to be properly released** based on type/annotations, rather than just "close event notification." So `visible` and `onDismiss` must be operated as a pair.
+
+#### D-3. Compound Subcomponents
+
+`BottomSheetModal` provides these subcomponents:
+
+- `BottomSheetModal.Header`: Configure header with `title/subtitle/actionIcon` or `children`
+- `BottomSheetModal.Body`: Body container (padding/size preset)
+- `BottomSheetModal.BodyDescription`: Center-aligned description text preset
+- `BottomSheetModal.Action`: Primary/Secondary button area (close then dismiss on press)
+- `BottomSheetModal.Footer`: Custom bottom area
+
+#### D-4. Backdrop / Background Customization
+
+At root:
+- `backdropComponent?: (props) => ReactElement | null`
+- `backgroundComponent?: (props) => ReactElement | null`
+
+These allow customizing Gorhom bottom sheet's backdrop/background.
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+`BottomSheetModal` operates with this flow internally:
+
+- External: `visible` (state) and `onDismiss` (setter role)
+- Internal: `useEffect` calls `present()` / `dismiss()` based on `visible` changes
+- Internal context: `InnerContext.close()` calls `onDismiss()` then performs dismiss
+
+In other words, "close" internally always prioritizes bringing down external state via `onDismiss()`.
+
+#### E-2. Reanimated / Shared Value
+
+Bottom sheet gesture/animation is mainly handled inside `@gorhom/bottom-sheet`. From documentation perspective, these are recommended:
+
+- Verify Reanimated/gesture-handler setup is properly applied in project
+- When composing UI where scroll/gesture conflicts inside modal (e.g., horizontal swipe + bottom sheet drag), check gesture priority
+
+---
+
+### (F) Accessibility
+
+`BottomSheetModal` root sets these to emphasize modal scope:
+
+- `accessibilityViewIsModal`
+- `importantForAccessibility="yes"`
+- Internal content container also has `accessible` + `accessibilityViewIsModal`
+
+Recommendations:
+- Close button (or cancel action) should be clear for screen reader users, so specify button label when using `BottomSheetModal.Action`.
+- When using icon-only `actionIcon`, provide appropriate accessibility label for that icon element.
+
+---
+
+### (G) Props Table
+
+> Reference: Public types from `packages/components/src/BottomSheetModal/BottomSheetModal.types.ts`.
+
+#### BottomSheetModal (Root) — `BottomSheetModalProps` (alias: `BottomSheetModalRootProps`)
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `visible` | `boolean` | Yes | `false` | Modal visibility state | External control required |
+| `onDismiss` | `() => void` | Yes | - | Called on close (change external state to false) | Required contract |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'lg'` | Content container width preset | sm=80%, md=90%, lg=100% |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'overlay'` | No | `'md'` | Shadow preset | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Corner radius | |
+| `detached` | `boolean` | No | `true` | Detached mode from bottom of screen | Use with `bottomInset` |
+| `bottomInset` | `number` | No | `12` | Detached mode bottom margin (added to safe area) | Safe area + offset |
+| `backdropComponent` | `(props: BottomSheetBackdropProps) => ReactElement \| null` | No | - | Custom backdrop | |
+| `backgroundComponent` | `(props: BottomSheetBackgroundProps) => ReactElement \| null` | No | - | Custom background | |
+| `children` | `ReactNode` | Yes | - | Modal content | |
+
+> `BottomSheetModalProps` extends `@gorhom/bottom-sheet`'s `BottomSheetModalProps`, but some like `snapPoints/backgroundStyle/index/enableDynamicSizing/handleComponent/handleIndicatorStyle/onDismiss` are controlled by component.
+
+#### Header — `BottomSheetModalHeaderProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Header preset size | |
+| `title` | `string` | No | - | Header title | |
+| `subtitle` | `string` | No | - | Header subtitle | |
+| `alignment` | `'center' \| 'start' \| 'end'` | No | `'start'` | Text/icon alignment | |
+| `actionIcon` | `ReactNode` | No | - | Top action icon | Label recommended if icon-only |
+| `children` | `ReactNode` | No | - | Custom header content (used instead of title/subtitle when provided) | |
+| `titleStyle` | `StyleProp<TextStyle>` | No | - | Title style | |
+| `subtitleStyle` | `StyleProp<TextStyle>` | No | - | Subtitle style | |
+| `iconWrapperStyle` | `StyleProp<ViewStyle>` | No | - | Icon wrapper style | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+
+#### Body — `BottomSheetModalBodyProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Body padding preset |
+| `children` | `ReactNode` | Yes | - | Body content |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style |
+
+#### BodyDescription — `BottomSheetModalBodyDescriptionProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Typo preset |
+| `children` | `ReactNode` | Yes | - | Description text |
+| `style` | `StyleProp<TextStyle>` | No | - | Text style |
+
+#### Action — `BottomSheetModalActionProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `size` | `ButtonSize` | No | - | Internal Button size | |
+| `primaryButtonProps` | `Partial<ButtonProps>` | No | - | Primary button props | close + dismiss on press |
+| `secondaryButtonProps` | `Partial<ButtonProps>` | No | - | Secondary button props | close + dismiss on press |
+| `layout` | `'horizontal' \| 'vertical'` | No | `'horizontal'` | Button layout direction | |
+| `showPrimary` | `boolean` | No | `true` | Show Primary | |
+| `showSecondary` | `boolean` | No | `false` | Show Secondary | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+
+#### Footer — `BottomSheetModalFooterProps`
+
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Bottom padding preset |
+| `children` | `ReactNode` | Yes | - | Bottom content |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style |

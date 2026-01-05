@@ -2,6 +2,7 @@ packages:
   - packages/core
   - packages/components
   - packages/cli
+  - docs
   - apps/*
   - tools/*
 

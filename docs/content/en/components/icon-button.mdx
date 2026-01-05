@@ -1,0 +1,146 @@
+### (A) One-liner
+
+**`IconButton` is a button that triggers actions with only an icon (or image).**
+It provides content via `icon` (ReactNode) or `src` (image), and offers press interaction animation, `loading`/`disabled` states, and icon-only accessibility label rules by default.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **Add IconButton**
+
+```bash title="Track A: add IconButton"
+pnpm dlx @fleet-ui/cli add IconButton
+```
+
+2) **Import example**
+
+```ts title="Track A: import"
+import { IconButton } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **Import example**
+
+```ts title="Track B: import"
+import { IconButton } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`IconButton` uses `expo-image` internally for image rendering. These dependencies are required:
+
+```bash title="Recommended runtime deps"
+# For Expo, npx expo install is recommended
+pnpm add expo-image react-native-reanimated react-native-gesture-handler react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Most Common Scenario (Minimal Example)
+
+```tsx title="IconButton basic usage"
+import { IconButton } from '@fleet-ui/components';
+import { Heart } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <IconButton
+      icon={<Heart />}
+      aria-label="Like"
+      onPress={() => {}}
+    />
+  );
+}
+```
+
+#### D-2. Image Icon: `src`
+
+When `src` is provided, renders image with `expo-image`.
+
+```tsx title="IconButton with image src"
+import { IconButton } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <IconButton
+      src="https://example.com/icon.png"
+      aria-label="Profile"
+      onPress={() => {}}
+    />
+  );
+}
+```
+
+#### D-3. `icon` vs `src` Priority
+
+Implementation behavior is as follows:
+
+- If `loading=true`, loader is displayed with highest priority.
+- Then if `src` exists, renders image.
+- Then if `icon` exists, renders icon.
+
+> In dev mode, outputs warning log when both `icon` and `src` are provided simultaneously (guide to clarify usage intent).
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model
+
+- `isDisabled = Boolean(disabled || loading)`
+- `accessibilityState = { disabled: isDisabled, busy: loading }`
+
+So `loading=true` is not just UI—it's a **state that blocks interaction**.
+
+#### E-2. Reanimated / Shared Value
+
+Uses internal shared value for press interaction.
+
+- press-in: `scale = 1.2`, `opacity = 0.6` (spring)
+- press-out: `scale/opacity = 1` return
+
+> Caution: Since scale interaction "grows," edges may be clipped when parent container has `overflow: hidden` on press.
+
+---
+
+### (F) Accessibility
+
+- Default role: `accessibilityRole="button"`
+- Label priority: `aria-label` → `accessibilityLabel`
+- State passed: `accessibilityState: { disabled, busy }`
+
+Recommended rules:
+- Since it's an icon-only button, **always providing a label is recommended** (`aria-label` recommended).
+- Even when `loading=true`, label should be maintained, and screen readers receive the `busy` state.
+
+---
+
+### (G) Props Table
+
+> Reference: `IconButtonProps` from `packages/components/src/IconButton/IconButton.types.ts`.
+> `IconButtonProps` extends `PressableProps` (however, `style` and `children` are redefined).
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'ghost'` | No | `'filled'` | Visual style | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Size preset | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'full'` | Corner radius | |
+| `src` | `string \| ImageSource` | No | - | Image source (higher priority) | `expo-image` required |
+| `icon` | `ReactNode` | No | - | Icon node | May be ignored if `src` exists |
+| `iconSize` | `number` | No | - | Icon size (px) | Calculated from size preset if not specified |
+| `iconColor` | `string` | No | - | Icon color (commented out in current implementation) | Consider extending if needed |
+| `loading` | `boolean` | No | `false` | Loading display + block interaction | `busy=true` |
+| `aria-label` | `string` | No | - | Accessibility label (required recommended) | Especially important on Web |
+| `testID` | `string` | No | - | Test identifier | loader is <code>&#36;&#123;testID&#125;-loader</code> |
+| `style` | `PressableProps['style']` | No | - | Container style | |
+
+#### PressableProps Inheritance (Summary)
+
+`IconButtonProps` extends `PressableProps`, so `onPress`, `onPressIn`, `onPressOut`, `disabled`, `accessibilityLabel`, etc. are supported as-is.

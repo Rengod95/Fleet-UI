@@ -1,0 +1,165 @@
+### (A) One-liner
+
+**`Slider` is a component for adjusting values by dragging one (or two) Thumbs.**
+`thumbCount=1` is a regular slider, `thumbCount=2` is a range slider, and `thumbCount=0` can be used as "progress bar mode" without thumb.
+
+---
+
+### (B) Installation (Track A / Track B)
+
+> Common prerequisite: unistyles side-effect import in app **entry file** is required.
+> - Track A: `import '@fleet-ui/local/core/unistyles';`
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Slider"
+pnpm dlx @fleet-ui/cli add Slider
+```
+
+```ts title="Track A: import"
+import { Slider } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Slider } from '@fleet-ui/components';
+```
+
+#### (Required) Per-component Dependencies
+
+`Slider` uses `react-native-gesture-handler` and Reanimated.
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-gesture-handler react-native-reanimated react-native-unistyles
+```
+
+---
+
+### (D) Core Features & Usage
+
+#### D-1. Single Thumb Slider
+
+```tsx title="Single thumb"
+import { Slider } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Slider
+      thumbCount={1}
+      min={0}
+      max={100}
+      step={1}
+      defaultValue={[30]}
+      onValueChange={(v) => console.log(v)} // [number]
+    />
+  );
+}
+```
+
+#### D-2. Range Slider (Two Thumbs)
+
+```tsx title="Range (dual thumbs)"
+import { Slider } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Slider
+      thumbCount={2}
+      min={0}
+      max={100}
+      step={5}
+      minStepsBetweenThumbs={1}
+      defaultValue={[20, 80]}
+      onValueChange={(v) => console.log(v)} // [min, max]
+    />
+  );
+}
+```
+
+#### D-3. Thumb Hidden (Progress Bar-like)
+
+```tsx title="Progress-like mode"
+import { Slider } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Slider
+      thumbCount={0}
+      defaultValue={[60]}
+      disabled
+      accessibilityLabel="Progress"
+    />
+  );
+}
+```
+
+---
+
+### (E) Internal State / Shared Value / Animation
+
+#### E-1. State Model (Important)
+
+`Slider` based on current implementation has **no controlled prop (value)**, only internal state (uncontrolled).
+
+- Value is maintained as `number[]` array.
+  - `thumbCount=1` → `[value0]`
+  - `thumbCount=2` → `[value0, value1]`
+- If no `defaultValue`:
+  - dual thumb: `[0, 100]`
+  - single thumb: `[min]`
+
+Callbacks:
+- Updates during drag are throttled by `throttleMs` (`updateValue`)
+- Final value on drag end is always committed (`commitValue`) and `onValueChange` is called without throttle.
+
+#### E-2. Gesture/Animation (Summary)
+
+- Thumb drag: Calculates position based on translationX with `Gesture.Pan()`
+- Snaps to `step` units in `positionToValueWorklet`
+- Visual effects during drag:
+  - trackScale/ thumbScale spring
+  - velocity-based inertiaOffset gives feeling of track slightly following
+- In dual thumb mode, minimum distance restriction based on `minStepsBetweenThumbs`
+
+---
+
+### (F) Accessibility
+
+Root sets:
+
+- `accessibilityRole="adjustable"`
+- `accessibilityValue={{ min, max, now: internalValue[0] }}`
+- `accessibilityState={{ disabled }}`
+- `accessibilityLabel` default is `'Slider'` (override recommended)
+
+> Note: Current implementation only exposes first value to `accessibilityValue.now`. For range slider (2 thumbs), providing "current range" with auxiliary text/labels at app level is recommended.
+
+---
+
+### (G) Props Table
+
+> Reference: `SliderProps` from `packages/components/src/Slider/Slider.types.ts`.
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | |
+| `trackVariant` | `'lined' \| 'flat'` | No | `'flat'` | Track style | |
+| `thumbVariant` | `'circle' \| 'oval' \| 'line'` | No | `'circle'` | Thumb style | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md'` | No | `'md'` | Track rounded | |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size (track/Thumb size) | |
+| `thumbShadow` | `'md' \| 'lg'` | No | `'md'` | Thumb shadow | |
+| `trackShadow` | `'none' \| 'base'` | No | `'base'` | Track inner shadow | |
+| `thumbCount` | `0 \| 1 \| 2` | No | `1` | Thumb count | 0 hides thumb |
+| `defaultValue` | `number[]` | No | single: `[min]`, dual: `[0, 100]` | Initial value | Array-based |
+| `min` | `number` | No | `0` | Minimum value | |
+| `max` | `number` | No | `100` | Maximum value | |
+| `step` | `number` | No | `1` | Step unit | Snap interval |
+| `minStepsBetweenThumbs` | `number` | No | `0` | Minimum step gap between two thumbs | range mode |
+| `throttleMs` | `number` | No | `200` | Drag callback throttle (ms) | |
+| `disabled` | `boolean` | No | `false` | Disabled | |
+| `onValueChange` | `(value: number[]) => void` | No | - | Value change callback | Called both during drag + end |
+| `trackLength` | `number` | No | - | Track length (px) | 100% if not specified |
+| `accessibilityLabel` | `string` | No | `'Slider'` | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |

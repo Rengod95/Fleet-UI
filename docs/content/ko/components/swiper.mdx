@@ -1,0 +1,129 @@
+### (A) 한줄 요약
+
+**`Swiper`는 좌→우로 스와이프하여 “행동을 확정/실행”하는 슬라이드-투-컨펌 컴포넌트예요.**  
+드래그 진행률에 따라 배경/텍스트가 전환되고, 임계치(`threshold`)를 넘으면 `onSwipeSuccess`가 호출돼요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+> 공통 전제: 앱 **엔트리 파일**에서 unistyles side-effect import는 필수예요.  
+> - Track A: `import '@fleet-ui/local/core/unistyles';`  
+> - Track B: `import '@fleet-ui/core/unistyles';`
+
+#### Track A (CLI / local install)
+
+```bash title="Track A: add Swiper"
+pnpm dlx @fleet-ui/cli add Swiper
+```
+
+```ts title="Track A: import"
+import { Swiper } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+```ts title="Track B: import"
+import { Swiper } from '@fleet-ui/components';
+```
+
+#### (필수) 컴포넌트별 추가 의존성
+
+`Swiper`는 다음 의존성을 써요.
+
+- `react-native-gesture-handler`, `react-native-reanimated` (스와이프/애니메이션)
+- `expo-linear-gradient` (`variant="gradient"`일 때)
+
+```bash title="Recommended runtime deps"
+pnpm add react-native-gesture-handler react-native-reanimated react-native-unistyles
+```
+
+```bash title="Expo only (for gradient)"
+npx expo install expo-linear-gradient
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 기본 사용
+
+```tsx title="Swiper basic usage"
+import { Swiper } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Swiper
+      placeholder="오른쪽으로 밀어 확정"
+      actionTitle="완료!"
+      onSwipeSuccess={() => console.log('success')}
+      onSwipeCancel={() => console.log('cancel')}
+    />
+  );
+}
+```
+
+#### D-2. Gradient variant
+
+`variant="gradient"`일 때는 `customGradient`를 직접 주거나, 테마의 gradient 토큰을 써요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+#### E-1. 상태 모델
+
+- `translateX`(SharedValue): thumb의 이동량
+- `isCompleting`: 완료 애니메이션 진행 중 가드(중복 완료 방지)
+- `isDragging`: 드래그 중 여부(thumb scale 등에 사용)
+- `thresholdValue`: 0~1로 clamp된 임계치
+
+#### E-2. 완료 판정
+
+드래그 종료 시:
+- 진행률 `progress = translateX / maxTranslate`
+- `progress >= threshold` 이거나, `velocityX > 500 && progress > 0.7`이면 완료로 간주해요.
+
+완료 시:
+- thumb를 끝까지 withTiming으로 이동
+- 완료 콜백 호출
+- 300ms 후 0으로 리셋(다시 사용할 수 있게)
+
+취소 시:
+- translateX를 0으로 되돌리고 `onSwipeCancel` 호출
+
+---
+
+### (F) 접근성(누락 금지)
+
+`Swiper`는 루트를 `accessibilityRole="button"`으로 노출하고, 스크린리더에서 “activate” 액션으로 완료를 트리거할 수 있게 해요.
+
+- `accessibilityActions={[{ name: 'activate' }]}`
+- `onAccessibilityAction`: activate이면 best-effort로 완료 애니메이션을 수행하고 성공 콜백을 호출해요.
+- 라벨 우선순위:
+  - `aria-label`(web) → `accessibilityLabel` → `placeholder`(string)
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/Swiper/Swiper.types.ts`의 `SwiperProps`.
+
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | 색상 테마 | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'gradient'` | No | `'filled'` | 스타일 variant | gradient는 expo-linear-gradient 필요 |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 크기 | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | 라운드 | |
+| `thumbShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | thumb 그림자 | |
+| `disabled` | `boolean` | No | `false` | 비활성화 | |
+| `placeholder` | `string` | No | - | 중앙 안내 텍스트 | |
+| `actionTitle` | `string` | No | `'Action!'` | 진행 배경 위 텍스트 | |
+| `icon` | `ReactNode` | No | - | thumb 아이콘 | 기본 chevrons icon |
+| `threshold` | `number` | No | `0.7` | 완료 임계치(0~1) | 내부에서 clamp |
+| `onSwipeSuccess` | `() => void \| Promise<void>` | No | - | 완료 콜백 | |
+| `onSwipeStart` | `() => void` | No | - | 시작 콜백 | |
+| `onSwipeCancel` | `() => void` | No | - | 취소 콜백 | |
+| `customGradient` | `{ colors: [string, string, ...string[]]; locations?: [number, number, ...number[]] }` | No | - | 커스텀 그라데이션 | gradient variant |
+| `aria-label` | `string` | No | - | 접근성 라벨(web) | |
+| `testID` | `string` | No | - | 테스트 식별자 | web은 data-testid |

@@ -1,0 +1,133 @@
+### (A) 한줄 요약
+
+**`LayoutTop`은 화면 상단에서 “타이틀/서브타이틀/에셋/우측 액션”을 일관된 레이아웃으로 배치하는 컴포넌트예요.**  
+타이틀 타이포를 size 프리셋으로 통일하고, `paddingTop/paddingBottom`(토큰 또는 숫자)과 `rightAlignment`로 상단 섹션의 레이아웃을 조정해요.
+
+---
+
+### (B) 설치 방법 (Track A / Track B)
+
+#### Track A (CLI / local install)
+
+1) **LayoutTop 추가**
+
+```bash title="Track A: add LayoutTop"
+pnpm dlx @fleet-ui/cli add LayoutTop
+```
+
+2) **import 예시**
+
+```ts title="Track A: import"
+import { LayoutTop } from '@fleet-ui/local/components';
+```
+
+#### Track B (NPM package)
+
+1) **import 예시**
+
+```ts title="Track B: import"
+import { LayoutTop } from '@fleet-ui/components';
+```
+
+---
+
+### (D) 핵심 기능(컴포넌트별) & 사용법
+
+#### D-1. 가장 흔한 사용 시나리오(최소 예제)
+
+```tsx title="LayoutTop basic usage"
+import { LayoutTop } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <LayoutTop
+      size="md"
+      paddingTop="md"
+      paddingBottom="md"
+      title={<LayoutTop.TitleTypo>결제</LayoutTop.TitleTypo>}
+      subtitleBottom={
+        <LayoutTop.SubtitleTypo>결제 정보를 확인해 주세요.</LayoutTop.SubtitleTypo>
+      }
+    />
+  );
+}
+```
+
+#### D-2. 에셋/우측 액션: `asset`, `right`
+
+```tsx title="Asset + Right"
+import { LayoutTop, IconButton } from '@fleet-ui/components';
+import { Settings } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <LayoutTop
+      asset={<LayoutTop.Asset>{/* 이미지/아이콘 */}</LayoutTop.Asset>}
+      title={<LayoutTop.TitleTypo>홈</LayoutTop.TitleTypo>}
+      right={<IconButton icon={<Settings />} aria-label="설정" onPress={() => {}} />}
+      rightAlignment="end"
+    />
+  );
+}
+```
+
+#### D-3. Padding: 프리셋 vs 숫자
+
+`paddingTop/paddingBottom`은 아래를 모두 지원해요.
+
+- 프리셋: `'none' | 'sm' | 'md' | 'lg'`
+- 숫자: 임의 px 값(number)
+
+숫자를 주는 경우 내부 variants는 `custom`로 처리되고, 실제 값은 인라인 스타일로 적용돼요.
+
+---
+
+### (E) 내부 상태 / Shared Value / Animation (필수)
+
+`LayoutTop`은 내부 상태/애니메이션(shared value)을 갖지 않아요.  
+대신 컨텍스트로 `size`를 전달해 `TitleTypo/SubtitleTypo`의 기본 타이포 스케일을 맞춰요.
+
+구현상 특징:
+- `LayoutTop.TitleTypo`/`SubtitleTypo`는 `size` prop으로 컨텍스트 size를 override 할 수 있어요.
+- `rightAlignment`는 우측 컬럼의 세로 정렬(justifyContent)에만 영향을 줘요.
+
+---
+
+### (F) 접근성(누락 금지)
+
+권장 규칙:
+- (웹) 키보드/포커스 이동이 자연스러운지 확인해요.
+- (공통) 상태 변화가 스크린리더에 충분히 전달되는지 확인해요.
+
+`LayoutTop` 자체는 단순 레이아웃 컨테이너예요. 접근성은 주로 “내부에 렌더링한 요소”가 책임져요.
+
+권장 규칙:
+- 실제 페이지 제목이라면 `title` 영역에 `accessibilityRole="header"`를 가진 텍스트를 사용해요(또는 상위에서 헤더 역할을 부여해요).
+- `right`에 아이콘-only 버튼을 넣는 경우 `aria-label`/`accessibilityLabel`을 제공해요.
+
+---
+
+### (G) Props Table (필수: 인터페이스 전체)
+
+> 기준: `packages/components/src/LayoutTop/LayoutTop.types.ts`의 public 타입들.
+
+#### LayoutTop — `LayoutTopProps`
+
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `asset` | `ReactNode` | No | - | 상단 에셋 영역 | |
+| `subtitleTop` | `ReactNode` | No | - | 타이틀 위 서브타이틀 | |
+| `title` | `ReactNode` | No | - | 메인 타이틀 | 보통 `LayoutTop.TitleTypo` 권장 |
+| `subtitleBottom` | `ReactNode` | No | - | 타이틀 아래 서브타이틀 | |
+| `right` | `ReactNode` | No | - | 우측 액션 영역 | |
+| `rightAlignment` | `'start' \| 'center' \| 'end'` | No | `'end'`(types) / 구현 기본값은 `'center'` | 우측 세로 정렬 | 구현 기본값과 타입 주석 차이 주의 |
+| `paddingTop` | `'none' \| 'sm' \| 'md' \| 'lg' \| number` | No | `'none'` | 상단 padding | number면 px |
+| `paddingBottom` | `'none' \| 'sm' \| 'md' \| 'lg' \| number` | No | `'md'` | 하단 padding | number면 px |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | 기본 타이포 스케일 | |
+| `style` | `StyleProp<ViewStyle>` | No | - | 컨테이너 스타일 | |
+
+#### Subcomponents
+
+- `LayoutTop.Asset`: `LayoutTopAssetProps` (`children`, `style`)
+- `LayoutTop.TitleTypo`: `LayoutTopTitleTypoProps` (`size?`, `children`, `style` + TextProps)
+- `LayoutTop.SubtitleTypo`: `LayoutTopSubtitleTypoProps` (`size?`, `children`, `style` + TextProps)
