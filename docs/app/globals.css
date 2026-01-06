@@ -59,6 +59,35 @@
 	--radius-2xl: calc(var(--radius) + 8px);
 	--radius-3xl: calc(var(--radius) + 12px);
 	--radius-4xl: calc(var(--radius) + 16px);
+
+  --animate-fade-in-up: fade-in-up 1s ease-out forwards;
+  --animate-blob: blob 7s infinite;
+  
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
 }
 
 html,
@@ -93,24 +122,22 @@ body {
 		letter-spacing: var(--fleet-typo-h2Strong-letter-spacing);
 	}
 	.docs-prose h2 {
-		@apply scroll-m-20 mt-10 border-none;
+		@apply scroll-m-20 mt-10 border-none text-foreground;
 		font-size: var(--fleet-typo-h4Strong-font-size);
 		line-height: var(--fleet-typo-h4Strong-line-height);
 		font-weight: var(--fleet-typo-h4Strong-font-weight);
 		letter-spacing: var(--fleet-typo-h4Strong-letter-spacing);
-		color: var(--color-neutral-700);
 	}
 	.docs-prose h3 {
-		@apply scroll-m-20 mt-8;
+		@apply scroll-m-20 mt-8 text-foreground;
 		font-size: var(--fleet-typo-h6Strong-font-size);
 		line-height: var(--fleet-typo-h6Strong-line-height);
 		font-weight: var(--font-weight-bold);
 		letter-spacing: var(--fleet-typo-h6Strong-letter-spacing);
-		color: var(--color-neutral-700);
 	}
 
 	.docs-prose h4 {
-		@apply scroll-m-20 mt-8;
+		@apply scroll-m-20 mt-8 text-foreground;
 		font-size: var(--fleet-typo-body1Strong-font-size);
 		line-height: var(--fleet-typo-body1Strong-line-height);
 		letter-spacing: var(--fleet-typo-body1Strong-letter-spacing);
