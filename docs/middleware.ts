@@ -39,6 +39,7 @@ function shouldIgnorePath(pathname: string) {
     pathname.startsWith('/assets') ||
     pathname.startsWith('/favicon') ||
     pathname.startsWith('/robots.txt') ||
+    pathname.startsWith('/llms.txt') ||
     pathname.startsWith('/sitemap')
   );
 }

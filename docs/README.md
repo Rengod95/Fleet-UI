@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Fleet UI 문서 사이트(Next.js)입니다.
 
-## Getting Started
+## 개발 환경(Development)
 
-First, run the development server:
+### 1) 환경변수 파일 준비
+
+보안 정책상 레포에 `.env*` 파일을 커밋하지 않고, `docs/env.*.example`을 템플릿으로 사용해요.
+
+- `docs/env.development.example` → `docs/.env.development.local`로 복사
+- 또는 `docs/env.example` → `docs/.env.local`로 복사
+
+필수 변수:
+- `NEXT_PUBLIC_SITE_URL`: sitemap/metadata base URL
+- `NEXT_PUBLIC_PLAYGROUND_BASE_URL`: Playground embed URL
+
+### 2) 개발 서버 실행
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm -C docs dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+기본 접속: `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 프로덕션(Production)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 1) 환경변수 설정
 
-## Learn More
+호스팅 환경(Vercel 등)에서는 아래 값을 “Environment Variables”에 등록해요.
 
-To learn more about Next.js, take a look at the following resources:
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_PLAYGROUND_BASE_URL`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+로컬에서 프로덕션 모드로 확인하려면:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `docs/env.production.example` → `docs/.env.production.local`로 복사
 
-## Deploy on Vercel
+### 2) 빌드/실행
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm -C docs build
+pnpm -C docs start
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 스크립트 전용 환경변수
+
+`DOCS_CREATE_EN_PLACEHOLDERS`는 `pnpm gen:component-docs`(tsx 스크립트)에서 읽는 값이라,
+Next.js의 `.env` 자동 로딩 대상이 아니에요. 필요하면 아래처럼 실행해 주세요.
+
+```bash
+DOCS_CREATE_EN_PLACEHOLDERS=1 pnpm -C docs dev
+```
+
+## Crawling/Indexing (robots.txt, sitemap, llms.txt)
+
+- `robots.txt`: `/robots.txt`
+- `sitemap`: `/sitemap.xml` (robots에도 연결됨)
+- `llms.txt`: `/llms.txt`
+
+NOTE: `middleware.ts` 변경(리다이렉트 예외 등)은 개발 서버 재시작이 필요할 수 있어요.
