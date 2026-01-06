@@ -10,7 +10,7 @@ function playgroundBaseUrl() {
     process.env.NEXT_PUBLIC_PLAYGROUND_BASE_URL ??
     (process.env.NODE_ENV === 'development'
       ? 'http://localhost:8081'
-      : 'https://playground.example.com')
+      : 'https://playground.fleet-ui.dev')
   );
 }
 
