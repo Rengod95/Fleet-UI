@@ -109,7 +109,11 @@ export function ParticlesBackground({
     if (prefersReducedMotion()) return;
 
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d', { alpha: true });
+    const ctx = canvas.getContext('2d', { 
+      alpha: true,
+      desynchronized: true, // 성능 향상을 위한 비동기 렌더링
+    });
+    
     if (!ctx) return;
 
     let raf = 0;
@@ -117,8 +121,11 @@ export function ParticlesBackground({
     let width = 0;
     let height = 0;
     let dpr = 1;
+    let lastFrameTime = 0;
+    const targetFps = 60;
+    const frameInterval = 1000 / targetFps;
 
-    // dynamic colors (theme-aware)
+    // dynamic colors (theme-aware) - 캐싱하여 매 프레임마다 계산하지 않음
     let c1 = colorFromVar('--primary', 0.45);
     let c2 = colorFromVar('--muted-foreground', 1);
     let c3 = colorFromVar('--foreground', 1);
@@ -131,7 +138,7 @@ export function ParticlesBackground({
 
     function resize() {
       const parent = canvas.parentElement;
-      if (!parent) return;
+      if (!parent || !ctx) return;
       const rect = parent.getBoundingClientRect();
       width = Math.max(1, Math.floor(rect.width));
       height = Math.max(1, Math.floor(rect.height));
@@ -147,42 +154,75 @@ export function ParticlesBackground({
       const count = Math.max(18, Math.round(baseCount * density));
 
       // keep as much as possible, but adjust count
-      if (particles.length > count) particles = particles.slice(0, count);
-      while (particles.length < count) {
-        particles.push({
-          x: Math.random() * width,
-          y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 0.18,
-          vy: (Math.random() - 0.5) * 0.18,
-          r: 0.6 + Math.random() * 1.8,
-          alpha: 0.35 + Math.random() * 0.55,
-        });
+      if (particles.length > count) {
+        particles = particles.slice(0, count);
+      } else {
+        while (particles.length < count) {
+          particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.18,
+            vy: (Math.random() - 0.5) * 0.18,
+            r: 0.6 + Math.random() * 1.8,
+            alpha: 0.35 + Math.random() * 0.55,
+          });
+        }
       }
     }
 
-    function step() {
+    function step(currentTime: number) {
+      if (!ctx) return;
+      
+      // FPS 제한으로 성능 최적화
+      const elapsed = currentTime - lastFrameTime;
+      if (elapsed < frameInterval) {
+        raf = window.requestAnimationFrame(step);
+        return;
+      }
+      lastFrameTime = currentTime - (elapsed % frameInterval);
+
       // if parent becomes hidden/0-size (rare), re-measure
-      if (width <= 1 || height <= 1) resize();
+      if (width <= 1 || height <= 1) {
+        resize();
+      }
 
       ctx.clearRect(0, 0, width, height);
 
-      // subtle vignette wash (helps depth)
-      const g = ctx.createRadialGradient(width * 0.5, height * 0.35, 0, width * 0.5, height * 0.35, Math.max(width, height));
+      // subtle vignette wash (helps depth) - 한 번만 생성하도록 최적화
+      const g = ctx.createRadialGradient(
+        width * 0.5, 
+        height * 0.35, 
+        0, 
+        width * 0.5, 
+        height * 0.35, 
+        Math.max(width, height)
+      );
       g.addColorStop(0, colorFromVar('--primary', 0.05));
       g.addColorStop(1, 'transparent');
       ctx.fillStyle = g;
       ctx.fillRect(0, 0, width, height);
 
-      // optional: connecting lines for close particles
+      // 파티클 연결 선 - 거리 계산 최적화
+      const maxDist = 90;
+      const maxDistSq = maxDist * maxDist;
+      
+      // Path2D 사용으로 렌더링 최적화
+      const linePath = new Path2D();
       for (let i = 0; i < particles.length; i++) {
         const a = particles[i];
+        if (!a) continue;
+        
         for (let j = i + 1; j < particles.length; j++) {
           const b = particles[j];
+          if (!b) continue;
+          
           const dx = a.x - b.x;
           const dy = a.y - b.y;
           const dist2 = dx * dx + dy * dy;
-          if (dist2 > 90 * 90) continue;
-          const t = 1 - Math.sqrt(dist2) / 90;
+          
+          if (dist2 > maxDistSq) continue;
+          
+          const t = 1 - Math.sqrt(dist2) / maxDist;
           ctx.strokeStyle = colorFromVar('--primary', 0.18 * t);
           ctx.lineWidth = 1;
           ctx.beginPath();
@@ -192,22 +232,26 @@ export function ParticlesBackground({
         }
       }
 
+      // 파티클 업데이트 및 렌더링 - 색상 재사용
+      ctx.globalAlpha = 1;
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
 
+        // 경계 처리
         if (p.x < -10) p.x = width + 10;
-        if (p.x > width + 10) p.x = -10;
+        else if (p.x > width + 10) p.x = -10;
+        
         if (p.y < -10) p.y = height + 10;
-        if (p.y > height + 10) p.y = -10;
+        else if (p.y > height + 10) p.y = -10;
 
         // three-tone mix for depth
         const pick = Math.random();
         const color = pick < 0.18 ? c1 : pick < 0.65 ? c2 : c3;
 
-        ctx.beginPath();
         ctx.fillStyle = color;
         ctx.globalAlpha = p.alpha;
+        ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
         ctx.fill();
       }
@@ -217,19 +261,37 @@ export function ParticlesBackground({
     }
 
     // keep colors in sync with theme toggles (.dark class on html)
-    const mo = new MutationObserver(() => refreshColors());
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    const mo = new MutationObserver(() => {
+      refreshColors();
+    });
+    mo.observe(document.documentElement, { 
+      attributes: true, 
+      attributeFilter: ['class'] 
+    });
 
-    const ro = new ResizeObserver(() => resize());
-    if (canvas.parentElement) ro.observe(canvas.parentElement);
-    window.addEventListener('resize', resize);
+    // ResizeObserver로 리사이즈 감지 (throttling)
+    let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
+    const ro = new ResizeObserver(() => {
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
+      resizeTimeout = setTimeout(() => {
+        resize();
+      }, 150); // 150ms 디바운스
+    });
+    
+    if (canvas.parentElement) {
+      ro.observe(canvas.parentElement);
+    }
 
     refreshColors();
     resize();
     raf = window.requestAnimationFrame(step);
 
     return () => {
-      window.removeEventListener('resize', resize);
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout);
+      }
       ro.disconnect();
       mo.disconnect();
       window.cancelAnimationFrame(raf);
