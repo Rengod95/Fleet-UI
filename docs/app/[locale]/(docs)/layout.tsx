@@ -1,7 +1,7 @@
-import { DocsHeader } from '../../../components/DocsHeader';
 import { Sidebar } from '../../../components/Sidebar';
 import { SidebarInset, SidebarProvider } from '../../../components/ui/sidebar';
 import { OnThisPage } from '../../../components/OnThisPage';
+import { Header } from '@/components/Header';
 
 export default function DocsLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +10,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <div className="flex h-dvh w-full">
           <Sidebar />
           <SidebarInset className="flex h-dvh min-h-0 flex-col overflow-hidden">
-            <DocsHeader />
+            <Header />
             <div className="flex flex-1 min-h-0 overflow-hidden">
               <div id="docs-scroll" className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain">
                 <div className="mx-auto px-4 lg:px-8">

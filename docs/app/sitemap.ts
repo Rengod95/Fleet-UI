@@ -30,7 +30,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];
 
   for (const locale of SUPPORTED_LOCALES) {
-    // index
+    // landing (`/{locale}`)
+    entries.push({
+      url: `${base}${withLocale('/', locale)}`,
+      lastModified: now,
+    });
+
+    // docs index
     entries.push({
       url: `${base}${withLocale('/components', locale)}`,
       lastModified: now,

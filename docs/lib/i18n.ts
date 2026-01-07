@@ -28,6 +28,7 @@ export function withLocale(path: string, locale: Locale): string {
     path.startsWith('/assets') ||
     path.startsWith('/favicon') ||
     path.startsWith('/robots.txt') ||
+    path.startsWith('/llms.txt') ||
     path.startsWith('/sitemap')
   ) {
     return path;

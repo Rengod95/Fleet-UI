@@ -10,7 +10,7 @@ function playgroundBaseUrl() {
     process.env.NEXT_PUBLIC_PLAYGROUND_BASE_URL ??
     (process.env.NODE_ENV === 'development'
       ? 'http://localhost:8081'
-      : 'https://playground.example.com')
+      : 'https://playground.fleet-ui.dev')
   );
 }
 
@@ -44,7 +44,7 @@ export function DemoFrame({ slug }: { slug: string }) {
         </Button>
       </div>
 
-      <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-[14px] rounded-[2.5rem] h-[880px] w-[421px] shadow-xl">
+      <div className="relative mx-auto border-gray-800 dark:border-gray-800 bg-gray-800 border-14 rounded-[2.5rem] h-[880px] w-[421px] shadow-xl">
         <div className="w-[148px] h-[18px] bg-gray-800 top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>
         <div className="h-[10px] w-[3px] bg-gray-800 absolute -start-[17px] top-[72px] rounded-s-lg"></div>
         <div className="h-[20px] w-[3px] bg-gray-800 absolute -start-[17px] top-[124px] rounded-s-lg"></div>

@@ -39,6 +39,6 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  return children;
+  return <>{children}</>;
 }
 
