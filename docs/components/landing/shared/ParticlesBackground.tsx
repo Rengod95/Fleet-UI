@@ -23,75 +23,22 @@ function cssVar(name: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
-function hexToRgba(hex: string, alpha: number) {
-  const value = hex.replace('#', '').trim();
-  const isShort = value.length === 3 || value.length === 4;
-  const isLong = value.length === 6 || value.length === 8;
-  if (!isShort && !isLong) return `rgba(255, 255, 255, ${alpha})`;
-
-  const full = isShort
-    ? value
-        .split('')
-        .map((c) => c + c)
-        .join('')
-    : value;
-
-  const r = Number.parseInt(full.slice(0, 2), 16);
-  const g = Number.parseInt(full.slice(2, 4), 16);
-  const b = Number.parseInt(full.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-function rgbToRgba(rgb: string, alpha: number) {
-  // rgb(1 2 3) / rgb(1,2,3) / rgba(1,2,3,0.5) 등 일부 변형을 커버
-  const inner = rgb
-    .trim()
-    .replace(/^rgba?\(/, '')
-    .replace(/\)$/, '')
-    .trim();
-
-  const parts = inner
-    .split(/[,/\s]+/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-  if (parts.length < 3) return `rgba(255, 255, 255, ${alpha})`;
-
-  const r = Number(parts[0]);
-  const g = Number(parts[1]);
-  const b = Number(parts[2]);
-  if (!Number.isFinite(r) || !Number.isFinite(g) || !Number.isFinite(b)) {
-    return `rgba(255, 255, 255, ${alpha})`;
-  }
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-function hslToHsla(hsl: string, alpha: number) {
-  // hsl(...) / hsla(...) 형태면 alpha만 덮어쓰기
-  const inner = hsl
-    .trim()
-    .replace(/^hsla?\(/, '')
-    .replace(/\)$/, '')
-    .trim();
-  return `hsla(${inner} / ${alpha})`;
-}
-
-function colorFromVar(name: string, alpha = 1) {
+function resolveCanvasColorFromVar(name: string) {
   const raw = cssVar(name);
-  if (!raw) return `rgba(255, 255, 255, ${alpha})`;
+  if (!raw) return null;
 
   // Case 1) hex tokens: "#00c5ff"
-  if (raw.startsWith('#')) return hexToRgba(raw, alpha);
+  if (raw.startsWith('#')) return raw;
 
-  // Case 2) already css function
-  if (raw.startsWith('rgb')) return rgbToRgba(raw, alpha);
-  if (raw.startsWith('hsl')) return hslToHsla(raw, alpha);
+  // Case 2) already css function (canvas can parse rgb()/rgba()/hsl()/hsla())
+  if (raw.startsWith('rgb') || raw.startsWith('hsl')) return raw;
 
   // Case 3) space-separated HSL parts (e.g. "240 10% 3.9%")
-  if (raw.includes('%') && raw.includes(' ')) return `hsla(${raw} / ${alpha})`;
+  // (Shadcn-style tokens often store "h s l" without wrapper)
+  if (raw.includes('%') && raw.includes(' ')) return `hsl(${raw})`;
 
-  // Fallback: try as-is (may still work for some formats), else safe fallback
-  // Note: Canvas doesn't support color-mix(), so keep this conservative.
-  return `rgba(255, 255, 255, ${alpha})`;
+  // Fallback: try as-is (named colors etc.)
+  return raw;
 }
 
 export function ParticlesBackground({
@@ -126,14 +73,10 @@ export function ParticlesBackground({
     const frameInterval = 1000 / targetFps;
 
     // dynamic colors (theme-aware) - 캐싱하여 매 프레임마다 계산하지 않음
-    let c1 = colorFromVar('--primary', 0.45);
-    let c2 = colorFromVar('--muted-foreground', 1);
-    let c3 = colorFromVar('--foreground', 1);
+    let primary = resolveCanvasColorFromVar('--primary') ?? '#00c5ff';
 
     function refreshColors() {
-      c1 = colorFromVar('--primary', 0.45);
-      c2 = colorFromVar('--muted-foreground', 1);
-      c3 = colorFromVar('--foreground', 1);
+      primary = resolveCanvasColorFromVar('--primary') ?? primary;
     }
 
     function resize() {
@@ -197,17 +140,17 @@ export function ParticlesBackground({
         height * 0.35, 
         Math.max(width, height)
       );
-      g.addColorStop(0, colorFromVar('--primary', 0.05));
+      g.addColorStop(0, primary);
       g.addColorStop(1, 'transparent');
       ctx.fillStyle = g;
+      ctx.globalAlpha = 0.05;
       ctx.fillRect(0, 0, width, height);
+      ctx.globalAlpha = 1;
 
       // 파티클 연결 선 - 거리 계산 최적화
       const maxDist = 90;
       const maxDistSq = maxDist * maxDist;
       
-      // Path2D 사용으로 렌더링 최적화
-      const linePath = new Path2D();
       for (let i = 0; i < particles.length; i++) {
         const a = particles[i];
         if (!a) continue;
@@ -223,7 +166,8 @@ export function ParticlesBackground({
           if (dist2 > maxDistSq) continue;
           
           const t = 1 - Math.sqrt(dist2) / maxDist;
-          ctx.strokeStyle = colorFromVar('--primary', 0.18 * t);
+          ctx.strokeStyle = primary;
+          ctx.globalAlpha = 0.18 * t;
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
@@ -231,9 +175,9 @@ export function ParticlesBackground({
           ctx.stroke();
         }
       }
+      ctx.globalAlpha = 1;
 
       // 파티클 업데이트 및 렌더링 - 색상 재사용
-      ctx.globalAlpha = 1;
       for (const p of particles) {
         p.x += p.vx;
         p.y += p.vy;
@@ -245,11 +189,8 @@ export function ParticlesBackground({
         if (p.y < -10) p.y = height + 10;
         else if (p.y > height + 10) p.y = -10;
 
-        // three-tone mix for depth
-        const pick = Math.random();
-        const color = pick < 0.18 ? c1 : pick < 0.65 ? c2 : c3;
-
-        ctx.fillStyle = color;
+        // 파티클(점)은 전부 primary 컬러로 통일
+        ctx.fillStyle = primary;
         ctx.globalAlpha = p.alpha;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
