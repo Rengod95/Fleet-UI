@@ -48,41 +48,34 @@ export default function ModalExamplesScreen() {
 	const [noSwipeModal, setNoSwipeModal] = useState(false);
 	const [alertModal, setAlertModal] = useState(false);
 	const [confirmModal, setConfirmModal] = useState(false);
-
+	const [backdropOpacityModal, setBackdropOpacityModal] = useState(false);
+	const [backdropOpacity, setBackdropOpacity] = useState(0.5);
+	const [backdropBlurModal, setBackdropBlurModal] = useState(false);
+	const [backdropBlur, setBackdropBlur] = useState(true);
+	const [backdropBlurIntensityModal, setBackdropBlurIntensityModal] = useState(false);
+	const [backdropBlurIntensity, setBackdropBlurIntensity] = useState(50);
+	const [closableModal, setClosableModal] = useState(false);
+	const [closable, setClosable] = useState(true);
+	const [showCloseButtonModal, setShowCloseButtonModal] = useState(false);
+	const [showCloseButton, setShowCloseButton] = useState(true);
 	return (
 		<ScrollView style={commonStyles.container}>
 			<View style={commonStyles.content}>
 				<PageHeader
 					title="Modal"
-					description="화면 중앙 또는 하단에 표시되는 오버레이 모달. Reanimated entering/exiting 애니메이션과 드래그 dismiss를 지원합니다."
+					description="Overlay modal displayed in the center or bottom of the screen. Supports reanimated animations and drag dismiss."
 				/>
 
-				{/* Basic Usage */}
-				<Section title="Basic Usage" description="기본적인 Modal 사용법">
-					<Button onPress={() => setBasicModal(true)}>기본 모달 열기</Button>
-
-					<Modal visible={basicModal} onClose={() => setBasicModal(false)}>
-						<Modal.Header title="Basic Modal Example Title with long text" />
-						<Modal.Body>
-							<Modal.Description content="Basic Modal Example Description For Long text Testing example descriptions." />
-						</Modal.Body>
-						<Modal.Footer>
-							<Button
-								variant="ghost"
-								colorScheme="neutral"
-								onPress={() => setBasicModal(false)}
-							>
-								취소
-							</Button>
-							<Button
-								onPress={() => setBasicModal(false)}
-								fullWidth
-								colorScheme="neutral"
-							>
-								확인
-							</Button>
-						</Modal.Footer>
-					</Modal>
+				<Section
+					title="Overview"
+					value="overview"
+					description="Basic Modal example (open/close)."
+				>
+					<View style={commonStyles.column}>
+						<Button variant="flat" onPress={() => setBasicModal(true)}>
+							Open Modal
+						</Button>
+					</View>
 				</Section>
 
 				{/* Sizes */}
@@ -94,8 +87,8 @@ export default function ModalExamplesScreen() {
 						{SIZES.map((size) => (
 							<Button
 								key={size}
-								variant="outlined"
-								size="sm"
+								variant="flat"
+								size="md"
 								onPress={() => setSizeModal({ visible: true, size })}
 							>
 								{size}
@@ -132,11 +125,11 @@ export default function ModalExamplesScreen() {
 					title="Rounded"
 					description="Set border radius by rounded variant"
 				>
-					<View style={styles.buttonRow}>
+					<View style={commonStyles.row}>
 						{ROUNDED.map((rounded) => (
 							<Button
 								key={rounded}
-								variant="outlined"
+								variant="flat"
 								size="sm"
 								onPress={() => setRoundedModal({ visible: true, rounded })}
 							>
@@ -169,25 +162,195 @@ export default function ModalExamplesScreen() {
 					</Modal>
 				</Section>
 
+				{/* Backdrop Opacity */}
+				<Section title="Backdrop Opacity prop" description="Set backdrop opacity value (0-1)">
+					<View style={commonStyles.row}>
+						<Button variant="flat" size="md" onPress={() =>{
+							 setBackdropOpacity(0);
+							 setBackdropOpacityModal(true);
+						}}>
+							0
+						</Button>
+						<Button variant="flat" size="md" onPress={() =>{
+							 setBackdropOpacity(0.3);
+							 setBackdropOpacityModal(true);
+						}}>
+							0.3
+						</Button>
+						<Button variant="flat" size="md" onPress={() =>{
+							 setBackdropOpacity(0.5);
+							 setBackdropOpacityModal(true);
+						}}>
+							0.5
+						</Button>
+						<Button variant="flat" size="md" onPress={() =>{
+							 setBackdropOpacity(1);
+							 setBackdropOpacityModal(true);
+						}}>
+							1
+						</Button>
+					</View>
+					<Modal
+						visible={backdropOpacityModal}
+						onClose={() => setBackdropOpacityModal(false)}
+						backdropOpacity={backdropOpacity}
+					>
+						<Modal.Header title="Backdrop Opacity" />
+						<Modal.Body>
+							<Modal.Description content={`Backdrop Opacity is set to ${backdropOpacity}`} />
+						</Modal.Body>
+						<Modal.Footer>
+							<Button onPress={() => setBackdropOpacityModal(false)}>Close</Button>
+						</Modal.Footer>
+					</Modal>
+				</Section>
+
+				{/* Backdrop Blur */}
+				<Section title="Backdrop Blur prop" description="Set backdrop blur behavior">
+					<View style={commonStyles.row}>
+						<Button variant="flat" size="md" onPress={() => {
+							setBackdropBlurModal(true);
+							setBackdropBlur(true);
+						}}>
+							Enable Blur
+						</Button>
+						<Button variant="flat" size="md" onPress={() => {
+							setBackdropBlurModal(true);
+							setBackdropBlur(false);
+						}}>
+							Disable Blur
+						</Button>
+					</View>
+					<Modal
+						visible={backdropBlurModal}
+						onClose={() => setBackdropBlurModal(false)}
+						useBackdropBlur={backdropBlur}
+					>
+						<Modal.Header title="Backdrop Blur" />
+						<Modal.Body>
+							<Modal.Description content={`Backdrop Blur is set to ${backdropBlur}`} />
+						</Modal.Body>
+						<Modal.Footer>
+							<Button onPress={() => setBackdropBlurModal(false)}>Close</Button>
+						</Modal.Footer>
+					</Modal>
+				</Section>
+
+				{/* Backdrop Blur Intensity */}
+				<Section title="Backdrop Blur Intensity prop (0-100)" description="Set backdrop blur intensity. Default is 50.">
+					<View style={commonStyles.row}>
+						<Button variant="flat" size="md" onPress={() => {
+							setBackdropBlurIntensity(10);
+							setBackdropBlurIntensityModal(true);
+						}}>
+							10
+						</Button>
+						<Button variant="flat" size="md" onPress={() => {
+							setBackdropBlurIntensity(50);
+							setBackdropBlurIntensityModal(true);
+						}}>
+							50
+						</Button>
+						<Button variant="flat" size="md" onPress={() => {
+							setBackdropBlurIntensity(100);
+							setBackdropBlurIntensityModal(true);
+						}}>
+							100
+						</Button>
+					</View>
+					<Modal
+						visible={backdropBlurIntensityModal}
+						onClose={() => setBackdropBlurIntensityModal(false)}
+						backdropBlurIntensity={backdropBlurIntensity}
+					>
+						<Modal.Header title="Backdrop Blur Intensity" />
+						<Modal.Body>
+							<Modal.Description content={`Backdrop Blur Intensity is set to ${backdropBlurIntensity}`} />
+						</Modal.Body>
+					</Modal>
+				</Section>
+
+				{/* closable prop */}
+				<Section title="closable prop" description="Set closable behavior">
+					<Text style={commonStyles.label}>If true, modal can be closed via backdrop/swipe, if false, only via button</Text>
+					<View style={commonStyles.row}>
+						<Button variant="flat" size="md" onPress={() => {
+							setClosableModal(true);
+							setClosable(true);
+						}}>
+							Enable Closable
+						</Button>
+						<Button variant="flat" size="md" onPress={() => {
+							setClosableModal(true);
+							setClosable(false);
+						}}>
+							Disable Closable
+						</Button>
+					</View>
+					<Modal
+						visible={closableModal}
+						onClose={() => setClosableModal(false)}
+						closable={closable}
+					>
+						<Modal.Header title="Closable" />
+						<Modal.Body>
+							<Modal.Description content={`Closable is set to ${closable}`} />
+						</Modal.Body>
+						<Modal.Footer>
+							<Button onPress={() => setClosableModal(false)}>Close</Button>
+						</Modal.Footer>
+					</Modal>
+				</Section>
+
+				{/* showCloseButton prop */}
+				<Section title="showCloseButton prop" description="Decide to show 'X' button in the top right corner of modal header.">
+					<View style={commonStyles.row}>
+						<Button variant="flat" size="md" onPress={() => {
+							setShowCloseButtonModal(true);
+							setShowCloseButton(true);
+						}}>
+							Enable Show Close Button
+						</Button>
+						<Button variant="flat" size="md" onPress={() => {
+							setShowCloseButtonModal(true);
+							setShowCloseButton(false);
+						}}>
+							Disable Show Close Button
+						</Button>
+					</View>
+					<Modal
+						visible={showCloseButtonModal}
+						onClose={() => setShowCloseButtonModal(false)}
+					>
+						<Modal.Header title="Show Close Button" showCloseButton={showCloseButton} />
+						<Modal.Body>
+							<Modal.Description content={`Show Close Button is set to ${showCloseButton}`} />
+						</Modal.Body>
+						<Modal.Footer>
+							<Button onPress={() => setShowCloseButtonModal(false)}>Close</Button>
+						</Modal.Footer>
+					</Modal>
+				</Section>
+				
 				{/* Swipe to Dismiss */}
 				<Section
-					title="Swipe to Dismiss"
-					description="드래그하여 모달을 닫을 수 있습니다"
+					title="Swipe to Dismiss prop"
+					description="Set swipe to dismiss behavior"
 				>
-					<View style={styles.buttonRow}>
+					<View style={commonStyles.row}>
 						<Button
-							variant="outlined"
+							variant="flat"
 							size="sm"
 							onPress={() => setSwipeModal(true)}
 						>
-							Swipe 활성화
+							Enable Swipe
 						</Button>
 						<Button
-							variant="outlined"
+							variant="flat"
 							size="sm"
 							onPress={() => setNoSwipeModal(true)}
 						>
-							Swipe 비활성화
+							Disable Swipe
 						</Button>
 					</View>
 
@@ -199,13 +362,12 @@ export default function ModalExamplesScreen() {
 						<Modal.Header title="Swipe to Dismiss" showCloseButton={false} />
 						<Modal.Body>
 							<Text style={styles.bodyText}>
-								swipeToDismiss={'{true}'} (기본값){'\n\n'}
-								모달을 아래로 스와이프하여 닫을 수 있습니다. 임계값(100px)을
-								넘으면 닫히고, 그렇지 않으면 원래 위치로 돌아갑니다.
+								swipeToDismiss={'{true}'} (default){'\n\n'}
+								You can close the modal by swiping down. If the threshold is exceeded, it will close, otherwise it will return to the original position.
 							</Text>
 						</Modal.Body>
 						<Modal.Footer>
-							<Button onPress={() => setSwipeModal(false)}>닫기</Button>
+							<Button onPress={() => setSwipeModal(false)}>Close</Button>
 						</Modal.Footer>
 					</Modal>
 
@@ -215,7 +377,7 @@ export default function ModalExamplesScreen() {
 						swipeToDismiss={false}
 						closable={true}
 					>
-						<Modal.Header title="Swipe 비활성화" />
+						<Modal.Header title="Swipe Disabled" />
 						<Modal.Body>
 							<ImageCard
 								source={{
@@ -270,8 +432,7 @@ export default function ModalExamplesScreen() {
 												rounded="sm"
 												variant="filled"
 												colorScheme="success"
-												shadow="button_primary"
-												style={{ flex: 1 }}
+											    style={{ flex: 1 }}
 											>
 												View Profile
 											</Button>
@@ -280,93 +441,13 @@ export default function ModalExamplesScreen() {
 								}
 							/>
 							<Modal.Description content="swipeToDismiss={'{false}'}" />
-							<Modal.Description content="닫기 버튼이나 배경을 터치하여 닫아야 합니다." />
+							<Modal.Description content="You need to close the modal by tapping the close button or background." />
 						</Modal.Body>
 						<Modal.Footer>
 							<Button onPress={() => setNoSwipeModal(false)}>닫기</Button>
 						</Modal.Footer>
 					</Modal>
 				</Section>
-
-				{/* Use Cases */}
-				<Section title="Use Cases" description="실제 사용 시나리오 예시">
-					<View style={styles.buttonRow}>
-						<Button
-							variant="outlined"
-							colorScheme="warning"
-							onPress={() => setAlertModal(true)}
-						>
-							Alert
-						</Button>
-						<Button
-							variant="outlined"
-							colorScheme="error"
-							onPress={() => setConfirmModal(true)}
-						>
-							Confirm Delete
-						</Button>
-					</View>
-
-					{/* Alert Modal */}
-					<Modal
-						visible={alertModal}
-						onClose={() => setAlertModal(false)}
-						size="md"
-						closable={false}
-						swipeToDismiss={false}
-					>
-						<Modal.Header
-							title="네트워크 에러 발생"
-							showCloseButton={false}
-							style={{
-								justifyContent: 'center',
-								alignItems: 'center',
-								width: '100%',
-							}}
-						/>
-						<Modal.Body
-							style={{ justifyContent: 'center', alignItems: 'center' }}
-						>
-							<Modal.Description content="네트워크 연결이 불안정합니다" />
-							<Modal.Description content="잠시 후 다시 시도해주세요." />
-						</Modal.Body>
-						<Modal.Footer>
-							<Button fullWidth onPress={() => setAlertModal(false)}>
-								확인
-							</Button>
-						</Modal.Footer>
-					</Modal>
-
-					{/* Confirm Delete Modal */}
-					<Modal
-						visible={confirmModal}
-						onClose={() => setConfirmModal(false)}
-						size="md"
-					>
-						<Modal.Header title="삭제 확인" />
-						<Modal.Body>
-							<Modal.Description content="정말로 이 항목을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다." />
-						</Modal.Body>
-						<Modal.Footer>
-							<Button
-								variant="ghost"
-								colorScheme="neutral"
-								onPress={() => setConfirmModal(false)}
-								style={{ flex: 1 }}
-							>
-								취소
-							</Button>
-							<Button
-								colorScheme="error"
-								onPress={() => setConfirmModal(false)}
-								style={{ flex: 1 }}
-							>
-								삭제
-							</Button>
-						</Modal.Footer>
-					</Modal>
-				</Section>
-
 				{/* Bottom Spacer */}
 				<View style={{ height: 40 }} />
 			</View>

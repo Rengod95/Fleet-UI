@@ -4,7 +4,8 @@ import { ToastProvider } from '@fleet-ui/components';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useUnistyles } from 'react-native-unistyles';
+import { useUnistyles ,StyleSheet} from 'react-native-unistyles';
+import { View } from 'react-native';
 // Initialize Fleet UI theming with Unistyles
 
 export default function RootLayout() {
@@ -13,43 +14,64 @@ export default function RootLayout() {
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<ToastProvider>
 				<StatusBar style="auto" />
-				<Stack
-					screenOptions={{
-						headerStyle: {
-							backgroundColor: theme.colors.neutral.content_1,
-						},
-						headerTintColor: theme.colors.neutral.text_1,
-						headerTitleStyle: {
-							fontWeight: '600',
-						},
-					}}
-				>
-					<Stack.Screen
-						name="index"
-						options={{
-							title: 'My UI SDK Playground',
-						}}
-					/>
-					<Stack.Screen
-						name="components"
-						options={{
-							headerShown: false,
-						}}
-					/>
-				<Stack.Screen
-					name="animations"
-					options={{
-						headerShown: false,
-					}}
-				/>
-				<Stack.Screen
-					name="samples"
-					options={{
-						headerShown: false,
-					}}
-				/>
-			</Stack>
+				<View style={styles.background}>
+					<View style={styles.container}>
+						<Stack
+							screenOptions={{
+								headerStyle: {
+									backgroundColor: theme.colors.neutral.content_1,
+								},
+								headerTintColor: theme.colors.neutral.text_1,
+								headerTitleStyle: {
+									fontWeight: '600',
+								},
+							}}
+						>
+							<Stack.Screen
+								name="index"
+								options={{
+									headerShown: false,
+								}}
+							/>
+							<Stack.Screen
+								name="components"
+								options={{
+									headerShown: false,
+								}}
+							/>
+							<Stack.Screen
+								name="showcases"
+								options={{
+									headerShown: false,
+								}}
+							/>
+							<Stack.Screen
+								name="scenarios"
+								options={{
+									headerShown: false,
+								}}
+							/>
+						</Stack>	
+					</View>
+				</View>
 			</ToastProvider>
 		</GestureHandlerRootView>
 	);
 }
+
+const styles = StyleSheet.create((theme,rt) => ({
+	background:{
+		display:'flex',
+		flexDirection:'row',
+		maxWidth: rt.screen.width,
+		height: rt.screen.height,
+		backgroundColor: theme.colors.neutral.content_1,
+		justifyContent:'center',
+	},
+	container:{
+		flex:1,
+		maxWidth:720,
+		// alignSelf:'center',
+		backgroundColor: theme.colors.neutral.content_1,
+	}
+}))

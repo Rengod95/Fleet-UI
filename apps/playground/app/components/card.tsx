@@ -48,6 +48,19 @@ export default function CardScreen() {
 				description="A versatile container component for grouping related content."
 			/>
 
+			<Section
+				title="Overview"
+				value="overview"
+				description="Most basic Card example (minimal required props, flat variant)."
+			>
+				<View style={commonStyles.fullWidthContainer}>
+					<Card variant="flat">
+						<Text style={styles.cardLabel}>Card</Text>
+						<Text style={styles.cardDescription}>Basic content</Text>
+					</Card>
+				</View>
+			</Section>
+
 			{/* Variants */}
 			<Section
 				title="Variants"

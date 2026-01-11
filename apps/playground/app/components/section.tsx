@@ -1,12 +1,17 @@
 import {
 	Icon,
+	Item,
+	ItemContent,
+	ItemDescription,
+	ItemMedia,
+	ItemTitle,
 	Section as LayoutSection,
 	SectionHeader,
 	SectionRightIcon,
 	SectionRightTypo,
 	type SectionSize,
 } from '@fleet-ui/components';
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronRight, Home } from 'lucide-react-native';
 import { Alert, ScrollView, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import {
@@ -31,15 +36,43 @@ export default function SectionExamplesScreen() {
 
 	return (
 		<ScrollView style={commonStyles.container}>
-			<View style={[commonStyles.content, { gap: 122 }]}>
+			<View style={[commonStyles.content]}>
 				<PageHeader
 					title="Section"
-					description="리스트 구간을 구분하는 레이아웃 컴포넌트. 헤더에 제목·서브타이틀·우측 액션을 배치하고, 사이즈/패딩/비율을 토큰 기반으로 제어합니다."
+					description="Section is a layout component that separates list sections. It places title/subtitle/right action in the header and controls size/padding/ratio based on token."
 				/>
 
 				<DemoSection
+					title="Overview"
+					value="overview"
+					description="The most basic Section example with Items."
+					sectionBodyStyle={{ marginTop: 24 }}
+				>
+					<LayoutSection
+						title="Section Title"
+						subtitle="Section Subtitle"
+						style={styles.card}
+						contentTopMargin={12}
+					>
+						{[1,2,3,4].map(item => {
+							return (
+								<Item key={item} variant="filled">
+									<ItemMedia mediaType="icon" variant="flat" size="md">
+										<Icon icon={Home} size="md" />
+									</ItemMedia>
+									<ItemContent>
+										<ItemTitle size="md">Item {item} Title</ItemTitle>
+										<ItemDescription size="md">Item description</ItemDescription>
+									</ItemContent>
+								</Item>
+							)
+						})}
+					</LayoutSection>
+				</DemoSection>
+
+				<DemoSection
 					title="Title Only + Right Icon"
-					description="타이틀과 우측 아이콘을 함께 사용할 수 있습니다."
+					description="Title and right icon can be used together."
 					sectionBodyStyle={{ marginTop: 24 }}
 				>
 					<View style={[styles.column, { gap: 44 }]}>
@@ -47,7 +80,7 @@ export default function SectionExamplesScreen() {
 							title="Section Title"
 							right={
 								<SectionRightIcon
-									accessibilityLabel="아이콘 액션"
+									accessibilityLabel="Icon action"
 									onPress={handleChevronPress}
 									icon={
 										<ChevronRight
@@ -66,7 +99,7 @@ export default function SectionExamplesScreen() {
 
 				<DemoSection
 					title="Title + Subtitle"
-					description="타이틀과 우측 아이콘을 함께 사용할 수 있습니다."
+					description="Title and subtitle can be used together."
 					sectionBodyStyle={{ marginTop: 24 }}
 				>
 					<View style={[styles.column, { gap: 44 }]}>
@@ -81,7 +114,7 @@ export default function SectionExamplesScreen() {
 
 				<DemoSection
 					title="Sizes"
-					description="타이포, 패딩, 우측 아이콘 크기를 size에 따라 조정합니다."
+					description="Adjust title/subtitle/right icon size based on size."
 					sectionBodyStyle={{ marginTop: 24 }}
 				>
 					<View style={[styles.column, { gap: 44 }]}>
@@ -90,16 +123,15 @@ export default function SectionExamplesScreen() {
 								key={size}
 								size={size}
 								title={`Section Title ${size}`}
-								subtitle="여기에 서브타이틀이 표시됩니다."
+								subtitle="Here is the subtitle."
 								right={
 									<SectionRightTypo size={size} onPress={handleMorePress}>
-										자세히 보기
+										View more
 									</SectionRightTypo>
 								}
 								contentStyle={styles.body}
 								style={styles.card}
 							>
-								{/* <View style={[styles.placeholder, { backgroundColor: theme.colors.neutral.content_2 }]} /> */}
 							</LayoutSection>
 						))}
 					</View>
@@ -107,17 +139,17 @@ export default function SectionExamplesScreen() {
 
 				<DemoSection
 					title="Subtitle Position"
-					description="subtitlePosition으로 서브타이틀이 타이틀/우측 행 위·아래 중 어디에 놓일지 결정합니다."
+					description="Determine where the subtitle will be placed in the title/right row using subtitlePosition."
 					sectionBodyStyle={{ marginTop: 24 }}
 				>
 					<View style={styles.column}>
 						<LayoutSection
-							title="Top에 서브타이틀"
+							title="Subtitle at Top"
 							subtitle="subtitlePosition 'top'"
 							subtitlePosition="top"
 							right={
 								<SectionRightTypo onPress={handleMorePress}>
-									자세히 보기
+									View more
 								</SectionRightTypo>
 							}
 							contentStyle={styles.body}
@@ -125,12 +157,12 @@ export default function SectionExamplesScreen() {
 						></LayoutSection>
 
 						<LayoutSection
-							title="Bottom에 서브타이틀"
+							title="Subtitle at Bottom"
 							subtitle="subtitlePosition 'bottom'"
 							subtitlePosition="bottom"
 							right={
 								<SectionRightTypo onPress={handleMorePress}>
-									자세히 보기
+									View more
 								</SectionRightTypo>
 							}
 							contentStyle={styles.body}
@@ -141,31 +173,24 @@ export default function SectionExamplesScreen() {
 
 				<DemoSection
 					title="Title Ratio"
-					description="titleRatio로 타이틀 영역과 우측 영역의 비율을 조정합니다."
+					description="Adjust the ratio of the title area and right area using titleRatio."
 					sectionBodyStyle={{ marginTop: 24 }}
 				>
 					<View style={styles.column}>
 						<LayoutSection
-							title="타이틀 80%"
-							subtitle="titleRatio=80"
+							title="Title 80% - Long Text example, Long Text example"
+							subtitle="titleRatio = 80"
 							titleRatio={80}
-							right={<SectionRightTypo>더보기</SectionRightTypo>}
-							contentStyle={styles.body}
+							right={<SectionRightTypo>View more</SectionRightTypo>}
+							headerStyle={{backgroundColor: theme.colors.neutral.content_4}}
 							style={styles.card}
-						>
-							<View
-								style={[
-									styles.placeholder,
-									{ backgroundColor: theme.colors.warning.content_2 },
-								]}
-							/>
-						</LayoutSection>
+						/>
 
 						<LayoutSection
-							title="타이틀 60%"
-							subtitle="titleRatio=60"
+							title="Title 60% - Long Text example, Long Text example"
+							subtitle="titleRatio = 60"
 							titleRatio={60}
-							right={<SectionRightTypo>더보기</SectionRightTypo>}
+							right={<SectionRightTypo>View more</SectionRightTypo>}
 							contentStyle={styles.body}
 							style={styles.card}
 						>
@@ -180,61 +205,150 @@ export default function SectionExamplesScreen() {
 				</DemoSection>
 
 				<DemoSection
-					title="Padding & Gap"
-					description="padding, gap, contentSpacing으로 헤더 좌우 패딩과 타이틀-서브타이틀 간격, 바디 간격을 조절합니다."
+					title="contentPaddingVertical"
+					description="Adjust the padding of the body(content area) using contentPaddingVertical."
 					sectionBodyStyle={{ marginTop: 24 }}
 				>
-					<View style={styles.column}>
+					<View style={[styles.column,{width:'100%'}]}>
 						<LayoutSection
-							title="좁은 패딩"
-							subtitle="padding=theme.spacing[3], gap=theme.spacing[1]"
-							padding={3}
-							gap={1}
-							contentSpacing={3}
+							title="contentPaddingVertical = 32"
+							subtitle="Subtitle is here"
+							contentPaddingVertical={32}
+							contentGap={40}
+							style={[styles.card]}
 							right={<SectionRightTypo>Link</SectionRightTypo>}
-							contentStyle={styles.body}
-							style={styles.card}
+							contentStyle={{width:'100%', backgroundColor:theme.colors.primary.content_3}}
 						>
-							<View
-								style={[
-									styles.placeholder,
-									{ backgroundColor: theme.colors.primary.content_2 },
-								]}
-							/>
+							<View style={{width:'100%'}}>
+							{[1,2,3,4].map(item => {
+								return (
+									<Item key={item} variant="filled">
+										<ItemMedia mediaType="icon" variant="flat" size="md">
+											<Icon icon={Home} size="md" />
+										</ItemMedia>
+										<ItemContent>
+											<ItemTitle size="md">Item {item} Title</ItemTitle>
+											<ItemDescription size="md">Item description</ItemDescription>
+										</ItemContent>
+									</Item>
+								)
+							})}
+						</View>
 						</LayoutSection>
+					</View>
+				</DemoSection>
 
+				<DemoSection
+					title="contentPaddingHorizontal"
+					description="Adjust the padding of the body(content area) using contentPaddingHorizontal."
+					sectionBodyStyle={{ marginTop: 24 }}
+				>
+					<View style={[styles.column,{width:'100%'}]}>
 						<LayoutSection
-							title="넉넉한 패딩"
-							subtitle="padding=theme.spacing[7], gap=theme.spacing[4]"
-							padding={7}
-							gap={4}
-							contentSpacing={6}
+							title="contentPaddingHorizontal = 32"
+							subtitle="Subtitle is here"
+							contentPaddingHorizontal={32}
+							contentGap={40}
+							style={[styles.card]}
 							right={<SectionRightTypo>Link</SectionRightTypo>}
-							contentStyle={styles.body}
-							style={styles.card}
+							contentStyle={{width:'100%', backgroundColor:theme.colors.primary.content_3}}
 						>
-							<View
-								style={[
-									styles.placeholder,
-									{ backgroundColor: theme.colors.neutral.content_3 },
-								]}
-							/>
+							<View style={{width:'100%'}}>
+							{[1,2,3,4].map(item => {
+								return (
+									<Item key={item} variant="filled">
+										<ItemMedia mediaType="icon" variant="flat" size="md">
+											<Icon icon={Home} size="md" />
+										</ItemMedia>
+										<ItemContent>
+											<ItemTitle size="md">Item {item} Title</ItemTitle>
+											<ItemDescription size="md">Item description</ItemDescription>
+										</ItemContent>
+									</Item>
+								)
+							})}
+						</View>
+						</LayoutSection>
+					</View>
+				</DemoSection>
+
+				<DemoSection
+					title="contentTopMargin"
+					description="Adjust the top margin of the body(content area) between header and body."
+					sectionBodyStyle={{ marginTop: 24 }}
+				>
+					<View style={[styles.column,{width:'100%'}]}>
+						<LayoutSection
+							title="contentTopMargin = 48"
+							subtitle="Subtitle is here"
+							contentTopMargin={48}
+							contentGap={40}
+							style={[styles.card]}
+							right={<SectionRightTypo>Link</SectionRightTypo>}
+							contentStyle={{width:'100%', backgroundColor:theme.colors.primary.content_3}}
+						>
+							<View style={{width:'100%'}}>
+							{[1,2,3,4].map(item => {
+								return (
+									<Item key={item} variant="filled">
+										<ItemMedia mediaType="icon" variant="flat" size="md">
+											<Icon icon={Home} size="md" />
+										</ItemMedia>
+										<ItemContent>
+											<ItemTitle size="md">Item {item} Title</ItemTitle>
+											<ItemDescription size="md">Item description</ItemDescription>
+										</ItemContent>
+									</Item>
+								)
+							})}
+						</View>
+						</LayoutSection>
+					</View>
+				</DemoSection>
+
+				<DemoSection
+					title="contentGap"
+					description="Adjust the gap between items in body(content area)."
+					sectionBodyStyle={{ marginTop: 24 }}
+				>
+					<View style={[styles.column,{width:'100%'}]}>
+						<LayoutSection
+							title="contentGap = 24"
+							subtitle="Subtitle is here"
+							contentGap={24}
+							style={[styles.card]}
+							right={<SectionRightTypo>Link</SectionRightTypo>}
+							contentStyle={{width:'100%', backgroundColor:theme.colors.primary.content_3}}
+						>
+							{[1,2,3,4].map(item => {
+								return (
+									<Item key={item} variant="filled">
+										<ItemMedia mediaType="icon" variant="flat" size="md">
+											<Icon icon={Home} size="md" />
+										</ItemMedia>
+										<ItemContent>
+											<ItemTitle size="md">Item {item} Title</ItemTitle>
+											<ItemDescription size="md">Item description</ItemDescription>
+										</ItemContent>
+									</Item>
+								)
+							})}
 						</LayoutSection>
 					</View>
 				</DemoSection>
 
 				<DemoSection
 					title="Right Actions"
-					description="텍스트/아이콘 우측 액션에 onPress를 넘기면 Reanimated 스프링 피드백이 적용됩니다."
+					description="Text/Icon right action with onPress will apply Reanimated spring feedback."
 					sectionBodyStyle={{ marginTop: 24 }}
 				>
-					<View style={styles.column}>
+					<View style={[styles.column, {gap:24}]}>
 						<LayoutSection
-							title="텍스트 액션"
-							subtitle="SectionRightTypo 사용"
+							title="Text Action"
+							subtitle="SectionRightTypo is used"
 							right={
 								<SectionRightTypo onPress={handleMorePress}>
-									자세히 보기
+									View more
 								</SectionRightTypo>
 							}
 							contentStyle={styles.body}
@@ -249,8 +363,8 @@ export default function SectionExamplesScreen() {
 						</LayoutSection>
 
 						<LayoutSection
-							title="아이콘 액션"
-							subtitle="SectionRightIcon 사용"
+							title="Icon Action"
+							subtitle="SectionRightIcon is used"
 							right={
 								<SectionRightIcon
 									accessibilityLabel="아이콘 액션"
@@ -274,36 +388,7 @@ export default function SectionExamplesScreen() {
 								]}
 							/>
 						</LayoutSection>
-
-						<LayoutSection
-							title="커스텀 Right"
-							subtitle="right prop에 노드를 직접 전달"
-							right={<Icon icon={ChevronRight} />}
-							contentStyle={styles.body}
-							style={styles.card}
-						>
-							<View
-								style={[
-									styles.placeholder,
-									{ backgroundColor: theme.colors.success.content_2 },
-								]}
-							/>
-						</LayoutSection>
 					</View>
-				</DemoSection>
-
-				<DemoSection
-					title="Header Only"
-					description="children 없이 헤더만 사용하여 리스트 상단 텍스트 라벨로 활용할 수 있습니다."
-					sectionBodyStyle={{ marginTop: 24 }}
-				>
-					<SectionHeader
-						title="헤더만 노출"
-						subtitle="이 영역 아래에 FlatList 헤더 등으로 바로 연결할 수 있습니다."
-						right={<SectionRightTypo>전체 보기</SectionRightTypo>}
-						padding={5}
-						testID="header-only"
-					/>
 				</DemoSection>
 			</View>
 		</ScrollView>
@@ -320,8 +405,6 @@ const styles = StyleSheet.create((theme) => ({
 		borderCurve: 'continuous',
 	},
 	body: {
-		borderTopWidth: 1,
-		borderTopColor: theme.colors.neutral.border_subtle,
 	},
 	placeholder: {
 		borderRadius: theme.rounded.lg,

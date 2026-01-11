@@ -1,5 +1,6 @@
 import {
 	Chip,
+	Icon,
 	type ChipColorScheme,
 	type ChipRounded,
 	type ChipSize,
@@ -7,13 +8,14 @@ import {
 } from '@fleet-ui/components';
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+import { ScopedTheme, StyleSheet, useUnistyles } from 'react-native-unistyles';
 import {
 	commonStyles,
 	DemoIcon,
 	PageHeader,
 	Section,
 } from '../../common/views';
+import { ArrowRight, Check, Circle, Star } from 'lucide-react-native';
 
 const COLOR_SCHEMES: ChipColorScheme[] = [
 	'primary',
@@ -41,6 +43,20 @@ export default function ChipExamplesScreen() {
 
 	// Interactive selection state
 	const [selectedChips, setSelectedChips] = useState<Set<string>>(new Set());
+
+	const [invertSampleChips, setInvertSampleChips] = useState<Set<string>>(new Set());
+
+	const toggleInvertSampleChip = (id: string) => {
+		setInvertSampleChips((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) {
+				next.delete(id);
+			} else {
+				next.add(id);
+			}
+			return next;
+		});
+	};
 
 	const toggleChip = (id: string) => {
 		setSelectedChips((prev) => {
@@ -78,9 +94,21 @@ export default function ChipExamplesScreen() {
 					description="Compact elements used for filtering, selection, or displaying tags. Supports inverted styles for selection states and dismissible functionality with onClose."
 				/>
 
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic Chip example (minimal required props, filled variant)."
+				>
+					<View style={commonStyles.row}>
+						<Chip variant="filled" colorScheme="primary" style={styles.chip}>
+							Chip
+						</Chip>
+					</View>
+				</Section>
+
 				{/* Variants */}
 				<Section title="Variants" description="Visual treatments of the chip.">
-					<View style={commonStyles.row}>
+					<View style={[commonStyles.row, {gap:0}]}>
 						{VARIANTS.map((variant) => (
 							<Chip key={variant} variant={variant} style={styles.chip}>
 								{variant}
@@ -95,7 +123,7 @@ export default function ChipExamplesScreen() {
 					description="Semantic color roles mapped from the design tokens."
 				>
 					{COLOR_SCHEMES.map((scheme) => (
-						<View key={scheme} style={commonStyles.row}>
+						<View key={scheme} style={[commonStyles.row, {gap:0}]}>
 							{VARIANTS.map((variant) => (
 								<Chip
 									key={`${scheme}-${variant}`}
@@ -124,54 +152,20 @@ export default function ChipExamplesScreen() {
 					</View>
 				</Section>
 
-				{/* Inverted */}
+				{/* Rounded */}
 				<Section
-					title="Inverted"
-					description="Inverted prop swaps the colorScheme + variant styles. Useful for selected states."
+					title="Rounded"
+					description="Border radius presets. Default is 'full' for pill shape."
 				>
-					<Text style={[styles.label, { color: theme.colors.neutral.text_2 }]}>
-						Normal vs Inverted
-					</Text>
 					<View style={commonStyles.row}>
-						{VARIANTS.map((variant) => (
-							<View key={variant} style={styles.compareGroup}>
-								<Chip
-									variant={variant}
-									colorScheme="primary"
-									style={styles.chip}
-								>
-									{variant}
-								</Chip>
-								<Chip
-									variant={variant}
-									colorScheme="primary"
-									inverted
-									style={styles.chip}
-								>
-									{variant} (inv)
-								</Chip>
-							</View>
-						))}
-					</View>
-
-					<Text
-						style={[
-							styles.label,
-							{ color: theme.colors.neutral.text_2, marginTop: 16 },
-						]}
-					>
-						Inverted across color schemes (filled variant)
-					</Text>
-					<View style={commonStyles.row}>
-						{COLOR_SCHEMES.map((scheme) => (
+						{ROUNDED.map((rounded) => (
 							<Chip
-								key={scheme}
-								colorScheme={scheme}
-								variant="filled"
-								inverted
+								key={rounded}
+								rounded={rounded}
 								style={styles.chip}
+								variant="filled"
 							>
-								{scheme}
+								{rounded}
 							</Chip>
 						))}
 					</View>
@@ -179,53 +173,32 @@ export default function ChipExamplesScreen() {
 
 				{/* With Icons */}
 				<Section
-					title="With Icons"
+					title="leftIcon and rightIcon props"
 					description="Left and right icon slots positioned at chip edges."
 				>
 					<View style={commonStyles.row}>
+						
+							<Chip
+								leftIcon={
+									<ScopedTheme name="dark" invertedAdaptive>
+										<Icon size="xs" colorScheme="neutral" icon={Star} />
+									</ScopedTheme>
+								}
+								style={styles.chip}
+								variant="filled"
+							>
+								Left icon
+							</Chip>
 						<Chip
-							leftIcon={<DemoIcon label="★" />}
-							style={styles.chip}
-							variant="filled"
-						>
-							Left icon
-						</Chip>
-						<Chip
-							rightIcon={<DemoIcon label="→" />}
+							rightIcon={
+								<ScopedTheme name="dark" invertedAdaptive>
+									<Icon size="xs" colorScheme="neutral" icon={ArrowRight} />
+								</ScopedTheme>
+							}
 							style={styles.chip}
 							variant="filled"
 						>
 							Right icon
-						</Chip>
-						<Chip
-							leftIcon={<DemoIcon label="◉" />}
-							rightIcon={<DemoIcon label="✓" />}
-							style={styles.chip}
-							variant="outlined"
-							colorScheme="success"
-						>
-							Both icons
-						</Chip>
-					</View>
-					<View style={commonStyles.row}>
-						<Chip
-							iconOnly
-							variant="filled"
-							rounded="full"
-							aria-label="Favorite"
-							style={styles.chip}
-						>
-							<DemoIcon label="★" />
-						</Chip>
-						<Chip
-							iconOnly
-							variant="outlined"
-							rounded="full"
-							aria-label="Settings"
-							style={styles.chip}
-							colorScheme="primary"
-						>
-							<DemoIcon label="⚙︎" />
 						</Chip>
 					</View>
 				</Section>
@@ -277,6 +250,30 @@ export default function ChipExamplesScreen() {
 						</Chip>
 					</View>
 				</Section>
+
+				{/* Inverted */}
+				<Section
+					title="Inverted Prop"
+					description="It's useful for selected state."
+				>
+					<Text style={[commonStyles.label, {alignSelf:'flex-start'}]}>
+						Press to toggle inverted state
+					</Text>
+					<View style={[commonStyles.row, {gap:0}]}>
+						{VARIANTS.map((variant) => (
+								<Chip
+									variant={variant}
+									colorScheme="primary"
+									inverted={invertSampleChips.has(variant)}
+									onPress={() => toggleInvertSampleChip(variant)}
+									style={styles.chip}
+								>
+									{variant}
+								</Chip>
+						))}
+					</View>
+				</Section>
+
 
 				{/* Interactive (Selectable) */}
 				<Section
@@ -399,47 +396,6 @@ export default function ChipExamplesScreen() {
 						>
 							Disabled flat
 						</Chip>
-					</View>
-				</Section>
-
-				{/* Rounded */}
-				<Section
-					title="Rounded"
-					description="Border radius presets. Default is 'full' for pill shape."
-				>
-					<View style={commonStyles.row}>
-						{ROUNDED.map((rounded) => (
-							<Chip
-								key={rounded}
-								rounded={rounded}
-								style={styles.chip}
-								variant="filled"
-							>
-								{rounded}
-							</Chip>
-						))}
-					</View>
-				</Section>
-
-				{/* Combined: Selectable + Dismissible */}
-				<Section
-					title="Combined: Selectable + Dismissible"
-					description="Chips that can be both selected and dismissed."
-				>
-					<View style={commonStyles.row}>
-						{['Tag A', 'Tag B', 'Tag C'].map((tag) => (
-							<Chip
-								key={tag}
-								variant="outlined"
-								colorScheme="primary"
-								inverted={selectedChips.has(tag)}
-								onPress={() => toggleChip(tag)}
-								onClose={() => {}}
-								style={styles.chip}
-							>
-								{tag}
-							</Chip>
-						))}
 					</View>
 				</Section>
 			</View>

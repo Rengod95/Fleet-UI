@@ -66,21 +66,22 @@ export default function ItemExamplesScreen() {
 				/>
 
 				<Section
-					title="Basic Item"
-					description="Simple item with title and description."
+					title="Overview"
+					value="overview"
+					description="Most basic Item example (flat variant)."
 					sectionBodyStyle={{ boxShadow: 'none' }}
 				>
-					<Item variant="flat">
-						<ItemMedia mediaType="image" size="md">
+					<View style={styles.column}>
+					<Item variant="filled">
+						<ItemMedia mediaType="icon" variant="flat" size="md">
 							<Icon icon={Home} size="md" />
 						</ItemMedia>
 						<ItemContent>
-							<ItemTitle size="md">Basic Item</ItemTitle>
-							<ItemDescription size="md">
-								A simple item with title and description.
-							</ItemDescription>
+							<ItemTitle size="md">Item</ItemTitle>
+							<ItemDescription size="md">Basic content</ItemDescription>
 						</ItemContent>
 					</Item>
+					</View>
 				</Section>
 
 				<Section
@@ -95,7 +96,7 @@ export default function ItemExamplesScreen() {
 									<Icon icon={Home} size="md" />
 								</ItemMedia>
 								<ItemContent>
-									<ItemTitle>{variant.toUpperCase()} Variant</ItemTitle>
+									<ItemTitle>{variant} Variant</ItemTitle>
 									<ItemDescription>
 										This is the {variant} variant style.
 									</ItemDescription>
@@ -477,7 +478,8 @@ export default function ItemExamplesScreen() {
 
 const styles = StyleSheet.create((theme) => ({
 	column: {
-		gap: theme.spacing[3],
+		width: '100%',
+		gap: theme.spacing[5],
 	},
 	itemSpacing: {
 		marginBottom: theme.spacing[2],

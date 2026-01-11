@@ -101,51 +101,75 @@ export default function AccordionExamplesScreen() {
 					title="Accordion"
 					description="A vertically stacked set of interactive headings that each reveal a section of content. Supports single/multiple expand modes, various variants, sizes, and animations."
 				/>
-
-				{/* Controlled Mode */}
 				<Section
-					title="Controlled Mode"
-					description="Value is controlled externally via state."
+					title="Overview"
+					value="overview"
+					description="Most basic Accordion example (single mode, flat variant)."
 				>
-					<Text style={styles.stateText}>
-						Single: {singleValue || '(none)'}
-					</Text>
-					<Accordion
-						type="single"
-						collapsible
-						value={singleValue}
-						onValueChange={setSingleValue}
-						variant="outlined"
-					>
-						<Accordion.Item key={'single_item_1'} value={'single_item_1'}>
-							<Accordion.Header>Single Item 1</Accordion.Header>
-							<Accordion.Content>
-								<Text style={styles.contentText}>Single Item 1 Content</Text>
-							</Accordion.Content>
-						</Accordion.Item>
-					</Accordion>
-
-					<View style={styles.spacer} />
-
-					<Text style={styles.stateText}>
-						Multiple: [{multipleValue.join(', ')}]
-					</Text>
-					<Accordion
-						type="multiple"
-						value={multipleValue}
-						onValueChange={setMultipleValue}
-						variant="outlined"
-					>
-						{FAQ_ITEMS.map((item) => (
-							<Accordion.Item key={item.value} value={item.value}>
-								<Accordion.Header>{item.title}</Accordion.Header>
+					<View style={commonStyles.fullWidthContainer}>
+						<Accordion
+							type="single"
+							collapsible
+							defaultValue="overview-item"
+							variant="flat"
+							colorScheme="neutral"
+						>
+							<Accordion.Item value="overview-item">
+								<Accordion.Header>Overview Item</Accordion.Header>
 								<Accordion.Content>
-									<Text style={styles.contentText}>{item.content}</Text>
+									<Text style={styles.contentText}>Accordion content</Text>
 								</Accordion.Content>
 							</Accordion.Item>
-						))}
-					</Accordion>
+						</Accordion>
+					</View>
 				</Section>
+
+				{/* Controlled Mode */}
+				<Accordion type="single" collapsible defaultValue="section1" variant="outlined">
+					<Accordion.Item value="section1">
+						<Accordion.Header>Controlled Mode</Accordion.Header>
+						<Accordion.Content>
+							<View>
+								<Accordion
+										type="single"
+										collapsible
+										value={singleValue}
+										onValueChange={setSingleValue}
+										variant="outlined"
+									>
+										<Accordion.Item key={'single_item_1'} value={'single_item_1'}>
+											<Accordion.Header>Single Item 1</Accordion.Header>
+											<Accordion.Content>
+												<Text style={styles.contentText}>Single Item 1 Content</Text>
+											</Accordion.Content>
+										</Accordion.Item>
+									</Accordion>
+
+									<View style={styles.spacer} />
+
+									<Text style={styles.stateText}>
+										Multiple: [{multipleValue.join(', ')}]
+									</Text>
+									<Accordion
+										type="multiple"
+										value={multipleValue}
+										onValueChange={setMultipleValue}
+										variant="outlined"
+									>
+										{FAQ_ITEMS.map((item) => (
+											<Accordion.Item key={item.value} value={item.value}>
+												<Accordion.Header>{item.title}</Accordion.Header>
+												<Accordion.Content>
+													<Text style={styles.contentText}>{item.content}</Text>
+												</Accordion.Content>
+											</Accordion.Item>
+										))}
+									</Accordion>
+							</View>
+						</Accordion.Content>
+					</Accordion.Item>
+				</Accordion>
+				
 
 				{/* Variants */}
 				<Section

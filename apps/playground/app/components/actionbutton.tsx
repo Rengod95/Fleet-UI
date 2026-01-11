@@ -42,7 +42,7 @@ const ROUNDED: ActionButtonRounded[] = [
 ];
 
 export default function ActionButtonExamplesScreen() {
-	useUnistyles();
+	const { theme } = useUnistyles();
 
 	return (
 		<ScrollView style={commonStyles.container}>
@@ -51,6 +51,29 @@ export default function ActionButtonExamplesScreen() {
 					title="ActionButton"
 					description="Icon/Image-focused vertical button with content container and optional title. Demonstrates variant, size, colorScheme, rounded, and shadow props."
 				/>
+
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic ActionButton example (minimal required props, flat variant)."
+				>
+					<View style={commonStyles.column}>
+						<ActionButton
+							variant="flat"
+							colorScheme="primary"
+							title="Action"
+							contentRounded="lg"
+						>
+							<Icon
+								icon={BoxIcon}
+								size="md"
+								strokeWidth={1.5}
+								colorScheme="primary"
+								accessibilityLabel="Action"
+							/>
+						</ActionButton>
+					</View>
+				</Section>
 
 				<Section
 					title="Variants"
@@ -100,13 +123,13 @@ export default function ActionButtonExamplesScreen() {
 					description="Combination of all color schemes and variants."
 				>
 					{COLOR_SCHEMES.map((scheme) => (
-						<View key={scheme} style={styles.schemeRow}>
+						<View key={scheme} style={[styles.schemeRow, {gap: 16}]}>
 							{VARIANTS.map((variant) => (
 								<ActionButton
 									key={`${scheme}-${variant}`}
 									colorScheme={scheme}
 									variant={variant}
-									title={`${scheme.slice(0, 3)}`}
+									title={scheme}
 								>
 									<Icon
 										icon={BoxIcon}
@@ -201,8 +224,8 @@ export default function ActionButtonExamplesScreen() {
 				</Section>
 
 				<Section
-					title="Container Rounded"
-					description="Border radius for root container."
+					title="Container Rounded and Root Style"
+					description="ActionButton has Root Contaianer with inner contents, you can change the root container styles with rootStyle prop."
 				>
 					<View style={commonStyles.row}>
 						{ROUNDED.map((rounded) => (
@@ -211,6 +234,8 @@ export default function ActionButtonExamplesScreen() {
 								containerRounded={rounded}
 								title={rounded}
 								variant="filled"
+								colorScheme="info"
+								rootStyle={{ backgroundColor: theme.colors.success.content_2, padding: theme.spacing[4] }}
 							>
 								<Icon
 									icon={BoxIcon}
@@ -255,7 +280,7 @@ export default function ActionButtonExamplesScreen() {
 						<ActionButton title="Star" variant="filled">
 							<Icon
 								icon={BoxIcon}
-								size="md"
+								size="sm"
 								strokeWidth={1}
 								accessibilityLabel={'Star'}
 							/>
@@ -271,7 +296,7 @@ export default function ActionButtonExamplesScreen() {
 						<ActionButton title="Settings" variant="outlined">
 							<Icon
 								icon={BoxIcon}
-								size="md"
+								size="lg"
 								strokeWidth={1}
 								accessibilityLabel={'Star'}
 							/>
@@ -279,7 +304,7 @@ export default function ActionButtonExamplesScreen() {
 						<ActionButton title="Bell" variant="faded">
 							<Icon
 								icon={BoxIcon}
-								size="md"
+								size="xl"
 								strokeWidth={1}
 								accessibilityLabel={'Star'}
 							/>
@@ -299,7 +324,7 @@ export default function ActionButtonExamplesScreen() {
 								source={{
 									uri: 'https://i.pravatar.cc/100?img=1',
 								}}
-								style={styles.image}
+								style={[styles.image]}
 							/>
 						</ActionButton>
 						<ActionButton

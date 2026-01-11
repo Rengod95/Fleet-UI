@@ -1,5 +1,5 @@
 import { Icon } from '@fleet-ui/components';
-import { AlertCircle, Check, Heart, Info, Star, X } from 'lucide-react-native';
+import { Heart, Star } from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 import { commonStyles, PageHeader, Section } from '../../common/views';
 
@@ -21,7 +21,6 @@ const COLOR_SCHEMES = [
 	'warning',
 	'success',
 	'info',
-	'secondary',
 ] as const;
 
 export default function IconScreen() {
@@ -30,8 +29,23 @@ export default function IconScreen() {
 			<View style={commonStyles.content}>
 				<PageHeader
 					title="Icon"
-					description="Lucide 아이콘을 Fleet UI 스타일로 래핑한 컴포넌트"
+					description="Wrapped Lucide icons with Fleet UI styles. It supports size, color scheme, and accessibility labels."
 				/>
+
+				<Section
+					title="Overview"
+					value="overview"
+					description="Basic Icon example (primary + lg)."
+				>
+					<View style={commonStyles.row}>
+						<Icon
+							icon={Star}
+							colorScheme="primary"
+							size="lg"
+							accessibilityLabel="Star primary lg"
+						/>
+					</View>
+				</Section>
 
 				{/* Size 변형 */}
 				<Section title="Sizes (_2xs ~ _4xl)">
@@ -59,18 +73,6 @@ export default function IconScreen() {
 								accessibilityLabel={`Star ${scheme}`}
 							/>
 						))}
-					</View>
-				</Section>
-
-				{/* 다양한 아이콘 예시 */}
-				<Section title="Icon Variety">
-					<View style={[commonStyles.grid, { gap: 16 }]}>
-						<Icon icon={Heart} accessibilityLabel="Heart" />
-						<Icon icon={Check} accessibilityLabel="Check" />
-						<Icon icon={X} accessibilityLabel="Close" />
-						<Icon icon={AlertCircle} accessibilityLabel="Alert" />
-						<Icon icon={Info} accessibilityLabel="Info" />
-						<Icon icon={Star} accessibilityLabel="Star" />
 					</View>
 				</Section>
 			</View>

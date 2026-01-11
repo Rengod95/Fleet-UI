@@ -23,14 +23,11 @@ import { commonStyles, PageHeader, Section } from '../../common/views';
 const VARIANTS: ImageCardVariant[] = ['vertical', 'horizontal'];
 const SHADOWS: ImageCardShadow[] = [
 	'none',
-	'xs',
 	'sm',
 	'md',
 	'lg',
-	'xl',
-	'card',
 ];
-const ROUNDED: ImageCardRounded[] = ['none', 'xs', 'sm', 'md', 'lg', 'xl'];
+const ROUNDED: ImageCardRounded[] = ['none', 'xs', 'sm', 'md', 'lg'];
 const SIZES: ImageCardSize[] = ['sm', 'md', 'lg'];
 
 // Sample images for demo
@@ -56,14 +53,13 @@ export default function ImageCardExamplesScreen() {
 					title="ImageCard"
 					description="A card component with a background image, gradient overlay, and content slots. Supports vertical/horizontal layouts with configurable typography size."
 				/>
-
 				{/* Basic Usage - Overview */}
 				<Section
-					title="Basic Usage"
-					description="Default vertical card with image and content slots."
+					title="Overview"
+					value="overview"
+					description="Most basic ImageCard example (vertical)."
 					sectionBodyStyle={{ boxShadow: 'none' }}
 				>
-					<View style={styles.cardContainer}>
 						<ImageCard
 							source={{ uri: SAMPLE_IMAGES.portrait }}
 							aspectRatio="3:4"
@@ -119,7 +115,6 @@ export default function ImageCardExamplesScreen() {
 											rounded="sm"
 											variant="filled"
 											colorScheme="success"
-											shadow="button_primary"
 											style={{ flex: 1 }}
 										>
 											View Profile
@@ -128,7 +123,6 @@ export default function ImageCardExamplesScreen() {
 								</View>
 							}
 						/>
-					</View>
 				</Section>
 
 				{/* Size Variants */}
@@ -214,43 +208,6 @@ export default function ImageCardExamplesScreen() {
 						}
 					/>
 				</Section>
-
-				{/* Shadow */}
-				<Section
-					title="Shadow"
-					description="Shadow intensity from token system."
-					sectionBodyStyle={{ boxShadow: 'none' }}
-				>
-					<View style={styles.cardRow}>
-						{SHADOWS.slice(0, 4).map((shadow) => (
-							<ImageCard
-								key={shadow}
-								source={{ uri: SAMPLE_IMAGES.square }}
-								aspectRatio={1}
-								width={150}
-								rounded="md"
-								shadow={shadow}
-								size="sm"
-								title={shadow}
-							/>
-						))}
-					</View>
-					<View style={[styles.cardRow, { marginTop: 16 }]}>
-						{SHADOWS.slice(4).map((shadow) => (
-							<ImageCard
-								key={shadow}
-								source={{ uri: SAMPLE_IMAGES.square }}
-								aspectRatio={1}
-								width={150}
-								rounded="md"
-								shadow={shadow}
-								size="sm"
-								title={shadow}
-							/>
-						))}
-					</View>
-				</Section>
-
 				{/* Rounded */}
 				<Section
 					title="Rounded"
@@ -258,28 +215,14 @@ export default function ImageCardExamplesScreen() {
 					sectionBodyStyle={{ boxShadow: 'none' }}
 				>
 					<View style={styles.cardRow}>
-						{ROUNDED.slice(0, 3).map((rounded) => (
+						{ROUNDED.map((rounded) => (
 							<ImageCard
 								key={rounded}
 								source={{ uri: SAMPLE_IMAGES.nature }}
 								aspectRatio={1}
 								width={150}
 								rounded={rounded}
-								shadow="md"
-								size="sm"
-								title={rounded}
-							/>
-						))}
-					</View>
-					<View style={[styles.cardRow, { marginTop: 16 }]}>
-						{ROUNDED.slice(3).map((rounded) => (
-							<ImageCard
-								key={rounded}
-								source={{ uri: SAMPLE_IMAGES.nature }}
-								aspectRatio={1}
-								width={150}
-								rounded={rounded}
-								shadow="md"
+								shadow="none"
 								size="sm"
 								title={rounded}
 							/>
@@ -293,7 +236,7 @@ export default function ImageCardExamplesScreen() {
 					description="Different aspect ratio configurations using number or string format."
 					sectionBodyStyle={{ boxShadow: 'none' }}
 				>
-					<Text style={[styles.label, { color: theme.colors.neutral.text_2 }]}>
+					<Text style={commonStyles.label}>
 						Portrait (3:4), Square (1:1), Landscape (4:3)
 					</Text>
 					<View style={styles.cardRow}>
@@ -302,7 +245,7 @@ export default function ImageCardExamplesScreen() {
 							aspectRatio="3:4"
 							width={130}
 							rounded="md"
-							shadow="md"
+							shadow="none"
 							size="sm"
 							title="3:4"
 						/>
@@ -311,7 +254,7 @@ export default function ImageCardExamplesScreen() {
 							aspectRatio={1}
 							width={150}
 							rounded="md"
-							shadow="md"
+							shadow="none"
 							size="sm"
 							title="1:1"
 						/>
@@ -320,17 +263,14 @@ export default function ImageCardExamplesScreen() {
 							aspectRatio="4:3"
 							width={180}
 							rounded="md"
-							shadow="md"
+							shadow="none"
 							size="sm"
 							title="4:3"
 						/>
 					</View>
 
 					<Text
-						style={[
-							styles.label,
-							{ color: theme.colors.neutral.text_2, marginTop: 24 },
-						]}
+						style={commonStyles.label}
 					>
 						Wide (16:9) with percentage width
 					</Text>
@@ -400,7 +340,7 @@ export default function ImageCardExamplesScreen() {
 							aspectRatio="3:4"
 							width={320}
 							rounded="lg"
-							shadow="xl"
+							shadow="lg"
 							size="md"
 							topContent={
 								<View style={styles.tagRow}>
@@ -516,7 +456,7 @@ export default function ImageCardExamplesScreen() {
 							aspectRatio={0.8}
 							width={320}
 							rounded="xl"
-							shadow="xl"
+							shadow="lg"
 							size="lg"
 							topContent={
 								<View style={styles.tagRow}>
@@ -575,9 +515,10 @@ const styles = StyleSheet.create((theme) => ({
 	},
 	cardRow: {
 		flexDirection: 'row',
-		flexWrap: 'wrap',
-		gap: theme.spacing[3],
+		flexWrap:'wrap',
+		gap: theme.spacing[7],
 		justifyContent: 'center',
+		paddingVertical: theme.spacing[5],
 	},
 	label: {
 		fontSize: theme.typography.caption1.fontSize,

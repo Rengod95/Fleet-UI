@@ -50,6 +50,21 @@ export default function IconButtonExamplesScreen() {
 				/>
 
 				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic IconButton example (filled, primary)."
+				>
+					<View style={commonStyles.row}>
+						<IconButton
+							variant="filled"
+							colorScheme="primary"
+							aria-label="icon button"
+							icon={<Search />}
+						/>
+					</View>
+				</Section>
+
+				<Section
 					title="Variants"
 					description="Filled, outlined, flat, and ghost styles across neutral scheme."
 				>

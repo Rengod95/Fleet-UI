@@ -29,6 +29,7 @@ const SIZES = ['sm', 'md', 'lg'] as const;
 const ROUNDED_OPTIONS = ['none', 'xs', 'sm', 'md', 'lg', 'xl'] as const;
 const INDICATOR_POSITIONS = ['start', 'end'] as const;
 const INDICATOR_VARIANTS = ['filled', 'flat', 'outlined'] as const;
+const SHADOW_OPTIONS = ['none', 'sm', 'md', 'lg'] as const;
 
 export default function CheckboxCardScreen() {
 	useUnistyles();
@@ -50,9 +51,25 @@ export default function CheckboxCardScreen() {
 					description="Card-style checkbox using Item + Checkbox composition. Accepts title/description as string props."
 				/>
 
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic CheckboxCard example (controlled, flat variant)."
+				>
+					<View style={{ gap: 12 , width: '100%'}}>
+						<CheckboxCard
+							variant="filled"
+							checked={singleChecked}
+							onCheckedChange={setSingleChecked}
+							title="Basic CheckboxCard"
+							description={`Checked: ${singleChecked ? 'true' : 'false'}`}
+						/>
+					</View>
+				</Section>
+
 				{/* Variants */}
 				<Section title="Variants">
-					<View style={{ gap: 12 }}>
+					<View style={{ gap: 12 , width: '100%'}}>
 						{VARIANTS.map((variant) => (
 							<CheckboxCard
 								key={variant}
@@ -67,23 +84,26 @@ export default function CheckboxCardScreen() {
 				</Section>
 
 				{/* Color Schemes */}
-				<Section title="Color Schemes (Checked)">
-					<View style={{ gap: 12 }}>
+				<Section title="Color Schemes x Variants (Checked)">
+					<View style={{ gap: 12 , width: '100%'}}>
 						{COLOR_SCHEMES.map((colorScheme) => (
-							<CheckboxCard
-								key={colorScheme}
-								colorScheme={colorScheme}
-								defaultChecked={true}
-								title={colorScheme}
-								description={`ColorScheme: ${colorScheme}`}
-							/>
+							VARIANTS.map((variant) => (
+								<CheckboxCard
+									key={`${colorScheme}-${variant}`}
+									variant={variant}
+									colorScheme={colorScheme}
+									defaultChecked={true}
+									title={colorScheme}
+									description={`ColorScheme: ${colorScheme} + Variant: ${variant}`}
+								/>
+							))
 						))}
 					</View>
 				</Section>
 
 				{/* Sizes */}
 				<Section title="Sizes">
-					<View style={{ gap: 12 }}>
+					<View style={{ gap: 12 , width: '100%'}}>
 						{SIZES.map((size) => (
 							<CheckboxCard
 								key={size}
@@ -96,9 +116,33 @@ export default function CheckboxCardScreen() {
 					</View>
 				</Section>
 
+				{/* Rounded */}
+				<Section title="Rounded">
+					<View style={{ gap: 12 , width: '100%'}}>
+						{ROUNDED_OPTIONS.map((rounded) => (
+							<CheckboxCard
+								key={rounded}
+								rounded={rounded}
+								defaultChecked={true}
+								colorScheme="primary"
+								title={`rounded: ${rounded}`}
+							/>
+						))}
+					</View>
+				</Section>
+
+				{/* Shadow */}
+				<Section title="Shadow">
+					<View style={{ gap: 24, overflow:'visible', width: '100%'}}>
+						{SHADOW_OPTIONS.map((shadow) => (
+							<CheckboxCard variant="flat" key={shadow} shadow={shadow} defaultChecked={true} colorScheme="primary" title={`shadow: ${shadow}`} />
+						))}
+					</View>
+				</Section>
+
 				{/* Indicator Position */}
 				<Section title="Indicator Position">
-					<View style={{ gap: 12 }}>
+					<View style={{ gap: 12 , width: '100%'}}>
 						{INDICATOR_POSITIONS.map((position) => (
 							<CheckboxCard
 								key={position}
@@ -114,7 +158,7 @@ export default function CheckboxCardScreen() {
 
 				{/* Indicator Variants */}
 				<Section title="Indicator Variants">
-					<View style={{ gap: 12 }}>
+					<View style={{ gap: 12 , width: '100%'}}>
 						{INDICATOR_VARIANTS.map((indicatorVariant) => (
 							<CheckboxCard
 								key={indicatorVariant}
@@ -129,8 +173,8 @@ export default function CheckboxCardScreen() {
 				</Section>
 
 				{/* With Media (Icon) */}
-				<Section title="With Media">
-					<View style={{ gap: 12 }}>
+				<Section title="Media Prop(icon, image)">
+					<View style={{ gap: 12 , width: '100%'}}>
 						<CheckboxCard
 							defaultChecked={true}
 							indicatorPosition="end"
@@ -161,8 +205,8 @@ export default function CheckboxCardScreen() {
 				</Section>
 
 				{/* Selected Color Scheme */}
-				<Section title="Selected Color Scheme">
-					<View style={{ gap: 12 }}>
+				<Section title="Selected Color Scheme" description='With selectedColorScheme prop, the colorScheme changes when the card is selected'>
+					<View style={{ gap: 12 , width: '100%'}}>
 						<CheckboxCard
 							colorScheme="neutral"
 							selectedColorScheme="success"
@@ -183,7 +227,7 @@ export default function CheckboxCardScreen() {
 
 				{/* Disabled State */}
 				<Section title="Disabled State">
-					<View style={{ gap: 12 }}>
+					<View style={{ gap: 12 , width: '100%'}}>
 						<CheckboxCard
 							disabled={true}
 							defaultChecked={false}
@@ -200,21 +244,9 @@ export default function CheckboxCardScreen() {
 					</View>
 				</Section>
 
-				{/* Interactive Demo - Single */}
-				<Section title="Interactive Demo - Single">
-					<CheckboxCard
-						checked={singleChecked}
-						onCheckedChange={setSingleChecked}
-						colorScheme="primary"
-						indicatorPosition="start"
-						title={singleChecked ? 'Checked ✓' : 'Unchecked'}
-						description="Tap to toggle checkbox state"
-						media={<Icon icon={Star} size="md" />}
-					/>
-				</Section>
-
 				{/* Group Usage */}
-				<Section title="CheckboxCardGroup">
+				<Section title="CheckboxCardGroup" description='CheckboxCardGroup is a group of CheckboxCard components. It allows you to control the selected values of the card states'>
+					<View style={{ gap: 12 , width: '100%'}}>
 					<Text style={commonStyles.label}>
 						Selected: {groupValues.join(', ') || 'None'}
 					</Text>
@@ -247,10 +279,12 @@ export default function CheckboxCardScreen() {
 							media={<Icon icon={Mail} size="md" />}
 						/>
 					</CheckboxCardGroup>
+					</View>
 				</Section>
 
 				{/* Group with Max Selection */}
 				<Section title="Group with Max Selection (max: 2)">
+					<View style={{ gap: 12 , width: '100%'}}>
 					<Text style={commonStyles.label}>
 						Selected: {limitedValues.length}/2 -{' '}
 						{limitedValues.join(', ') || 'None'}
@@ -288,26 +322,12 @@ export default function CheckboxCardScreen() {
 							media={<Icon icon={Settings} size="md" />}
 						/>
 					</CheckboxCardGroup>
-				</Section>
-
-				{/* Rounded Options */}
-				<Section title="Rounded Options">
-					<View style={{ gap: 12 }}>
-						{ROUNDED_OPTIONS.map((rounded) => (
-							<CheckboxCard
-								key={rounded}
-								rounded={rounded}
-								defaultChecked={true}
-								colorScheme="primary"
-								title={`rounded: ${rounded}`}
-							/>
-						))}
 					</View>
 				</Section>
 
 				{/* Complete Example */}
 				<Section title="Complete Example - Settings">
-					<View style={{ gap: 12 }}>
+					<View style={{ gap: 12 , width: '100%'}}>
 						<CheckboxCard
 							variant="fade"
 							colorScheme="primary"

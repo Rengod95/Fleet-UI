@@ -1,5 +1,5 @@
 import { Swiper } from '@fleet-ui/components';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, ScrollView, Text, View } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
 import { commonStyles, PageHeader, Section } from '../../common/views';
 
@@ -30,21 +30,37 @@ export default function SwiperScreen() {
 				{/* Header */}
 				<PageHeader
 					title="Swiper"
-					description="좌→우 스와이프 제스처로 액션을 확인하고 실행하는 인터랙티브 컴포넌트"
+					description="Left to right swipe gesture to confirm and execute an action."
 				/>
+
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic Swiper example (filled, primary)."
+				>
+					<Swiper
+						variant="filled"
+						colorScheme="primary"
+						onSwipeSuccess={() => handleSwipeSuccess('overview')}
+						placeholder="Slide"
+					/>
+				</Section>
 
 				{/* Variants */}
 				<Section title="Variants">
 					<View style={commonStyles.column}>
+
 						{VARIANTS.map((variant) => (
-							<Swiper
-								key={variant}
-								variant={variant}
-								colorScheme="neutral"
-								onSwipeSuccess={() => handleSwipeSuccess(variant)}
-							>
-								Slide to {variant}
-							</Swiper>
+							<>
+								<Text style={commonStyles.label}>{variant}</Text>
+								<Swiper
+									key={variant}
+									variant={variant}
+									colorScheme="neutral"
+									placeholder={`Slide to ${variant}`}
+									onSwipeSuccess={() => handleSwipeSuccess(variant)}
+								/>
+							</>
 						))}
 					</View>
 				</Section>
@@ -142,6 +158,7 @@ export default function SwiperScreen() {
 
 				{/* Threshold */}
 				<Section title="Threshold">
+					<Text style={commonStyles.label}>Threshold decied to trigger swipe success, if the thumb is dragged to the threshold or more, the swipe success will be triggered automatically.</Text>
 					<View style={commonStyles.column}>
 						<Swiper
 							variant="filled"

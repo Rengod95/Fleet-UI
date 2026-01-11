@@ -41,8 +41,6 @@ export default function RadioCardScreen() {
 	// 그룹 사용 상태들
 	const [paymentMethod, setPaymentMethod] = useState<string>('card');
 	const [shippingMethod, setShippingMethod] = useState<string>('standard');
-	const [themeMode, setThemeMode] = useState<string>('system');
-	const [subscriptionPlan, setSubscriptionPlan] = useState<string>('pro');
 
 	return (
 		<ScrollView style={commonStyles.container}>
@@ -52,9 +50,26 @@ export default function RadioCardScreen() {
 					description="Card-style radio using Item + Radio composition. Accepts title/description as string props."
 				/>
 
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic RadioCard example (controlled group, flat variant)."
+				>
+					<View style={[{width:'100%'}]}>
+						<RadioCard
+							variant="filled"
+							value="card"
+							selected={paymentMethod === 'card'}
+							onSelect={() => setPaymentMethod('card')}
+							title="Card"
+							description="Payment method"
+						/>
+					</View>
+				</Section>
+
 				{/* Variants */}
 				<Section title="Variants">
-					<View style={{ gap: 12 }}>
+					<View style={[{width:'100%', gap :16}]}>
 						{VARIANTS.map((variant) => (
 							<RadioCard
 								key={variant}
@@ -70,24 +85,27 @@ export default function RadioCardScreen() {
 				</Section>
 
 				{/* Color Schemes */}
-				<Section title="Color Schemes (Selected)">
-					<View style={{ gap: 12 }}>
+				<Section title="Color Schemes x Variants">
+					<View style={[{width:'100%', gap :16}]}>
 						{COLOR_SCHEMES.map((colorScheme) => (
+							VARIANTS.map((variant) => (
 							<RadioCard
-								key={colorScheme}
+								key={`${colorScheme}-${variant}`}
 								colorScheme={colorScheme}
+								variant={variant}
 								value={colorScheme}
 								defaultSelected={true}
 								title={colorScheme}
-								description={`ColorScheme: ${colorScheme}`}
-							/>
+								description={`${variant} variant`}
+								/>
+							))
 						))}
 					</View>
 				</Section>
 
 				{/* Sizes */}
 				<Section title="Sizes">
-					<View style={{ gap: 12 }}>
+					<View style={[{width:'100%', gap :16}]}>
 						{SIZES.map((size) => (
 							<RadioCard
 								key={size}
@@ -101,9 +119,25 @@ export default function RadioCardScreen() {
 					</View>
 				</Section>
 
+				{/* Rounded Options */}
+				<Section title="Rounded">
+					<View style={[{width:'100%', gap :16}]}>
+						{ROUNDED_OPTIONS.map((rounded) => (
+							<RadioCard
+								key={rounded}
+								rounded={rounded}
+								value={rounded}
+								defaultSelected={true}
+								colorScheme="primary"
+								title={`rounded: ${rounded}`}
+							/>
+						))}
+					</View>
+				</Section>
+
 				{/* Indicator Position */}
 				<Section title="Indicator Position">
-					<View style={{ gap: 12 }}>
+					<View style={[{width:'100%', gap :16}]}>
 						{INDICATOR_POSITIONS.map((position) => (
 							<RadioCard
 								key={position}
@@ -120,7 +154,7 @@ export default function RadioCardScreen() {
 
 				{/* Indicator Variants */}
 				<Section title="Indicator Variants">
-					<View style={{ gap: 12 }}>
+					<View style={[{width:'100%', gap :16}]}>
 						{INDICATOR_VARIANTS.map((indicatorVariant) => (
 							<RadioCard
 								key={indicatorVariant}
@@ -136,8 +170,8 @@ export default function RadioCardScreen() {
 				</Section>
 
 				{/* Selected Color Scheme */}
-				<Section title="Selected Color Scheme">
-					<View style={{ gap: 12 }}>
+				<Section title="Selected Color Scheme Prop">
+					<View style={[{width:'100%', gap :16}]}>
 						<RadioCard
 							colorScheme="neutral"
 							selectedColorScheme="primary"
@@ -146,21 +180,12 @@ export default function RadioCardScreen() {
 							title="neutral → primary (selected)"
 							description="Changes colorScheme when selected"
 						/>
-
-						<RadioCard
-							colorScheme="neutral"
-							selectedColorScheme="primary"
-							value="unselected-demo"
-							defaultSelected={false}
-							title="neutral → primary (unselected)"
-							description="Uses neutral when not selected"
-						/>
 					</View>
 				</Section>
 
 				{/* Disabled State */}
 				<Section title="Disabled State">
-					<View style={{ gap: 12 }}>
+					<View style={[{width:'100%', gap :16}]}>
 						<RadioCard
 							disabled={true}
 							value="disabled-1"
@@ -181,213 +206,107 @@ export default function RadioCardScreen() {
 
 				{/* Payment Method Example */}
 				<Section title="Example: Payment Method">
-					<Text style={commonStyles.label}>Selected: {paymentMethod}</Text>
-					<RadioCardGroup
-						value={paymentMethod}
-						onValueChange={setPaymentMethod}
-						name="payment-method"
-						gap="md"
-					>
-						<RadioCard
-							value="card"
-							indicatorPosition="start"
-							colorScheme="primary"
-							title="Credit Card"
-							description="Pay with Visa, Mastercard, or AMEX"
-							media={<Icon icon={CreditCard} size="md" />}
-						/>
+					<View style={[{width:'100%', gap :16}]}>
+					 	<Text style={commonStyles.label}>Selected: {paymentMethod}</Text>
+						<RadioCardGroup
+							value={paymentMethod}
+							onValueChange={setPaymentMethod}
+							name="payment-method"
+							gap="md"
+						>
+							<RadioCard
+								value="card"
+								indicatorPosition="start"
+								colorScheme="primary"
+								title="Credit Card"
+								description="Pay with Visa, Mastercard, or AMEX"
+								media={<Icon icon={CreditCard} size="md" />}
+							/>
 
-						<RadioCard
-							value="wallet"
-							indicatorPosition="start"
-							colorScheme="primary"
-							title="Digital Wallet"
-							description="Apple Pay, Google Pay, or PayPal"
-							media={<Icon icon={Wallet} size="md" />}
-						/>
+							<RadioCard
+								value="wallet"
+								indicatorPosition="start"
+								colorScheme="primary"
+								title="Digital Wallet"
+								description="Apple Pay, Google Pay, or PayPal"
+								media={<Icon icon={Wallet} size="md" />}
+							/>
 
-						<RadioCard
-							value="bank"
-							indicatorPosition="start"
-							colorScheme="primary"
-							title="Bank Transfer"
-							description="Direct bank transfer (1-2 days)"
-							media={<Icon icon={Building2} size="md" />}
-						/>
+							<RadioCard
+								value="bank"
+								indicatorPosition="start"
+								colorScheme="primary"
+								title="Bank Transfer"
+								description="Direct bank transfer (1-2 days)"
+								media={<Icon icon={Building2} size="md" />}
+							/>
 
-						<RadioCard
-							value="mobile"
-							indicatorPosition="start"
-							colorScheme="primary"
-							title="Mobile Payment"
-							description="Samsung Pay or carrier billing"
-							media={<Icon icon={Smartphone} size="md" />}
-						/>
-					</RadioCardGroup>
+							<RadioCard
+								value="mobile"
+								indicatorPosition="start"
+								colorScheme="primary"
+								title="Mobile Payment"
+								description="Samsung Pay or carrier billing"
+								media={<Icon icon={Smartphone} size="md" />}
+							/>
+						</RadioCardGroup>
+					</View>
 				</Section>
 
 				{/* Shipping Method Example */}
 				<Section title="Example: Shipping Method">
-					<Text style={commonStyles.label}>Selected: {shippingMethod}</Text>
-					<RadioCardGroup
-						value={shippingMethod}
-						onValueChange={setShippingMethod}
-						name="shipping-method"
-						gap="md"
-					>
-						<RadioCard
-							value="standard"
-							indicatorPosition="end"
-							variant="fade"
-							colorScheme="neutral"
-							selectedColorScheme="success"
-							title="Standard Shipping"
-							description="5-7 business days • Free"
-							media={<Icon icon={Package} size="md" />}
-						/>
-
-						<RadioCard
-							value="express"
-							indicatorPosition="end"
-							variant="fade"
-							colorScheme="neutral"
-							selectedColorScheme="info"
-							title="Express Shipping"
-							description="2-3 business days • $9.99"
-							media={<Icon icon={Truck} size="md" />}
-						/>
-
-						<RadioCard
-							value="overnight"
-							indicatorPosition="end"
-							variant="fade"
-							colorScheme="neutral"
-							selectedColorScheme="warning"
-							title="Overnight Shipping"
-							description="Next business day • $24.99"
-							media={<Icon icon={Plane} size="md" />}
-						/>
-
-						<RadioCard
-							value="same-day"
-							indicatorPosition="end"
-							variant="fade"
-							colorScheme="neutral"
-							selectedColorScheme="error"
-							title="Same Day Delivery"
-							description="Within 4 hours • $39.99"
-							media={<Icon icon={Rocket} size="md" />}
-						/>
-					</RadioCardGroup>
-				</Section>
-
-				{/* Theme Mode Example */}
-				<Section title="Example: Theme Mode">
-					<Text style={commonStyles.label}>Selected: {themeMode}</Text>
-					<RadioCardGroup
-						value={themeMode}
-						onValueChange={setThemeMode}
-						name="theme-mode"
-						gap="md"
-					>
-						<RadioCard
-							value="light"
-							indicatorPosition="start"
-							variant="outlined"
-							colorScheme="primary"
-							rounded="lg"
-							title="Light Mode"
-							description="Bright and clear interface"
-							media={<Icon icon={Sun} size="md" />}
-						/>
-
-						<RadioCard
-							value="dark"
-							indicatorPosition="start"
-							variant="outlined"
-							colorScheme="primary"
-							rounded="lg"
-							title="Dark Mode"
-							description="Easy on the eyes at night"
-							media={<Icon icon={Moon} size="md" />}
-						/>
-
-						<RadioCard
-							value="system"
-							indicatorPosition="start"
-							variant="outlined"
-							colorScheme="primary"
-							rounded="lg"
-							title="System Default"
-							description="Follows your device settings"
-							media={<Icon icon={Monitor} size="md" />}
-						/>
-					</RadioCardGroup>
-				</Section>
-
-				{/* Subscription Plan Example */}
-				<Section title="Example: Subscription Plans">
-					<Text style={commonStyles.label}>Selected: {subscriptionPlan}</Text>
-					<RadioCardGroup
-						value={subscriptionPlan}
-						onValueChange={setSubscriptionPlan}
-						name="subscription-plan"
-						gap="md"
-					>
-						<RadioCard
-							value="basic"
-							indicatorPosition="end"
-							indicatorVariant="outlined"
-							variant="outlined"
-							colorScheme="neutral"
-							selectedColorScheme="primary"
-							rounded="xl"
-							title="Basic Plan"
-							description="$9.99/month • Essential features"
-							media={<Icon icon={Sparkles} size="md" />}
-						/>
-
-						<RadioCard
-							value="pro"
-							indicatorPosition="end"
-							indicatorVariant="outlined"
-							variant="outlined"
-							colorScheme="neutral"
-							selectedColorScheme="success"
-							rounded="xl"
-							title="Pro Plan"
-							description="$19.99/month • Advanced features + Priority support"
-							media={<Icon icon={Crown} size="md" />}
-						/>
-
-						<RadioCard
-							value="enterprise"
-							indicatorPosition="end"
-							indicatorVariant="outlined"
-							variant="outlined"
-							colorScheme="neutral"
-							selectedColorScheme="warning"
-							rounded="xl"
-							title="Enterprise Plan"
-							description="Custom pricing • Unlimited everything"
-							media={<Icon icon={Gem} size="md" />}
-						/>
-					</RadioCardGroup>
-				</Section>
-
-				{/* Rounded Options */}
-				<Section title="Rounded Options">
-					<View style={{ gap: 12 }}>
-						{ROUNDED_OPTIONS.map((rounded) => (
+					<View style={[{width:'100%', gap :16}]}>
+						<Text style={commonStyles.label}>Selected: {shippingMethod}</Text>
+						<RadioCardGroup
+							value={shippingMethod}
+							onValueChange={setShippingMethod}
+							name="shipping-method"
+							gap="md"
+						>
 							<RadioCard
-								key={rounded}
-								rounded={rounded}
-								value={rounded}
-								defaultSelected={true}
-								colorScheme="primary"
-								title={`rounded: ${rounded}`}
+								value="standard"
+								indicatorPosition="end"
+								variant="fade"
+								colorScheme="neutral"
+								selectedColorScheme="success"
+								title="Standard Shipping"
+								description="5-7 business days • Free"
+								media={<Icon icon={Package} size="md" />}
 							/>
-						))}
+
+							<RadioCard
+								value="express"
+								indicatorPosition="end"
+								variant="fade"
+								colorScheme="neutral"
+								selectedColorScheme="info"
+								title="Express Shipping"
+								description="2-3 business days • $9.99"
+								media={<Icon icon={Truck} size="md" />}
+							/>
+
+							<RadioCard
+								value="overnight"
+								indicatorPosition="end"
+								variant="fade"
+								colorScheme="neutral"
+								selectedColorScheme="warning"
+								title="Overnight Shipping"
+								description="Next business day • $24.99"
+								media={<Icon icon={Plane} size="md" />}
+							/>
+
+							<RadioCard
+								value="same-day"
+								indicatorPosition="end"
+								variant="fade"
+								colorScheme="neutral"
+								selectedColorScheme="error"
+								title="Same Day Delivery"
+								description="Within 4 hours • $39.99"
+								media={<Icon icon={Rocket} size="md" />}
+							/>
+						</RadioCardGroup>
 					</View>
 				</Section>
 			</View>

@@ -1,8 +1,9 @@
-import { Button, TabBar, type TabBarItem } from '@fleet-ui/components';
+import { Button, Icon, TabBar, Typo, type TabBarItem } from '@fleet-ui/components';
 import { useMemo, useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { commonStyles, DemoIcon, PageHeader, Section } from '../../common/views';
+import { Home, Search, User } from 'lucide-react-native';
 
 const COLOR_SCHEMES = [
 	'primary',
@@ -25,78 +26,53 @@ const SAMPLE_ITEMS = [
 	'Profile',
 	'Something Long Title',
 ];
-const CUSTOM_ITEM_LABELS = ['Home', 'Explore', 'Profile'] as const;
+const CUSTOM_ITEM_LABELS = ['Home', 'Explore', 'Profile'];
+
+const CUSTOM_ITEMS = [
+	<View style={{flexDirection:'row',gap : 12}}>
+		<Icon icon={Home} />
+		<Typo>Home</Typo>
+	</View>,
+	<View style={{flexDirection:'row',gap : 12}}>
+		<Icon icon={Search} />
+		<Typo>Explore</Typo>
+	</View>,
+	<View style={{flexDirection:'row',gap : 12}}>
+		<Icon icon={User} />
+		<Typo>Profile</Typo>
+	</View>,
+]
 
 export default function TabBarScreen() {
 	useUnistyles();
 	const [selectedPage, setSelectedPage] = useState(1);
-
-	const customItems = useMemo(
-		() =>
-			[
-				<View style={styles.customItem}>
-					<DemoIcon />
-					<Text style={styles.customItemText}>Home</Text>
-				</View>,
-				<View style={styles.customItem}>
-					<DemoIcon />
-					<Text style={styles.customItemText}>Explore</Text>
-				</View>,
-				<View style={styles.customItem}>
-					<DemoIcon />
-					<Text style={styles.customItemText}>Profile</Text>
-				</View>,
-			] satisfies TabBarItem[],
-		[]
-	);
 
 	return (
 		<ScrollView style={commonStyles.container}>
 			<View style={commonStyles.content}>
 				<PageHeader
 					title="TabBar"
-					description="동적 탭 바 컴포넌트 - Pager와 동기화 가능"
+					description="A horizontal tab component that displays multiple tabs, indicates the current selection, and triggers tab switching."
 				/>
 
 				<Section
-					title="Controlled (selectedPage / onSelect)"
-					description="TabBar는 컨트롤드 컴포넌트로 사용 가능하며, 외부 selectedPage 변경에도 indicator가 동기화됩니다."
+					title="Overview"
+					value="overview"
+					description="The most basic TabBar example (uncontrolled)."
 				>
-					<TabBar
-						selectedPage={selectedPage}
-						items={SAMPLE_ITEMS}
-						onSelect={setSelectedPage}
-						variant="filled"
-						colorScheme="neutral"
-					/>
-
-					<View style={styles.controlsRow}>
-						<Button
-							variant="outlined"
+					<View style={commonStyles.column}>
+						<TabBar
+							selectedPage={0} // You can also use the selectedPage prop to control the selected page.
+							items={SAMPLE_ITEMS}
+							variant="filled"
 							colorScheme="neutral"
-							onPress={() =>
-								setSelectedPage((prev) => Math.max(prev - 1, 0))
-							}
-						>
-							Prev
-						</Button>
-						<Button
-							variant="outlined"
-							colorScheme="neutral"
-							onPress={() =>
-								setSelectedPage((prev) =>
-									Math.min(prev + 1, SAMPLE_ITEMS.length - 1)
-								)
-							}
-						>
-							Next
-						</Button>
+						/>
 					</View>
 				</Section>
 
 				<Section title="Variants">
 					{VARIANTS.map((variant) => (
-						<View key={variant} style={styles.exampleBlock}>
+						<View key={variant} style={[commonStyles.column]}>
 							<Text style={commonStyles.label}>{variant}</Text>
 							<TabBar
 								selectedPage={1}
@@ -110,7 +86,7 @@ export default function TabBarScreen() {
 
 				<Section title="Sizes">
 					{SIZES.map((size) => (
-						<View key={size} style={styles.exampleBlock}>
+						<View key={size} style={[commonStyles.column]}>
 							<Text style={commonStyles.label}>{size}</Text>
 							<TabBar
 								selectedPage={0}
@@ -125,7 +101,7 @@ export default function TabBarScreen() {
 
 				<Section title="Rounded">
 					{ROUNDED_OPTIONS.map((rounded) => (
-						<View key={rounded} style={styles.exampleBlock}>
+						<View key={rounded} style={[commonStyles.column]}>
 							<Text style={commonStyles.label}>{rounded}</Text>
 							<TabBar
 								selectedPage={1}
@@ -140,7 +116,7 @@ export default function TabBarScreen() {
 
 				<Section title="Shadow (with underlined variant)">
 					{SHADOW_OPTIONS.map((shadow) => (
-						<View key={shadow} style={styles.exampleBlock}>
+						<View key={shadow} style={[commonStyles.column]}>
 							<Text style={commonStyles.label}>{shadow}</Text>
 							<TabBar
 								selectedPage={0}
@@ -155,7 +131,7 @@ export default function TabBarScreen() {
 
 				<Section title="Indicator Shadow (with filled variant)">
 					{SHADOW_OPTIONS.map((shadow) => (
-						<View key={shadow} style={styles.exampleBlock}>
+						<View key={shadow} style={[commonStyles.column]}>
 							<Text style={commonStyles.label}>{shadow}</Text>
 							<TabBar
 								selectedPage={0}
@@ -168,92 +144,155 @@ export default function TabBarScreen() {
 					))}
 				</Section>
 
-				<Section title="Color schemes (filled)">
-					{COLOR_SCHEMES.map((colorScheme) => (
-						<View key={colorScheme} style={styles.exampleBlock}>
-							<Text style={commonStyles.label}>{colorScheme}</Text>
+				<Section title="Color schemes">
+					<View style={[commonStyles.column]}>
+							<Text style={commonStyles.label}>ColorSchems of Tabbar affects the only variants filled and underlined. other variants are affected on just item's text color.</Text>
 							<TabBar
 								selectedPage={0}
 								items={SAMPLE_ITEMS}
 								variant="filled"
-								colorScheme={colorScheme}
+								colorScheme={'primary'}
 							/>
-						</View>
-					))}
+							<TabBar
+								selectedPage={0}
+								items={SAMPLE_ITEMS}
+								variant="flat"
+								colorScheme={'primary'}
+							/>
+							<TabBar
+								selectedPage={0}
+								items={SAMPLE_ITEMS}
+								variant="faded"
+								colorScheme={'primary'}
+							/>
+							<TabBar
+								selectedPage={0}
+								items={SAMPLE_ITEMS}
+								variant="ghost"
+								colorScheme={'primary'}
+							/>
+							<TabBar
+								selectedPage={0}
+								items={SAMPLE_ITEMS}
+								variant="underlined"
+								colorScheme={'primary'}
+							/>
+					</View>
 				</Section>
 
 				<Section title="Indicator padding">
 					{INDICATOR_PADDINGS.map((indicatorPadding) => (
-						<View key={indicatorPadding} style={styles.exampleBlock}>
+						<View key={indicatorPadding} style={[commonStyles.column]}>
 							<Text style={commonStyles.label}>{indicatorPadding}</Text>
 							<TabBar
 								selectedPage={1}
 								items={SAMPLE_ITEMS}
 								indicatorPadding={indicatorPadding}
-								variant="filled"
+								variant="faded"
 								colorScheme="neutral"
 							/>
 						</View>
 					))}
 				</Section>
 
-				<Section
-					title="A11y labels (custom ReactNode items)"
-					description="ReactNode 아이템 사용 시 accessibilityLabels / getItemAccessibilityLabel로 라벨을 제공할 수 있습니다."
-				>
-					<View style={styles.exampleBlock}>
-						<Text style={commonStyles.label}>accessibilityLabels</Text>
+				<Section title="Custom items">
+					<View style={[commonStyles.column]}>
 						<TabBar
 							selectedPage={0}
-							items={customItems}
+							items={CUSTOM_ITEMS}
 							variant="flat"
-							colorScheme="primary"
-							accessibilityLabels={CUSTOM_ITEM_LABELS}
+							colorScheme="neutral"
 						/>
-					</View>
 
-					<View style={styles.exampleBlock}>
-						<Text style={commonStyles.label}>getItemAccessibilityLabel</Text>
+						<Text style={commonStyles.label}>If you should adjust the TabBar height by custom item's dynamic height or something like that, you can use the style prop</Text>
 						<TabBar
 							selectedPage={0}
-							items={customItems}
-							variant="flat"
-							colorScheme="primary"
-							getItemAccessibilityLabel={(_, index) => CUSTOM_ITEM_LABELS[index]}
+							items={CUSTOM_ITEMS}
+							variant="underlined"
+							colorScheme="neutral"
+							style={{height:60}}
 						/>
 					</View>
 				</Section>
 
 				<Section
-					title="Disabled indices + hitSlop"
-					description="disabledIndices로 특정 탭을 비활성화할 수 있으며, hitSlop으로 터치 영역을 확장할 수 있습니다."
+					title="Controlled (selectedPage / onSelect)"
+					description="TabBar can be used as a controlled component, and the indicator will be synchronized even if the external selectedPage is changed."
 				>
-					<View style={styles.exampleBlock}>
-						<Text style={commonStyles.label}>disabledIndices</Text>
+					<View style={commonStyles.column}>
 						<TabBar
-							selectedPage={0}
+							selectedPage={selectedPage}
 							items={SAMPLE_ITEMS}
+							onSelect={setSelectedPage}
 							variant="filled"
 							colorScheme="neutral"
-							disabledIndices={[1, 3]}
-							hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
 						/>
-					</View>
 
-					<View style={styles.exampleBlock}>
-						<Text style={commonStyles.label}>isItemDisabled</Text>
+						<View style={styles.controlsRow}>
+							<Button
+								size="sm"
+								variant="outlined"
+								colorScheme="neutral"
+								onPress={() =>
+									setSelectedPage((prev) => Math.max(prev - 1, 0))
+								}
+							>
+								Prev
+							</Button>
+							<Button
+								size="sm"
+								variant="outlined"
+								colorScheme="neutral"
+								onPress={() =>
+									setSelectedPage((prev) =>
+										Math.min(prev + 1, SAMPLE_ITEMS.length - 1)
+									)
+								}
+							>
+								Next
+							</Button>
+						</View>
+					</View>
+				</Section>
+
+				<Section title="Disabled Indicies">
+					<View style={[commonStyles.column]}>
+						<Text style={commonStyles.label}>
+							Indices are the default values to disabled items on initializing TabBar.
+						</Text>
 						<TabBar
 							selectedPage={0}
-							items={SAMPLE_ITEMS}
-							variant="filled"
+							items={CUSTOM_ITEMS}
+							variant="underlined"
 							colorScheme="neutral"
-							isItemDisabled={(_, index) => index === 2}
+							style={{height:60}}
+							disabledIndices={[0,1]}
 						/>
 					</View>
 				</Section>
+
+				<Section title="isItemDisabled Function">
+					<View style={[commonStyles.column]}>
+						<Text style={commonStyles.label}>
+							You can also use the isItemDisabled(Callback Function) to disable items dynamically.
+						</Text>
+						<Text style={commonStyles.label}>
+							The Below example is disabled the first and second items.
+						</Text>
+						<TabBar
+							selectedPage={2}
+							items={CUSTOM_ITEMS}
+							variant="underlined"
+							colorScheme="neutral"
+							style={{height:60}}
+							isItemDisabled={(item, index) => index === 0 || index === 1}
+						/>
+					</View>
+				</Section>
+
 
 				<Section title="Combinations">
-					<View style={styles.exampleBlock}>
+					<View style={[commonStyles.column]}>
 						<TabBar
 							selectedPage={2}
 							items={['Tab 1', 'Tab 2', 'Tab 3', 'Tab 4', 'Tab 5']}
@@ -265,7 +304,7 @@ export default function TabBarScreen() {
 						/>
 					</View>
 
-					<View style={styles.exampleBlock}>
+					<View style={[commonStyles.column]}>
 						<TabBar
 							selectedPage={0}
 							items={['One', 'Two', 'Three']}
@@ -277,7 +316,7 @@ export default function TabBarScreen() {
 						/>
 					</View>
 
-					<View style={styles.exampleBlock}>
+					<View style={[commonStyles.column]}>
 						<TabBar
 							selectedPage={1}
 							items={['Dashboard', 'Analytics', 'Settings']}
@@ -285,6 +324,7 @@ export default function TabBarScreen() {
 							colorScheme="info"
 							size="md"
 							rounded="md"
+							style={{height:64}}
 						/>
 					</View>
 				</Section>

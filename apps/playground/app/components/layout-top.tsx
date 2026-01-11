@@ -1,5 +1,5 @@
 import { LayoutTop, Button, Icon } from '@fleet-ui/components';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View, Text } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import {
 	commonStyles,
@@ -13,15 +13,38 @@ const SIZES: Array<'sm' | 'md' | 'lg'> = ['sm', 'md', 'lg'];
 const PADDINGS: Array<'none' | 'sm' | 'md' | 'lg'> = ['none', 'sm', 'md', 'lg'];
 
 export default function LayoutTopExamplesScreen() {
-	useUnistyles();
+	const { theme } = useUnistyles();
 
 	return (
 		<ScrollView style={commonStyles.container}>
 			<View style={commonStyles.content}>
 				<PageHeader
 					title="LayoutTop"
-					description="A flexible top layout container with slots for asset, title, subtitles, and right content. Supports size-based typography and padding presets with per-slot overrides."
+					description="Page Header Layout for Describing the page."
 				/>
+
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic LayoutTop example (md)."
+				>
+					<View style={{width: '100%'}}>
+						<LayoutTop
+							size="md"
+							asset={
+								<LayoutTop.Asset>
+									<Icon icon={BoxIcon} size="md" />
+								</LayoutTop.Asset>
+							}
+							title={<LayoutTop.TitleTypo>Title is here</LayoutTop.TitleTypo>}
+							subtitleBottom={
+								<LayoutTop.SubtitleTypo numberOfLines={2}>
+									Bottom Subtitle is here
+								</LayoutTop.SubtitleTypo>
+							}
+						/>
+					</View>
+				</Section>
 
 				<Section
 					title="Sizes (context)"
@@ -62,22 +85,22 @@ export default function LayoutTopExamplesScreen() {
 							size="md"
 							asset={
 								<LayoutTop.Asset>
-									<DemoIcon />
+									<Icon icon={BoxIcon} size="md" />
 								</LayoutTop.Asset>
 							}
 							subtitleTop={
-								<LayoutTop.SubtitleTypo size="sm">
-									Context size: md
+								<LayoutTop.SubtitleTypo size="md">
+									subtitle top size - md
 								</LayoutTop.SubtitleTypo>
 							}
 							title={
 								<LayoutTop.TitleTypo size="lg">
-									Title override to lg
+									title size: lg
 								</LayoutTop.TitleTypo>
 							}
 							subtitleBottom={
-								<LayoutTop.SubtitleTypo size="sm" numberOfLines={2}>
-									Subtitle override to sm with two lines support.
+								<LayoutTop.SubtitleTypo size="sm">
+									subtitle bottom size - sm.
 								</LayoutTop.SubtitleTypo>
 							}
 							right={
@@ -90,63 +113,39 @@ export default function LayoutTopExamplesScreen() {
 				</Section>
 
 				<Section
-					title="Padding presets"
-					description="Use spacing tokens or custom numeric values."
+					title="Top & Bottom Padding presets"
+					description="Use spacing tokens or custom numeric values for top and bottom padding."
 				>
 					<View style={styles.blockGap}>
 						{PADDINGS.map((pad) => (
+							<View style={{width: '100%', backgroundColor: theme.colors.neutral.content_2}}>
+								<Text style={commonStyles.label}>{`padding: ${pad}`}</Text>
+								<LayoutTop
+									key={pad}
+									paddingTop={pad}
+									paddingBottom={pad}
+									title={<LayoutTop.TitleTypo>{`${pad.toUpperCase()} Padding`}</LayoutTop.TitleTypo>}
+									subtitleBottom={
+										<LayoutTop.SubtitleTypo>
+											Top & bottom use padding preset.
+										</LayoutTop.SubtitleTypo>
+									}
+								/>
+							</View>
+						))}
+						<View style={{width: '100%', backgroundColor: theme.colors.neutral.content_2}}>
 							<LayoutTop
-								key={pad}
-								paddingTop={pad}
-								paddingBottom={pad}
-								title={<LayoutTop.TitleTypo>{`padding: ${pad}`}</LayoutTop.TitleTypo>}
+								paddingTop={28}
+								paddingBottom={36}
+								size="sm"
+								title={<LayoutTop.TitleTypo>custom numeric padding</LayoutTop.TitleTypo>}
 								subtitleBottom={
 									<LayoutTop.SubtitleTypo>
-										Top & bottom use the same preset spacing.
+										custom numeric padding - top: 28px, bottom: 36px
 									</LayoutTop.SubtitleTypo>
 								}
 							/>
-						))}
-
-						<LayoutTop
-							paddingTop={28}
-							paddingBottom={36}
-							size="sm"
-							title={<LayoutTop.TitleTypo>Custom numeric padding</LayoutTop.TitleTypo>}
-							subtitleBottom={
-								<LayoutTop.SubtitleTypo>
-									Top: 28px, Bottom: 36px
-								</LayoutTop.SubtitleTypo>
-							}
-						/>
-					</View>
-				</Section>
-
-				<Section
-					title="Slot composition"
-					description="Combine asset, subtitles, title, and right slot."
-				>
-					<View style={styles.blockGap}>
-						<LayoutTop
-							size="lg"
-							asset={
-								<LayoutTop.Asset>
-									<DemoIcon />
-								</LayoutTop.Asset>
-							}
-							subtitleTop={<LayoutTop.SubtitleTypo>Upgrade plan</LayoutTop.SubtitleTypo>}
-							title={<LayoutTop.TitleTypo>Billing overview</LayoutTop.TitleTypo>}
-							subtitleBottom={
-								<LayoutTop.SubtitleTypo>
-									See your upcoming invoice and usage summary.
-								</LayoutTop.SubtitleTypo>
-							}
-							right={
-								<Button size="sm" variant="flat" colorScheme="neutral">
-									Change
-								</Button>
-							}
-						/>
+						</View>
 					</View>
 				</Section>
 			</View>
@@ -156,6 +155,7 @@ export default function LayoutTopExamplesScreen() {
 
 const styles = StyleSheet.create((theme) => ({
 	blockGap: {
-		gap: theme.spacing[6],
+		width: '100%',
+		gap: theme.spacing[12],
 	},
 }));

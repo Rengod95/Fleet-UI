@@ -50,17 +50,14 @@ export default function OTPInputExamplesScreen() {
 					description="One-Time Password input component with customizable slots, bounce animation on input, and support for SMS autofill."
 				/>
 
-				{/* Basic Usage */}
 				<Section
-					title="Basic Usage"
-					description="Default 6-digit OTP input with bordered variant."
+					title="Overview"
+					value="overview"
+					description="Most basic OTPInput example (N digits available). Enter code to see the result."
 				>
 					<View style={styles.centerRow}>
-						<OTPInput
-							maxLength={6}
-							placeholder=""
-							onComplete={handleComplete}
-						/>
+						<OTPInput maxLength={4} placeholder="" onComplete={handleComplete} />
+						
 					</View>
 					{completedCode && (
 						<View style={styles.resultContainer}>
@@ -71,15 +68,16 @@ export default function OTPInputExamplesScreen() {
 					)}
 				</Section>
 
+			
 				{/* Variants */}
 				<Section
 					title="Variants"
 					description="Different visual styles: flat, bordered, underlined, faded."
 				>
-					<View style={styles.variantList}>
+					<View style={commonStyles.fullWidthContainer}>
 						{VARIANTS.map((variant) => (
-							<View key={variant} style={styles.variantItem}>
-								<Text style={styles.variantLabel}>{variant}</Text>
+							<View key={variant} style={commonStyles.column}>
+								<Text style={commonStyles.label}>{variant}</Text>
 								<OTPInput maxLength={4} variant={variant} />
 							</View>
 						))}
@@ -91,10 +89,10 @@ export default function OTPInputExamplesScreen() {
 					title="Sizes"
 					description="Slot dimensions and spacing scale with size: sm, md, lg, xl."
 				>
-					<View style={styles.sizeList}>
+					<View style={commonStyles.fullWidthContainer}>
 						{SIZES.map((size) => (
-							<View key={size} style={styles.sizeItem}>
-								<Text style={styles.sizeLabel}>{size.toUpperCase()}</Text>
+							<View key={size} style={commonStyles.column}>
+								<Text style={commonStyles.label}>{size.toUpperCase()}</Text>
 								<OTPInput maxLength={4} size={size} />
 							</View>
 						))}
@@ -103,35 +101,64 @@ export default function OTPInputExamplesScreen() {
 
 				{/* Color Schemes */}
 				<Section
-					title="Color Schemes"
-					description="Border color changes on focus. Tap to focus and see the colorScheme effect."
+					title="Color Schemes x Variants"
+					description="Color scheme changes on focus and typing. Tap to focus and see the colorScheme effect."
 				>
-					<View style={styles.colorSchemeList}>
+					<View style={commonStyles.fullWidthContainer}>
 						{COLOR_SCHEMES.map((colorScheme) => (
-							<View key={colorScheme} style={styles.colorSchemeItem}>
-								<View
-									style={[
-										styles.colorBadge,
-										{
-											backgroundColor:
-												theme.colors[colorScheme]?.border_default ??
-												theme.colors.neutral.text_1,
-										},
-									]}
-								/>
-								<Text style={styles.colorSchemeLabel}>{colorScheme}</Text>
-								<OTPInput
-									maxLength={4}
-									colorScheme={colorScheme}
-									variant="bordered"
-								/>
+							<View key={colorScheme} style={[commonStyles.column, {marginBottom:theme.spacing[10]}]}>
+								<View style={[commonStyles.row, {width:'100%', justifyContent:'flex-start'}]}>
+									<Text style={[commonStyles.label, {marginBottom:0}]}>{colorScheme}</Text>
+									<View
+										style={[
+											styles.colorBadge,
+											{
+												backgroundColor:
+													theme.colors[colorScheme]?.border_default ??
+													theme.colors.neutral.text_1,
+											},
+										]}
+									/>
+								</View>
+								<View key={`${colorScheme}-bordered`} style={commonStyles.row}>
+									<Text style={commonStyles.label}>VARIANT - BORDERED</Text>
+									<OTPInput
+										maxLength={4}
+										colorScheme={colorScheme}
+										variant="bordered"
+									/>
+								</View>
+								<View key={`${colorScheme}-flat`} style={commonStyles.row}>
+									<Text style={commonStyles.label}>VARIANT - FLAT</Text>
+									<OTPInput
+										maxLength={4}
+										colorScheme={colorScheme}
+										variant="flat"
+									/>
+								</View>
+								<View key={`${colorScheme}-underlined`} style={commonStyles.row}>
+									<Text style={commonStyles.label}>VARIANT - UNDERLINED</Text>
+									<OTPInput
+										maxLength={4}
+										colorScheme={colorScheme}
+										variant="underlined"
+									/>
+								</View>
+								<View key={`${colorScheme}-faded`} style={commonStyles.row}>
+									<Text style={commonStyles.label}>VARIANT - FADE</Text>
+									<OTPInput
+										maxLength={4}
+										colorScheme={colorScheme}
+										variant="faded"
+									/>
+								</View>
 							</View>
 						))}
 					</View>
 				</Section>
 
 				{/* Radius */}
-				<Section title="Radius" description="Corner radius options for slots.">
+				<Section title="Rounded" description="Corner radius options for slots.">
 					<View style={styles.radiusList}>
 						{RADIUS_OPTIONS.map((radius) => (
 							<View key={radius} style={styles.radiusItem}>
@@ -144,18 +171,43 @@ export default function OTPInputExamplesScreen() {
 
 				{/* Shadow */}
 				<Section title="Shadow" description="Shadow depth options for slots.">
-					<View style={styles.shadowList}>
+					<View style={commonStyles.fullWidthContainer}>
 						{SHADOW_OPTIONS.map((shadow) => (
-							<View key={shadow} style={styles.shadowItem}>
-								<Text style={styles.shadowLabel}>{shadow}</Text>
+							<View key={shadow} style={commonStyles.column}>
+								<Text style={commonStyles.label}>{shadow}</Text>
 								<OTPInput
 									maxLength={4}
 									shadow={shadow}
-									variant="faded"
-									rounded="md"
+									variant="flat"
 								/>
 							</View>
 						))}
+					</View>
+				</Section>
+
+				{/* Gap */}
+				<Section title="Gap prop" description="Gap between slots. Default is 8.">
+					<View style={commonStyles.column}>
+					<Text style={commonStyles.label}>GAP - SM</Text>
+					<View style={commonStyles.row}>
+						<OTPInput maxLength={4} gap="sm" />
+					</View>
+					<Text style={commonStyles.label}>GAP - MD</Text>
+					<View style={commonStyles.row}>
+						<OTPInput maxLength={4} gap="md" />
+					</View>
+					<Text style={commonStyles.label}>GAP - LG</Text>
+					<View style={commonStyles.row}>
+						<OTPInput maxLength={4} gap="lg" />
+					</View>
+					<Text style={commonStyles.label}>GAP - XL</Text>
+					<View style={commonStyles.row}>
+						<OTPInput maxLength={4} gap="xl" />
+					</View>
+					<Text style={commonStyles.label}>GAP - CUSTOM DIGIT - 8</Text>
+					<View style={commonStyles.row}>
+						<OTPInput maxLength={4} gap={8} />
+					</View>
 					</View>
 				</Section>
 
@@ -173,145 +225,6 @@ export default function OTPInputExamplesScreen() {
 						<View style={styles.stateItem}>
 							<Text style={styles.stateLabel}>Invalid</Text>
 							<OTPInput maxLength={4} defaultValue="12" isInvalid />
-						</View>
-					</View>
-				</Section>
-
-				{/* Bounce Animation Demo */}
-				<Section
-					title="Bounce Animation"
-					description="Each slot bounces when a character is entered. Type to see the animation!"
-				>
-					<View style={styles.centerRow}>
-						<OTPInput
-							maxLength={6}
-							colorScheme="primary"
-							variant="bordered"
-							size="lg"
-							rounded="lg"
-						/>
-					</View>
-					<Text style={styles.hintText}>
-						💡 문자 입력 시 슬롯이 "통" 하고 튀는 애니메이션이 발생합니다
-					</Text>
-				</Section>
-
-				{/* Underlined Variant Focus Effect */}
-				<Section
-					title="Underlined Focus Effect"
-					description="Underlined variant shows an animated line on focus."
-				>
-					<View style={styles.centerRow}>
-						<OTPInput
-							maxLength={6}
-							variant="underlined"
-							colorScheme="primary"
-							size="lg"
-						/>
-					</View>
-				</Section>
-
-				{/* Custom Render */}
-				<Section
-					title="Custom Render"
-					description="Use the render prop for custom slot layouts. Example: 3-3 grouping."
-				>
-					<View style={styles.centerRow}>
-						<OTPInput
-							maxLength={6}
-							colorScheme="success"
-							render={({ slots, isFocused }: OTPRenderProps) => (
-								<View style={styles.customRenderContainer}>
-									{/* First 3 slots */}
-									<View style={styles.slotGroup}>
-										{slots.slice(0, 3).map((slot) => (
-											<OTPSlot
-												key={slot.index}
-												slot={slot}
-												colorScheme="success"
-												variant="bordered"
-												size="lg"
-												rounded="md"
-											/>
-										))}
-									</View>
-
-									{/* Separator */}
-									<View style={styles.separator}>
-										<Text style={styles.separatorText}>-</Text>
-									</View>
-
-									{/* Last 3 slots */}
-									<View style={styles.slotGroup}>
-										{slots.slice(3, 6).map((slot) => (
-											<OTPSlot
-												key={slot.index}
-												slot={slot}
-												colorScheme="success"
-												variant="bordered"
-												size="lg"
-												rounded="md"
-											/>
-										))}
-									</View>
-								</View>
-							)}
-						/>
-					</View>
-				</Section>
-
-				{/* Combination Examples */}
-				<Section
-					title="Combination Examples"
-					description="Various combinations of props for different use cases."
-				>
-					<View style={styles.combinationList}>
-						{/* Modern minimal */}
-						<View style={styles.combinationItem}>
-							<Text style={styles.combinationLabel}>Modern Minimal</Text>
-							<OTPInput
-								maxLength={4}
-								variant="flat"
-								colorScheme="primary"
-								rounded="lg"
-								size="lg"
-							/>
-						</View>
-
-						{/* Classic bordered */}
-						<View style={styles.combinationItem}>
-							<Text style={styles.combinationLabel}>Classic Bordered</Text>
-							<OTPInput
-								maxLength={6}
-								variant="bordered"
-								colorScheme="neutral"
-								rounded="sm"
-								size="md"
-							/>
-						</View>
-
-						{/* Underlined elegant */}
-						<View style={styles.combinationItem}>
-							<Text style={styles.combinationLabel}>Underlined Elegant</Text>
-							<OTPInput
-								maxLength={4}
-								variant="underlined"
-								colorScheme="info"
-								size="xl"
-							/>
-						</View>
-
-						{/* Faded with shadow */}
-						<View style={styles.combinationItem}>
-							<Text style={styles.combinationLabel}>Faded + Shadow</Text>
-							<OTPInput
-								maxLength={5}
-								variant="faded"
-								colorScheme="warning"
-								rounded="md"
-								shadow="md"
-								size="md"
-							/>
 						</View>
 					</View>
 				</Section>
@@ -335,14 +248,14 @@ const styles = StyleSheet.create((theme) => ({
 	},
 	resultContainer: {
 		marginTop: theme.spacing[3],
-		padding: theme.spacing[3],
-		backgroundColor: theme.colors.success.content_2,
-		borderRadius: theme.rounded.md,
+		padding: theme.spacing[4],
+		backgroundColor: theme.colors.success.content_1,
+		borderRadius: theme.rounded.sm,
 		alignItems: 'center',
 	},
 	resultText: {
 		...theme.typography.body2,
-		color: theme.colors.success.solid,
+		color: theme.colors.success.text_4,
 		fontWeight: '600',
 	},
 	hintText: {

@@ -14,8 +14,7 @@ const COLORS = [
 	'info',
 ] as const;
 const SIZES = ['sm', 'md', 'lg', 'xl'] as const;
-const LABEL_PLACEMENTS = ['inside', 'outside', 'outside-left'] as const;
-const SHADOWS = ['none', 'sm', 'md', 'lg', 'xl', 'inner'] as const;
+const ROUNDED = ['none', 'sm', 'md', 'lg', 'full'] as const;
 export default function InputScreen() {
 	useUnistyles();
 	return (
@@ -24,6 +23,21 @@ export default function InputScreen() {
 			contentContainerStyle={commonStyles.content}
 		>
 			<PageHeader title="Input" description="Text input component." />
+
+			<Section
+				title="Overview"
+				value="overview"
+				description="Most basic Input example (filled, primary)."
+			>
+				<View style={commonStyles.fullWidthContainer}>
+					<Input
+						label="Input"
+						variant="filled"
+						colorScheme="primary"
+						placeholder="Enter text"
+					/>
+				</View>
+			</Section>
 
 			<Section title="Variants">
 				<View style={commonStyles.fullWidthContainer}>
@@ -105,16 +119,10 @@ export default function InputScreen() {
 					))}
 				</View>
 			</Section>
-
-			<Section title="Label Placements">
+			<Section title="Rounded">
 				<View style={commonStyles.fullWidthContainer}>
-					{LABEL_PLACEMENTS.map((placement) => (
-						<Input
-							key={placement}
-							label={placement}
-							labelPlacement={placement}
-							placeholder="Enter text"
-						/>
+					{ROUNDED.map((rounded) => (
+						<Input key={rounded} label={rounded} rounded={rounded} placeholder="Enter text" variant='filled' />
 					))}
 				</View>
 			</Section>

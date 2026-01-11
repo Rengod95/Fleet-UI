@@ -33,10 +33,14 @@ export default function BottomSheetModalScreen() {
 							description="Detached Bottom Sheet Modal with compound components pattern."
 						/>
 
-						<Section title="Title + Subtitle + Action Icon + Action Buttons">
-							<View style={commonStyles.row}>
-								<Button onPress={() => setWelcomeVisible(true)}>
-									Open Modal
+						<Section
+							title="Overview"
+							value="overview"
+							description="Most basic BottomSheetModal usage (open/close)."
+						>
+							<View style={commonStyles.column}>
+								<Button variant="filled" onPress={() => setWelcomeVisible(true)}>
+									Open BottomSheetModal
 								</Button>
 							</View>
 						</Section>
@@ -73,7 +77,7 @@ export default function BottomSheetModalScreen() {
 					onDismiss={() => setWelcomeVisible(false)}
 				>
 					<BottomSheetModal.Header
-					size='lg'
+						size='lg'
 						title="Welcome Fleet UI!"
 						subtitle="Let's get started with 30+ components"
 						actionIcon={
