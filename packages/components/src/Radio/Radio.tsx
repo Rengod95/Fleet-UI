@@ -4,6 +4,7 @@ import {
 	type GestureResponderEvent,
 	type View,
 	Pressable,
+	Text,
 } from 'react-native';
 import Animated, {
 	Easing,
@@ -90,6 +91,11 @@ export const radioStyles = StyleSheet.create((theme, _rt) => {
 		});
 
 	return {
+		wrapper: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing[4],
+		},
 		container: {
 			justifyContent: 'center',
 			alignItems: 'center',
@@ -201,6 +207,8 @@ export const Radio = forwardRef<View, RadioProps>((props, ref) => {
 		variant = 'filled',
 		size = 'md',
 		shadow = 'none',
+		label,
+		labelPosition = 'right',
 		selected: selectedProp,
 		defaultSelected = false,
 		onSelect,
@@ -208,6 +216,7 @@ export const Radio = forwardRef<View, RadioProps>((props, ref) => {
 		accessibilityLabel,
 		testID,
 		style,
+		labelStyle,
 		onPress,
 		...rest
 	} = props;
@@ -300,7 +309,9 @@ export const Radio = forwardRef<View, RadioProps>((props, ref) => {
 			testID={testID}
 			{...rest}
 			hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+			style={radioStyles.wrapper}
 		>
+			{label && labelPosition === 'left' && <Text style={labelStyle}>{label}</Text>}
 			<Animated.View
 				style={[
 					radioStyles.container,
@@ -316,6 +327,7 @@ export const Radio = forwardRef<View, RadioProps>((props, ref) => {
 					]}
 				/>
 			</Animated.View>
+			{label && labelPosition === 'right' && <Text style={labelStyle}>{label}</Text>}
 		</Pressable>
 	);
 });

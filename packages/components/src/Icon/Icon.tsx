@@ -21,13 +21,12 @@ const getColorFromScheme = (
 	colorScheme: NonNullable<IconProps['colorScheme']>
 ) => {
 	const colorMap = {
-		primary: theme.colors.primary.text_1,
+		primary: theme.colors.primary.solid,
 		neutral: theme.colors.neutral.text_3,
-		error: theme.colors.error.text_1,
-		warning: theme.colors.warning.text_1,
-		success: theme.colors.success.text_1,
-		info: theme.colors.info.text_1,
-		secondary: theme.colors.neutral.text_2,
+		error: theme.colors.error.solid,
+		warning: theme.colors.warning.solid,
+		success: theme.colors.success.solid,
+		info: theme.colors.info.solid,
 	};
 	return colorMap[colorScheme];
 };

@@ -26,6 +26,7 @@ import type { ToastProps } from './Toast.types';
 const DEFAULT_THRESHOLD = 48;
 const SPRING_CONFIG = { stiffness: 1200, damping: 70, mass: 3 };
 const INITIAL_TRANSLATE_Y = 144;
+const EXIT_ANIMATION_MS = 300;
 
 const AnimatedView = Animated.createAnimatedComponent(View);
 
@@ -45,7 +46,6 @@ export const Toast: React.FC<ToastProps> = ({
 	action,
 	onRequestClose,
 	onPress,
-	onExited,
 	testID,
 	...rest
 }) => {
@@ -76,7 +76,7 @@ export const Toast: React.FC<ToastProps> = ({
 			opacity.value = 0;
 			scale.value = 0;
 		}
-	}, [visible, direction, onExited]);
+	}, [visible, direction]);
 
 	const handleBodyPress = (event: GestureResponderEvent) => {
 		if (!visible) return;
@@ -93,7 +93,7 @@ export const Toast: React.FC<ToastProps> = ({
 
 		setTimeout(() => {
 			onRequestClose();
-		}, 300);
+		}, EXIT_ANIMATION_MS);
 	};
 
 	const panGesture = useMemo(
@@ -159,8 +159,6 @@ export const Toast: React.FC<ToastProps> = ({
 
 	const hasText = title || description;
 
-	if (!visible) return null;
-
 	return (
 		<GestureDetector gesture={panGesture}>
 			<AnimatedView
@@ -176,6 +174,7 @@ export const Toast: React.FC<ToastProps> = ({
 					testID={testID ? `${testID}-body` : undefined}
 				>
 					{icon ? <View style={styles.icon}>{icon}</View> : null}
+
 					{hasText ? (
 						<View style={styles.texts}>
 							{title ? <Text style={styles.title}>{title}</Text> : null}
@@ -184,6 +183,7 @@ export const Toast: React.FC<ToastProps> = ({
 							) : null}
 						</View>
 					) : null}
+
 					{action ? (
 						<Pressable
 							style={styles.action}
@@ -196,22 +196,14 @@ export const Toast: React.FC<ToastProps> = ({
 					) : null}
 					{closable ? (
 						<View style={styles.close}>
-							<IconButton
-								variant="ghost"
-								size="md"
-								colorScheme="neutral"
+							<Pressable
 								onPress={handleClose}
 								aria-label="close toast"
 								testID={testID ? `${testID}-close` : undefined}
-								icon={
-									<Icon
-										icon={X}
-										size={size}
-										colorScheme="neutral"
-										strokeWidth={2}
-									/>
-								}
-							/>
+								
+							>
+							  <X size={22} color={theme.colors.neutral.text_2} strokeWidth={1.5} />
+							</Pressable>
 						</View>
 					) : null}
 				</Pressable>
@@ -324,14 +316,17 @@ const styles = StyleSheet.create((theme) => {
 						paddingHorizontal: theme.spacing[4],
 						paddingVertical: theme.spacing[3],
 						gap: theme.spacing[3],
+						minHeight: 48,
 					},
 					md: {
 						gap: theme.spacing[4],
+						minHeight: 56,
 					},
 					lg: {
 						paddingHorizontal: theme.spacing[5],
 						paddingVertical: theme.spacing[8],
 						gap: theme.spacing[4],
+						minHeight: 64,
 					},
 				},
 				rounded: {
@@ -359,27 +354,24 @@ const styles = StyleSheet.create((theme) => {
 		},
 
 		icon: {
-			width: theme.spacing[8],
-			height: theme.spacing[8],
 			alignItems: 'center',
 			justifyContent: 'center',
 		},
 
 		texts: {
 			flex: 1,
-			gap: theme.spacing[1],
 		},
 
 		title: {
-			...theme.typography.h6Strong,
 			color: theme.colors.neutral.text_1,
 			variants: {
 				size: {
 					sm: {
-						...theme.typography.body1Strong,
+						...theme.typography.body2Strong,
 					},
 					md: {
-						...theme.typography.h6Strong,
+						...theme.typography.body1Strong,
+						fontWeight: theme.text.fontWeight.semibold,
 					},
 					lg: {
 						...theme.typography.h6Strong,

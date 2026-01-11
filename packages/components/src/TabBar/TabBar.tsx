@@ -449,7 +449,7 @@ export function TabBar({
 						);
 
 						return (
-							<TabBarItem
+							<TabBarItem 
 								key={i}
 								index={i}
 								dragProgress={dragProgress}
@@ -482,10 +482,10 @@ export function TabBar({
 const styles = StyleSheet.create((theme) => {
 	return {
 		rootContainer: {
+			flex:1,
 			position: 'relative',
 			flexDirection: 'row',
 			borderCurve: 'continuous',
-			flex: 1,
 
 			variants: {
 				variant: {
@@ -519,7 +519,7 @@ const styles = StyleSheet.create((theme) => {
 					sm: { minHeight: 40 },
 					md: { minHeight: 44 },
 					lg: { minHeight: 48 },
-					xl: { minHeight: 52 },
+					xl: { minHeight: 56 },
 				},
 				shadow: {
 					none: {},

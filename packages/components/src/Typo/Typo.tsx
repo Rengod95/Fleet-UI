@@ -7,23 +7,25 @@ const styles = StyleSheet.create((theme) => {
 	const paletteEntries = theme.utils.getColorSchemePaletteEntries(theme);
 
 	const textCompoundVariants = paletteEntries.flatMap(([scheme, palette]) => {
-		return [
-			{
+		const variants = ['h1', 'h1Strong', 'h1Weak', 'h2', 'h2Strong', 'h2Weak', 'h3', 'h3Strong', 'h3Weak', 'h4', 'h4Strong', 'h4Weak', 'h5', 'h5Strong', 'h5Weak', 'h6', 'h6Strong', 'h6Weak', 'body1', 'body1Strong', 'body1Weak', 'body2', 'body2Strong', 'body2Weak', 'body3', 'body3Strong', 'body3Weak', 'caption1', 'caption1Strong', 'caption1Weak', 'caption2', 'caption2Strong', 'caption2Weak'];
+		return variants.flatMap((variant) => {
+			return [{
 				colorScheme: scheme,
+				variant: variant,
 				colorWeight: 1,
 				styles: {
 					color: palette.text_1,
 				},
-			},
-			{
+			}, {
 				colorScheme: scheme,
+				variant: variant,
 				colorWeight: 2,
 				styles: {
 					color: palette.text_2,
 				},
-			},
-			{
+			},{
 				colorScheme: scheme,
+				variant: variant,
 				colorWeight: 3,
 				styles: {
 					color: palette.text_3,
@@ -31,17 +33,18 @@ const styles = StyleSheet.create((theme) => {
 			},
 			{
 				colorScheme: scheme,
+				variant: variant,
 				colorWeight: 4,
 				styles: {
 					color: palette.text_4,
 				},
-			},
-		];
+			}]
+		});
 	});
 
 	return {
 		text: {
-			color: theme.colors.neutral.text_1,
+			// color: theme.colors.neutral.text_1,
 			variants: {
 				variant: {
 					h1: {
@@ -158,20 +161,6 @@ const styles = StyleSheet.create((theme) => {
 						alignSelf: 'stretch',
 					},
 				},
-				colorScheme: {
-					neutral: {},
-					primary: {},
-					error: {},
-					success: {},
-					warning: {},
-					info: {},
-				},
-				colorWeight: {
-					1: {},
-					2: {},
-					3: {},
-					4: {},
-				}
 			},
 			compoundVariants: textCompoundVariants,
 		},
@@ -183,13 +172,11 @@ export const Typo = forwardRef<RNText, TypoProps>((props, ref) => {
 		variant = 'body2',
 		extend = false,
 		style,
-		colorScheme = 'neutral',
-		colorWeight = 1,
 		children,
 		...restProps
 	} = props;
 
-	styles.useVariants({ variant, extend, colorScheme, colorWeight });
+	styles.useVariants({ variant, extend });
 
 	return (
 		<RNText ref={ref} style={[styles.text, style]} {...restProps}>

@@ -196,12 +196,6 @@ export const MenuTrigger = forwardRef<View, MenuTriggerProps>(
 	const scaleX = useSharedValue(0.5);
 	const scaleY = useSharedValue(0);
 
-	// Modal hide (call after animation is complete)
-	const hideModal = useCallback(() => {
-		'worklet';
-		setModalVisible(false);
-	}, []);
-
 	// Open menu
 	const handleOpen = useCallback(() => {
 		if (!isControlled) {
@@ -302,7 +296,7 @@ export const MenuTrigger = forwardRef<View, MenuTriggerProps>(
 					{ stiffness: 1500, mass: 2, damping: 100 },
 					(finished) => {
 						if (finished) {
-							hideModal()
+							runOnJS(setModalVisible)(false);
 						}
 					}
 				)

@@ -21,7 +21,6 @@ export interface IconProps extends ViewProps {
 		| 'warning'
 		| 'success'
 		| 'info'
-		| 'secondary';
 
 	/**
 	 * Icon size

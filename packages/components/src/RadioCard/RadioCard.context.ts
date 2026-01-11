@@ -15,9 +15,7 @@ export const RadioCardGroupContext =
 export const useRadioCardGroupContext = (): RadioCardGroupContextValue => {
 	const context = useContext(RadioCardGroupContext);
 	if (!context) {
-		throw new Error(
-			'useRadioCardGroupContext must be used within a <RadioCardGroup /> component'
-		);
+		return null;
 	}
 	return context;
 };

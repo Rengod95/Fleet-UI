@@ -1,4 +1,5 @@
-import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
+import { ReactNode } from 'react';
+import type { PressableProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 export type CheckboxVariant = 'filled' | 'flat' | 'outlined';
 
@@ -18,6 +19,17 @@ export type CheckboxRounded = 'none' | 'sm' | 'md' | 'lg' | 'full';
 
 export interface CheckboxProps
 	extends Omit<PressableProps, 'children' | 'style'> {
+	/**
+	 * Label
+	 */
+	label?: ReactNode;
+
+	/**
+	 * Label position
+	 * @default 'right'
+	 */
+	labelPosition?: 'left' | 'right';
+
 	/**
 	 * Color scheme (토큰 시스템의 primitive 컬러 그룹)
 	 * @default 'primary'
@@ -84,4 +96,9 @@ export interface CheckboxProps
 	 * Custom style
 	 */
 	style?: StyleProp<ViewStyle>;
+
+	/**
+	 * Label style
+	 */
+	labelStyle?: StyleProp<TextStyle>;
 }

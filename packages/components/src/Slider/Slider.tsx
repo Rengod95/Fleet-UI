@@ -75,6 +75,8 @@ export const SIZE_CONFIG = {
 	},
 } as const;
 
+const SLIDER_STEP = 1;
+
 // ========================================================================
 // Animation Configuration
 // ========================================================================
@@ -104,7 +106,7 @@ export const ANIMATION_CONFIG = {
 
 	// inertia factor (velocity * factor)
 	inertiaFactor: 0.15,
-	maxInertiaOffset: 10,
+	maxInertiaOffset: 7,
 } as const;
 
 // ========================================================================
@@ -178,7 +180,6 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 		thumbCount = 1,
 		min = 0,
 		max = 100,
-		step = 1,
 		minStepsBetweenThumbs = 0,
 		throttleMs = 200,
 		disabled = false,
@@ -362,7 +363,7 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 				// For dual thumb, ensure minimum distance
 				if (thumbCount === 2 && maxPosition > 0) {
 					const minDistance =
-						minStepsBetweenThumbs * step * (maxPosition / (max - min));
+						minStepsBetweenThumbs * SLIDER_STEP * (maxPosition / (max - min));
 					if (thumbIndex === 0) {
 						const maxAllowed = otherPositionValue.value - minDistance;
 						newPosition = Math.min(newPosition, maxAllowed);
@@ -386,7 +387,7 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 					trackDim,
 					min,
 					max,
-					step
+					SLIDER_STEP
 				);
 
 				// Build new values array
@@ -398,7 +399,7 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 								trackDim,
 								min,
 								max,
-								step
+								SLIDER_STEP
 							);
 				const val1 =
 					thumbCount === 2
@@ -409,7 +410,7 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 									trackDim,
 									min,
 									max,
-									step
+									SLIDER_STEP
 								)
 						: undefined;
 
@@ -426,7 +427,7 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 					trackDim,
 					min,
 					max,
-					step
+					SLIDER_STEP
 				);
 				const finalVal1 =
 					thumbCount === 2
@@ -435,7 +436,7 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 								trackDim,
 								min,
 								max,
-								step
+								SLIDER_STEP
 							)
 						: undefined;
 
@@ -466,7 +467,7 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 			thumbCount,
 			min,
 			max,
-			step,
+			SLIDER_STEP,
 			minStepsBetweenThumbs,
 			updateValue,
 			commitValue,
@@ -516,7 +517,7 @@ export const Slider = forwardRef<RNView, SliderProps>((props, ref) => {
 	// Track animated style (scale + inertia)
 	const trackAnimatedStyle = useAnimatedStyle(() => {
 		const scaleY = Math.max(1, trackScale.value);
-		const scaleX = Math.min(1.02, Math.max(1, trackScale.value));
+		const scaleX = Math.min(1.01, Math.max(1, trackScale.value));
 		// const scaleX = 1;
 		const translateX = withSpring(inertiaOffset.value, ANIMATION_CONFIG.spring);
 
