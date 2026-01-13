@@ -106,7 +106,7 @@ export default function AccordionExamplesScreen() {
 					value="overview"
 					description="Most basic Accordion example (single mode, flat variant)."
 				>
-					<View style={commonStyles.fullWidthContainer}>
+					<View style={{width: '100%'}}>
 						<Accordion
 							type="single"
 							collapsible
@@ -123,53 +123,6 @@ export default function AccordionExamplesScreen() {
 						</Accordion>
 					</View>
 				</Section>
-
-				{/* Controlled Mode */}
-				<Accordion type="single" collapsible defaultValue="section1" variant="outlined">
-					<Accordion.Item value="section1">
-						<Accordion.Header>Controlled Mode</Accordion.Header>
-						<Accordion.Content>
-							<View>
-								<Accordion
-										type="single"
-										collapsible
-										value={singleValue}
-										onValueChange={setSingleValue}
-										variant="outlined"
-									>
-										<Accordion.Item key={'single_item_1'} value={'single_item_1'}>
-											<Accordion.Header>Single Item 1</Accordion.Header>
-											<Accordion.Content>
-												<Text style={styles.contentText}>Single Item 1 Content</Text>
-											</Accordion.Content>
-										</Accordion.Item>
-									</Accordion>
-
-									<View style={styles.spacer} />
-
-									<Text style={styles.stateText}>
-										Multiple: [{multipleValue.join(', ')}]
-									</Text>
-									<Accordion
-										type="multiple"
-										value={multipleValue}
-										onValueChange={setMultipleValue}
-										variant="outlined"
-									>
-										{FAQ_ITEMS.map((item) => (
-											<Accordion.Item key={item.value} value={item.value}>
-												<Accordion.Header>{item.title}</Accordion.Header>
-												<Accordion.Content>
-													<Text style={styles.contentText}>{item.content}</Text>
-												</Accordion.Content>
-											</Accordion.Item>
-										))}
-									</Accordion>
-							</View>
-						</Accordion.Content>
-					</Accordion.Item>
-				</Accordion>
-				
 
 				{/* Variants */}
 				<Section
@@ -372,7 +325,7 @@ export default function AccordionExamplesScreen() {
 					title="Shadow"
 					description="Elevation presets from none to large."
 				>
-					<View style={styles.shadowGrid}>
+					<View style={[styles.shadowGrid, {width: '100%'}]}>
 						{SHADOWS.map((shadow) => (
 							<View key={shadow} style={styles.shadowItem}>
 								<Text style={styles.variantLabel}>shadow: {shadow}</Text>
@@ -401,6 +354,7 @@ export default function AccordionExamplesScreen() {
 					title="With Icons"
 					description="Left and right icons in the header."
 				>
+					<View style={[ {width: '100%'}]}>
 					<Accordion type="single" collapsible variant="outlined">
 						<Accordion.Item value="item-1">
 							<Accordion.Header
@@ -445,6 +399,7 @@ export default function AccordionExamplesScreen() {
 							</Accordion.Content>
 						</Accordion.Item>
 					</Accordion>
+					</View>
 				</Section>
 
 				{/* Custom Right Icon */}
@@ -452,6 +407,7 @@ export default function AccordionExamplesScreen() {
 					title="Custom Right Icon"
 					description="Replace the default chevron with a custom icon."
 				>
+					<View style={{width: '100%'}}>
 					<Accordion type="single" collapsible variant="flat">
 						<Accordion.Item value="item-1">
 							<Accordion.Header
@@ -477,6 +433,7 @@ export default function AccordionExamplesScreen() {
 							</Accordion.Content>
 						</Accordion.Item>
 					</Accordion>
+					</View>
 				</Section>
 
 				{/* Disabled Items */}
@@ -484,6 +441,7 @@ export default function AccordionExamplesScreen() {
 					title="Disabled Items"
 					description="Individual items can be disabled."
 				>
+					<View style={{width: '100%'}}>
 					<Accordion type="single" collapsible variant="outlined">
 						<Accordion.Item value="item-1">
 							<Accordion.Header>Enabled Item</Accordion.Header>
@@ -508,6 +466,7 @@ export default function AccordionExamplesScreen() {
 							</Accordion.Content>
 						</Accordion.Item>
 					</Accordion>
+					</View>
 				</Section>
 
 				{/* Non-collapsible Single */}
@@ -515,6 +474,7 @@ export default function AccordionExamplesScreen() {
 					title="Non-collapsible Single"
 					description="In single mode without collapsible, one item is always expanded."
 				>
+					<View style={{width: '100%'}}>
 					<Accordion
 						type="single"
 						collapsible={false}
@@ -538,6 +498,7 @@ export default function AccordionExamplesScreen() {
 							</Accordion.Content>
 						</Accordion.Item>
 					</Accordion>
+					</View>
 				</Section>
 
 				{/* Combined Props */}
@@ -545,6 +506,7 @@ export default function AccordionExamplesScreen() {
 					title="Combined Props"
 					description="Multiple props combined for a complete example."
 				>
+					<View style={{width: '100%'}}>
 					<Accordion
 						type="single"
 						collapsible
@@ -587,6 +549,7 @@ export default function AccordionExamplesScreen() {
 							</Accordion.Content>
 						</Accordion.Item>
 					</Accordion>
+					</View>
 				</Section>
 			</View>
 		</ScrollView>
@@ -603,6 +566,7 @@ const styles = StyleSheet.create((theme) => ({
 		color: theme.colors.neutral.text_2,
 	},
 	variantContainer: {
+		width: '100%',
 		marginBottom: theme.spacing[4],
 	},
 	variantLabel: {

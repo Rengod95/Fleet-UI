@@ -69,7 +69,7 @@ export default function SliderScreen() {
 							},
 						]}
 					>
-						<Slider defaultValue={[50]} />
+						<Slider defaultValue={[50]} colorScheme="primary" />
 					</View>
 				</Section>
 

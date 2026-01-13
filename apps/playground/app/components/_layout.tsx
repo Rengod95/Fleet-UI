@@ -198,6 +198,6 @@ const styles = StyleSheet.create((theme,rt) => ({
 	container:{
 		maxWidth:720,
 		flex:1,
-		backgroundColor: theme.colors.neutral.content_1,
+		backgroundColor: theme.colors.background,
 	}
 }))

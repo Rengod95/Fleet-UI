@@ -91,11 +91,11 @@ export default function BottomSheetModalScreen() {
 
 					<BottomSheetModal.Action
 						primaryButtonProps={{
-							children: 'Apple로 시작',
+							children: 'Start with Apple Sign In',
 							onPress: () => console.log('Apple'),
 						}}
 						secondaryButtonProps={{
-							children: '채팅으로 시작',
+							children: 'Start with Chat',
 							onPress: () => console.log('Chat'),
 						}}
 						showPrimary
@@ -131,21 +131,21 @@ export default function BottomSheetModalScreen() {
 								style={{ width: 48, height: 48 }}
 							/>
 						}
-						subtitle="다음부터 자동으로 로그인할까요?"
+						subtitle="Do you want to automatically log in next time?"
 					/>
 					<BottomSheetModal.Body>
 						<BottomSheetModal.BodyDescription>
-							'설정'에서 언제든 변경할 수 있어요.
+							You can change it anytime in the settings.
 						</BottomSheetModal.BodyDescription>
 					</BottomSheetModal.Body>
 					<BottomSheetModal.Action
 						layout="horizontal"
 						primaryButtonProps={{
-							children: '네, 좋아요',
+							children: 'Yes, I like it',
 							onPress: () => setConfirmVisible(false),
 						}}
 						secondaryButtonProps={{
-							children: '다음에 할게요',
+							children: 'I will do it later',
 							onPress: () => setConfirmVisible(false),
 						}}
 						showPrimary
@@ -160,8 +160,7 @@ export default function BottomSheetModalScreen() {
 					detached={false}
 				>
 					<BottomSheetModal.Header
-						title="최혜지님의"
-						subtitle="대출 조회 결과가 나왔어요"
+						title="Your loan search result is here"
 					/>
 					<BottomSheetModal.Body>
 						<View
@@ -173,37 +172,19 @@ export default function BottomSheetModalScreen() {
 								gap: 8,
 							}}
 						>
-							<Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-								56개 금융사에서
+							<Text style={{ fontSize: 24, fontWeight: 'bold' , textAlign: 'center' }}>
+								Search for loans from 56 financial institutions
 							</Text>
-							<Text style={{ fontSize: 16 }}>한 번에 대출 조회해보세요</Text>
-							<View
-								style={{
-									flexDirection: 'row',
-									alignItems: 'center',
-									gap: 8,
-									marginTop: 8,
-								}}
-							>
-								<Text>✅</Text>
-								<Text>신용도에 영향이 없어요</Text>
-							</View>
-							<View
-								style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
-							>
-								<Text>🏛️</Text>
-								<Text>방문없이 한 번에 심사가 가능해요</Text>
-							</View>
 						</View>
 					</BottomSheetModal.Body>
 					<BottomSheetModal.Action
 						layout="vertical"
 						primaryButtonProps={{
-							children: '한번에 조회하기',
+							children: 'Search for loans',
 							onPress: () => setResultVisible(false),
 						}}
 						secondaryButtonProps={{
-							children: '관심없어요',
+							children: 'I don\'t like it',
 							onPress: () => setResultVisible(false),
 						}}
 						showPrimary
@@ -216,7 +197,7 @@ export default function BottomSheetModalScreen() {
 					visible={customBodyVisible}
 					onDismiss={() => setCustomBodyVisible(false)}
 				>
-					<BottomSheetModal.Header title="커스텀 바디 예제" />
+					<BottomSheetModal.Header title="Custom Body Example" />
 					<BottomSheetModal.Body>
 						<ScrollView
 							style={{
@@ -242,7 +223,7 @@ export default function BottomSheetModalScreen() {
 					</BottomSheetModal.Body>
 					<BottomSheetModal.Footer>
 						<Button onPress={() => setCustomBodyVisible(false)} fullWidth>
-							닫기
+							Close
 						</Button>
 					</BottomSheetModal.Footer>
 				</BottomSheetModal>
@@ -285,7 +266,7 @@ export default function BottomSheetModalScreen() {
 					<BottomSheetModal.Action showPrimary showSecondary />
 					<BottomSheetModal.Footer>
 						<Button onPress={() => setCustomBodyVisible(false)} fullWidth>
-							닫기
+							Close
 						</Button>
 					</BottomSheetModal.Footer>
 				</BottomSheetModal>

@@ -39,10 +39,10 @@ export default function SwiperScreen() {
 					description="Most basic Swiper example (filled, primary)."
 				>
 					<Swiper
-						variant="filled"
-						colorScheme="primary"
+						variant="flat"
+						colorScheme="success"
 						onSwipeSuccess={() => handleSwipeSuccess('overview')}
-						placeholder="Slide"
+						placeholder="Slide to Action"
 					/>
 				</Section>
 

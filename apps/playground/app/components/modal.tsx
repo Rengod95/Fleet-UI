@@ -76,6 +76,28 @@ export default function ModalExamplesScreen() {
 							Open Modal
 						</Button>
 					</View>
+					<Modal
+						visible={basicModal}
+						onClose={() => setBasicModal(false)}
+						size="md"
+						closable={false}
+					>
+						<Modal.Header
+							title={`Basic Modal Example`}
+						/>
+						<Modal.Body>
+							<Modal.Description content="Basic Modal Example Description For Long text Testing example descriptions." />
+						</Modal.Body>
+						<Modal.Footer>
+							<Button
+								onPress={() => setBasicModal(false)}
+								fullWidth
+								colorScheme="neutral"
+							>
+								Confirm
+							</Button>
+						</Modal.Footer>
+					</Modal>
 				</Section>
 
 				{/* Sizes */}

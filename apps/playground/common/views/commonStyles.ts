@@ -5,7 +5,7 @@ export const commonStyles = StyleSheet.create((theme, rt) => ({
 		paddingTop: rt.insets.top,
 		paddingBottom: rt.insets.bottom,
 		flex: 1,
-		backgroundColor: theme.colors.neutral.content_1,
+		backgroundColor: theme.colors.background,
 
 	},
 	content: {
