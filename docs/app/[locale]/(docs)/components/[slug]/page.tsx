@@ -6,6 +6,7 @@ import { componentDocs } from '../../../../../lib/component-docs';
 import { components } from '../../../../../lib/generated/components';
 import { componentContent as componentContentEn } from '../../../../../lib/generated/component-content.en';
 import { componentContent as componentContentKo } from '../../../../../lib/generated/component-content.ko';
+import { playgroundSampleCode } from '../../../../../lib/generated/playground-sample-code';
 import { isLocale, type Locale, SUPPORTED_LOCALES } from '../../../../../lib/i18n';
 import { buildAlternates } from '../../../../../lib/seo';
 
@@ -40,6 +41,11 @@ export default async function ComponentPage({
     name: known?.name ?? slug,
   };
 
+  const loadCode = playgroundSampleCode[slug];
+  const playgroundCode = loadCode ? await loadCode() : undefined;
+  const sampleCode = playgroundCode?.sampleCode;
+  const sampleCodeHtml = playgroundCode?.sampleCodeHtml;
+
   const primaryMap = locale === 'en' ? componentContentEn : componentContentKo;
   const fallbackMap = componentContentKo;
 
@@ -47,7 +53,7 @@ export default async function ComponentPage({
   const loadFallback = fallbackMap[slug];
 
   let missingTranslation = false;
-  let MDX: React.ComponentType<any> | null = null;
+  let MDX: React.ComponentType | null = null;
 
   if (loadPrimary) {
     MDX = (await loadPrimary()).default;
@@ -59,6 +65,9 @@ export default async function ComponentPage({
   return (
     <ComponentDocLayout
       doc={doc}
+      locale={locale}
+      sampleCode={sampleCode}
+      sampleCodeHtml={sampleCodeHtml}
       content={
         MDX ? (
           <>
