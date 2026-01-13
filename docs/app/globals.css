@@ -102,6 +102,9 @@ body {
   body {
     @apply bg-background font-sans text-foreground;
 	}
+strong {
+	@apply font-extrabold;
+}
 }
 
 @layer components {
@@ -122,11 +125,11 @@ body {
 		letter-spacing: var(--fleet-typo-h2Strong-letter-spacing);
 	}
 	.docs-prose h2 {
-		@apply scroll-m-20 mt-10 border-none text-foreground;
-		font-size: var(--fleet-typo-h4Strong-font-size);
-		line-height: var(--fleet-typo-h4Strong-line-height);
-		font-weight: var(--fleet-typo-h4Strong-font-weight);
-		letter-spacing: var(--fleet-typo-h4Strong-letter-spacing);
+		@apply scroll-m-20 mt-16 border-none text-foreground;
+		font-size: var(--fleet-typo-h4-font-size);
+		line-height: var(--fleet-typo-h4-line-height);
+		font-weight: var(--fleet-typo-h4-font-weight);
+		letter-spacing: var(--fleet-typo-h4-letter-spacing);
 	}
 	.docs-prose h3 {
 		@apply scroll-m-20 mt-8 text-foreground;
@@ -145,7 +148,7 @@ body {
 	}
 
 	.docs-prose p {
-		@apply my-4 text-muted-foreground;
+		@apply mt-3 mb-1 text-muted-foreground;
 	}
 	.docs-prose hr {
 		/* MDX의 `---` 구분선: 위/아래 간격을 동일하게 유지 */
@@ -156,13 +159,13 @@ body {
 		@apply mt-4 mb-2;
 	}
 	.docs-prose h2 {
-		@apply mt-10 mb-2;
+		@apply mt-16 mb-2;
 	}
 	.docs-prose  h3 {
 		@apply mt-8 mb-2;
 	}
 	.docs-prose h4 {
-		@apply mt-6 mb-4;
+		@apply mt-8 mb-3;
 	}
 	.docs-prose a {
 		@apply underline underline-offset-4 decoration-muted-foreground/40 hover:decoration-muted-foreground;
@@ -173,17 +176,17 @@ body {
 	.docs-prose a.docs-heading-anchor:hover {
 		@apply underline underline-offset-4 decoration-muted-foreground/40;
 	}
-	.docs-prose code {
+	/* .docs-prose code {
 		@apply rounded-md bg-muted px-1.5 py-0.5 font-mono text-[0.85em] text-foreground;
-	}
-	.docs-prose pre {
+	} */
+	/* .docs-prose pre {
 		@apply mt-4;
-	}
-	.docs-prose pre code {
+	} */
+	/* .docs-prose pre code {
 		@apply bg-transparent p-0;
-	}
+	} */
 	.docs-prose ul {
-		@apply mb-4 mt-3 list-disc pl-5 text-muted-foreground;
+		@apply mb-6 mt-6 list-disc ml-4 text-muted-foreground;
 	}
 	.docs-prose li {
 		@apply mt-1;
@@ -204,10 +207,30 @@ body {
 
 @layer components {
 	/* rehype-pretty-code (Shiki) */
+
+	figure[data-rehype-pretty-code-figure] {
+		@apply my-4;
+	  }
+	  
+	figure[data-rehype-pretty-code-figure] > figcaption[data-rehype-pretty-code-title] {
+		@apply w-full rounded-t-xl border border-border bg-muted px-4 py-2 text-xs text-muted-foreground;
+		font-family: var(--font-mono);
+	}
+	
+	/* pre가 갖고 있던 mt-4 때문에 title과 떨어져 보이는 문제 방지 */
+	.docs-prose figure[data-rehype-pretty-code-figure] > figcaption[data-rehype-pretty-code-title] + pre[data-theme] {
+		@apply mt-0 rounded-t-none border border-border border-t-0 mb-4;
+	}
+	
+	/* 기존 pre[data-theme] 스타일을 유지하되, figure 안에서는 padding/라운드 충돌이 없게 */
+	figure[data-rehype-pretty-code-figure] > pre[data-theme] {
+		@apply rounded-b-xl;
+	}
+
 	pre[data-theme] {
 		@apply relative overflow-x-auto rounded-xl bg-muted p-4;
-		font-size: var(--fleet-typo-body2-font-size);
-		line-height: var(--fleet-typo-body2-line-height);
+		font-size: var(--fleet-typo-body3-font-size);
+		line-height: var(--fleet-typo-body3-line-height);
 	}
 
 	pre[data-theme] code {
@@ -225,9 +248,15 @@ body {
 		background-color: var(--shiki-dark-bg);
 	}
 
+	pre {
+		overflow-x: auto;
+		padding: 1rem 0;
+	}
+
 	/* Line padding */
 	pre [data-line] {
 		@apply block;
+		padding: 0 1rem;
 	}
 
 	/* Highlighted line / chars */
@@ -244,6 +273,25 @@ body {
 	}
 	pre:hover button[data-rehype-pretty-code-copy-button] {
 		@apply opacity-100;
+	}
+}
+
+@layer components {
+	/* Fixed-height code panels (ex: right-side sample code next to DemoFrame) */
+	.codeblock-scroll pre {
+		height: 100%;
+		overflow: auto;
+	}
+	.codeblock-scroll pre[data-theme] {
+		height: 100%;
+		overflow: auto;
+	}
+	/* Tighter line-height for long sample code (avoid body typography line-height) */
+	.codeblock-scroll pre[data-theme] {
+		line-height: 12px;
+	}
+	.codeblock-scroll pre[data-theme] code[data-theme] {
+		line-height: 12px;
 	}
 }
 
