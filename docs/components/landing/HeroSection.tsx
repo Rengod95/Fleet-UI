@@ -1,67 +1,115 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { AnimatedBlob } from './shared/AnimatedBlob';
+import { ArrowRight, Github, Sparkles, Wrench, Palette, Plug } from 'lucide-react';
+import { MotionSection, MotionItem } from './shared/MotionWrapper';
 import { GradientText } from './shared/GradientText';
+
+const VALUE_BADGES = [
+  {
+    icon: Sparkles,
+    label: 'Production Ready',
+    description: 'Built-in motion',
+  },
+  {
+    icon: Wrench,
+    label: 'DX',
+    description: 'Easy to use',
+  },
+  {
+    icon: Palette,
+    label: 'Design System',
+    description: 'Design system',
+  },
+  {
+    icon: Plug,
+    label: 'Extensibility',
+    description: 'Swap themes',
+  },
+];
+
+const TECH_STACK = ['React Native', 'Unistyles', 'Reanimated'];
 
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden px-6 pt-20 pb-16 text-center md:pt-32">
-      <AnimatedBlob />
+    <section className="relative flex min-h-[90vh] flex-col justify-center overflow-hidden px-6 pt-20 pb-16 md:pt-32">
+      <div className="mx-auto w-full max-w-7xl">
+        <MotionSection className="space-y-8">
+          {/* Main Headline - Left Aligned */}
+          <MotionItem>
+            <h1 className="max-w-4xl text-4xl font-light leading-tight tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+              <GradientText>Production-Ready UI SDK</GradientText>
+              <br />
+              for Series B Quality Apps.
+            </h1>
+          </MotionItem>
 
-      {/* Hero Content */}
-      <div className="relative z-10 max-w-5xl space-y-8">
-        {/* Badge */}
-        <div className="animate-fade-in-up flex justify-center opacity-0 [--animation-delay:200ms]">
-          <span className="inline-flex items-center rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-300 backdrop-blur-md">
-            <span className="mr-1 h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
-            v1.0 Public Beta is Live
-          </span>
-        </div>
+          {/* Subheadline */}
+          <MotionItem>
+            <p className="max-w-2xl text-base text-gray-400 sm:text-xl font-light leading-normal">
+              UI SDK with Consistent design based on minimalism and fluid animations.
+              <br className="hidden sm:block" />
+              Zero runtime overhead, Easy to Copy/Paste leverage Unistyles.
+            </p>
+          </MotionItem>
 
-        {/* Headline */}
-        <h1 className="animate-fade-in-up text-2xl font-bold leading-[72px] tracking-tight text-foreground opacity-0 sm:text-5xl md:text-6xl [--animation-delay:100ms]">
-          Fully Animated, Production-Ready <br/>UI Library for <GradientText>React Native</GradientText>
-        </h1>
-
-        {/* Subheadline */}
-        <p className="animate-fade-in-up mx-auto max-w-2xl text-lg text-muted-foreground opacity-0 sm:text-xl [--animation-delay:600ms]">
-          Built for Developers, Designers and Vibe Coders.
-          <br className="hidden sm:block" />
-          Production-ready animated components with zero complexity.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="animate-fade-in-up flex flex-col items-center justify-center gap-4 opacity-0 sm:flex-row [--animation-delay:800ms]">
-          <Link
-            href="/docs/introduce"
-            className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-sky-500 px-8 font-medium text-primary-foreground transition-all hover:bg-sky-500/90 hover:ring-4 hover:ring-sky-500/20"
-          >
-            <span className="mr-2">Get Started</span>
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link
-            href="/docs/components"
-            className="inline-flex h-12 items-center justify-center rounded-full border border-border/60 bg-muted/30 px-8 font-medium text-foreground backdrop-blur-sm transition-colors hover:bg-muted/50"
-          >
-            View Components
-          </Link>
-        </div>
-
-        {/* Tech Stack Badges */}
-        <div className="animate-fade-in-up mt-12 flex flex-wrap justify-center gap-6 opacity-0 grayscale transition-all duration-500 hover:grayscale-0 [--animation-delay:1000ms]">
-          {['React Native', 'Unistyles', 'Reanimated'].map((tech) => (
-            <div
-              key={tech}
-              className="flex items-center gap-2 rounded-lg border border-border/40 bg-muted/30 px-4 py-2 text-sm font-medium text-muted-foreground backdrop-blur-sm"
-            >
-              {/* Placeholder icons would go here, using simple circles for now */}
-              <div className="h-2 w-2 rounded-full bg-muted-foreground/60" />
-              {tech}
+          {/* 4 Value Badges */}
+          {/* <MotionItem>
+            <div className="flex flex-wrap gap-3 sm:gap-4 justify-around my-16">
+              {VALUE_BADGES.map((badge) => (
+                <div
+                  key={badge.label}
+                  className="group flex items-center gap-3 rounded-xl bg-muted/20 border border-border px-3 py-2 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.04]"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors group-hover:bg-white/15 group-hover:text-white">
+                    <badge.icon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <div className="text-lg font-medium text-white">{badge.label}</div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </MotionItem> */}
+
+          {/* CTA Buttons */}
+          <MotionItem>
+            <div className="flex flex-col gap-4 pt-2 sm:flex-row">
+              <Link
+                href="/en/getting-started/install"
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary via-sky-500 to-primary px-8 font-medium text-white transition-all hover:bg-sky-400 hover:shadow-lg hover:shadow-sky-500/25"
+              >
+                Get Started
+              </Link>
+              <a
+                href="https://github.com/Rengod95/Fleet-UI"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-8 font-medium text-white backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.04]"
+              >
+                <Github className="h-4 w-4" />
+                View on GitHub
+              </a>
+            </div>
+          </MotionItem>
+
+          {/* Tech Stack Badges */}
+          <MotionItem>
+            <div className="flex flex-wrap items-center gap-4 px-2">
+              <span className="text-xs uppercase tracking-wider text-gray-500">Built with</span>
+              <div className="flex flex-wrap gap-3">
+                {TECH_STACK.map((tech) => (
+                  <span
+                    key={tech}
+                    className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-1.5 text-sm text-gray-400"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </MotionItem>
+        </MotionSection>
       </div>
     </section>
   );

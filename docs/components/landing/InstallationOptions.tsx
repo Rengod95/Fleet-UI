@@ -1,113 +1,180 @@
 'use client';
 
-import { cn } from '@/lib/utils';
-import { CodeBlock } from './shared/CodeBlock';
+import { useState } from 'react';
+import Link from 'next/link';
+import { Check, Package, Terminal } from 'lucide-react';
+import { MotionSection, MotionItem } from './shared/MotionWrapper';
 import { GradientText } from './shared/GradientText';
-import { Terminal, Package, ArrowRight, Check } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+type Track = 'a' | 'b';
+
+const TRACKS = {
+  a: {
+    label: 'TRACK A - Local',
+    description: 'Own the source code—install only what you need and customize freely.',
+    features: [
+      'Component-by-component install',
+      'Source ownership & deep customization',
+      'Opt-in updates (you choose what to merge)',
+    ],
+    idealFor: 'Teams that need to evolve tokens/components aggressively',
+    icon: Terminal,
+    badge: 'Most flexible',
+    emphasis: 'Copy / Paste Code',
+  },
+  b: {
+    label: 'TRACK B - Package',
+    description: 'Install via packages—get a stable baseline and upgrade with versions.',
+    features: [
+      'Fastest time-to-first-screen',
+      'Versioned upgrades & patches',
+      'Standard APIs, predictable usage',
+    ],
+    idealFor: 'Teams prioritizing velocity and predictable maintenance',
+    icon: Package,
+    badge: 'Most stable',
+    emphasis: 'Package manager Inst.',
+  },
+};
 
 export function InstallationOptions() {
+  const [activeTrack, setActiveTrack] = useState<Track>('a');
+
   return (
-    <section className="relative overflow-hidden border-y border-white/5 bg-black/20 px-6 py-24">
-      {/* Background decoration */ }
-      <div className="absolute inset-0 bg-grid-white/[0.02] -z-10" />
+    <section className="relative overflow-hidden border-y border-white/5 bg-white/1 px-6 py-24 sm:py-32">
+      {/* Background accents */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-0 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-linear-to-br from-primary/18 via-primary/10 to-transparent blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-[420px] w-[420px] rounded-full bg-linear-to-tr from-primary/14 via-primary/8 to-transparent blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.06),transparent_55%)]" />
+      </div>
 
-      <div className="mx-auto max-w-7xl">
-        <div className="text-center mb-16">
-           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Choose Your <GradientText>Installation Track</GradientText>
-          </h2>
-          <p className="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">
-            Whether you want full ownership of the source code or a traditional package dependency.
-          </p>
-        </div>
-
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 items-start">
-           {/* Track A: Local Install */}
-           <div className="group relative rounded-3xl border border-blue-500/20 bg-gradient-to-b from-blue-500/5 to-transparent p-8 transition-all hover:border-blue-500/40">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-50" />
-              
-              <div className="mb-6 flex items-center justify-between">
-                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400">
-                    <Terminal className="h-6 w-6" />
-                 </div>
-                 <div className="flex px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/10 text-xs font-semibold text-blue-300">
-                    Recommended for Customization
-                 </div>
-              </div>
-
-              <h3 className="text-2xl font-bold text-white mb-2">Track A: Local Install</h3>
-              <p className="text-gray-400 mb-8 min-h-[3rem]">
-                 Copy-paste components into your project. You own the code.
+      <div className="mx-auto max-w-5xl">
+        <MotionSection className="space-y-10">
+          {/* Header */}
+          <div className="mx-auto max-w-2xl text-center">
+            <MotionItem>
+              <p className="text-xs font-medium tracking-widest text-white/50">
+                INSTALLATION
               </p>
-
-              <div className="space-y-3 mb-8">
-                 <FeatureItem color="blue">Source Ownership</FeatureItem>
-                 <FeatureItem color="blue">Zero Abstraction</FeatureItem>
-                 <FeatureItem color="blue">Modify Implementation Directly</FeatureItem>
-              </div>
-              <CodeBlock 
-                code="pnpm dlx @fleet-ui/cli init" 
-                language="bash" 
-              />
-           </div>
-
-           {/* Track B: Package Install */}
-           <div className="group relative rounded-3xl border border-purple-500/20 bg-gradient-to-b from-purple-500/5 to-transparent p-8 transition-all hover:border-purple-500/40">
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent opacity-50" />
-              
-              <div className="mb-6 flex items-center justify-between">
-                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400">
-                    <Package className="h-6 w-6" />
-                 </div>
-                 <div className="flex px-3 py-1 rounded-full border border-purple-500/20 bg-purple-500/10 text-xs font-semibold text-purple-300">
-                    Best for Stability
-                 </div>
-              </div>
-
-              <h3 className="text-2xl font-bold text-white mb-2">Track B: Package Install</h3>
-              <p className="text-gray-400 mb-8 min-h-[3rem]">
-                 Standard npm dependency. Receive updates automatically.
+            </MotionItem>
+            <MotionItem>
+              <h2 className="mt-3 text-balance text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
+                Choose your <GradientText>installation</GradientText> Track
+              </h2>
+            </MotionItem>
+            <MotionItem>
+              <p className="mt-4 text-pretty text-base leading-relaxed text-white/60 sm:text-lg">
+                Pick the model that matches your team: a shadcn-style local install for full
+                ownership, or a package install for a stable, versioned workflow.
               </p>
+            </MotionItem>
+          </div>
 
-              <div className="space-y-3 mb-8">
-                 <FeatureItem color="purple">Semantic Versioning</FeatureItem>
-                 <FeatureItem color="purple">Automatic Updates</FeatureItem>
-                 <FeatureItem color="purple">Standard SDK Pattern</FeatureItem>
-              </div>
+          {/* Pricing-style plans */}
+          <MotionItem>
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+              {(Object.keys(TRACKS) as Track[]).map((key) => {
+                const option = TRACKS[key];
+                const isActive = activeTrack === key;
+                const Icon = option.icon;
 
-              <CodeBlock 
-                code="pnpm add @fleet-ui/core @fleet-ui/components" 
-                language="bash" 
-              />
-           </div>
-        </div>
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setActiveTrack(key)}
+                    className={cn(
+                      'group relative w-full overflow-hidden rounded-2xl border p-4 text-left backdrop-blur-sm transition-all sm:p-5',
+                      isActive
+                        ? 'border-sky-500/30 bg-white/6 shadow-lg shadow-sky-500/10'
+                        : 'border-white/10 bg-white/2 hover:border-white/20 hover:bg-white/4'
+                    )}
+                  >
+                    <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      <div className="absolute inset-0 bg-linear-to-br from-white/6 to-transparent" />
+                    </div>
 
-        <div className="mt-20 text-center">
-          <a
-            href="/docs/getting-started/install"
-            className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-black transition-all hover:bg-gray-200 hover:scale-105 active:scale-95"
-          >
-            Start Installing
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </a>
-        </div>
+                    <div className="flex items-start gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-12 mt-1">
+                          <div className="flex items-center gap-4 text-lg font-medium text-white">
+                            <div
+                              className={cn(
+                                'flex h-9 w-9 items-center justify-center rounded-xl border transition-colors',
+                                isActive
+                                  ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
+                                  : 'border-white/10 bg-white/5 text-white/70 group-hover:bg-white/8 group-hover:text-white'
+                              )}
+                            >
+                              <Icon className="h-5 w-5" />
+                            </div>
+                          {option.label}
+                          </div>
+                          <div
+                            className={cn(
+                              'rounded-full border px-2.5 py-1 text-sm',
+                              isActive
+                                ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
+                                : 'border-white/10 bg-white/3 text-white/60'
+                            )}
+                          >
+                            {option.badge}
+                          </div>
+                        </div>
+
+                        <p className="mt-4 px-1 text-sm leading-relaxed text-white/80 sm:text-base">
+                          {option.description}
+                        </p>
+
+                        <div className="my-8 rounded-lg border border-white/10 bg-white/2 px-3 py-5">
+                          <div className="text-xs uppercase tracking-wider text-white/80 font-bold">
+                            What you get
+                          </div>
+                          <div className="mt-0.5 text-3xl font-semibold text-white">
+                            {option.emphasis}
+                          </div>
+                        </div>
+
+                       
+
+                        <div className="mt-8 space-y-3">
+                          {option.features.map((feature) => (
+                            <div key={feature} className="flex items-start gap-2 text-base text-white/80">
+                              <Check className="mt-0.5 h-4 w-4 text-emerald-400" />
+                              <span>{feature}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="mt-14 border-t border-white/10 pt-4">
+                          <div className="text-xs uppercase tracking-wider text-white/45">
+                          <GradientText className="text-sm font-bold">Best for</GradientText>
+                          </div>
+                          <div className="mt-1 text-base text-white/90">{option.idealFor}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </MotionItem>
+
+          {/* CTA */}
+          <MotionItem>
+            <div className="flex justify-center pt-2">
+              <Link
+                href="/en/getting-started/install"
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-linear-to-r from-primary via-sky-500 to-primary px-8 font-medium text-white transition-all hover:shadow-lg hover:shadow-sky-500/25"
+              >
+                Detailed Installation Guide
+              </Link>
+            </div>
+          </MotionItem>
+        </MotionSection>
       </div>
     </section>
-  );
-}
-
-function FeatureItem({ children, color }: { children: React.ReactNode; color: 'blue' | 'purple' }) {
-  const styles = {
-    blue: 'text-blue-400',
-    purple: 'text-purple-400',
-  };
-
-  return (
-    <div className="flex items-center gap-3">
-       <div className={cn("flex items-center justify-center h-5 w-5 rounded-full bg-white/10", styles[color])}>
-         <Check className="h-3 w-3" strokeWidth={3} />
-       </div>
-       <span className="text-gray-300 text-sm">{children}</span>
-    </div>
   );
 }

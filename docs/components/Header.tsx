@@ -148,7 +148,7 @@ export function Header() {
         <div
           className={cn(
             'mx-auto flex items-center gap-3',
-            isLandingPage ? 'h-16 max-w-7xl px-6' : 'h-14 px-4 lg:px-6'
+            isLandingPage ? 'h-16 max-w-7xl px-2' : 'h-14 px-4 lg:px-6'
           )}
         >
           {/* Sidebar Trigger (문서 페이지에서만) */}

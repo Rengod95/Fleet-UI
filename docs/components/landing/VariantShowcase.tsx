@@ -195,7 +195,7 @@ export function VariantShowcase() {
 
           {/* Right: Code Display */}
           <div className="relative">
-             <div className="absolute -inset-4 bg-gradient-to-r from-primary/20 to-purple-500/20 blur-3xl opacity-30 -z-10 rounded-[3rem]" />
+             <div className="absolute -inset-4 bg-linear-to-r from-primary/20 via-primary/12 to-primary/6 blur-3xl opacity-30 -z-10 rounded-[3rem]" />
              
              <div className="rounded-2xl border border-border bg-[#0d1117]/80 shadow-2xl backdrop-blur-md">
                 <div className="flex items-center justify-between border-b border-white/5 px-6 py-4">

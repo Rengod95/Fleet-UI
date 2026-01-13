@@ -1,59 +1,48 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+import { MotionSection, MotionItem } from './shared/MotionWrapper';
 import { GradientText } from './shared/GradientText';
-import { CodeBlock } from './shared/CodeBlock';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Palette, Layers, Zap, ArrowUp } from 'lucide-react';
 
-const RAW_COLORS_CODE = `
-// Primary (Accent) - Light Scale
-const primaryLightScale: ColorScale = {
-	'1': '#f0ffff',
-	'2': '#dbffff',
-	'3': '#77fbff',
-	'4': '#00e7ff',
-	'5': '#00c5ff',
-	'6': '#0098ff',
-	'7': '#0069bb',
-	'8': '#004679',
-	'9': '#002f4e',
-	'10': '#002236',
-	'11': '#001e2e',
+const RAW_CODE_CONTENT = `
+const lightColorScale = {
+  '1': '#0098ff',  // ← Just a color value
+  ...
+  '11': '#0069bb',
+};
+
+const darkColorScale = {
+  '1': '#0069bb',
+  ...
+  '11': '#0098ff',
 };
 
 export const rawColors = {
-	neutral: {
-		light: neutralLightScale,
-		dark: neutralDarkScale,
-	},
-	primary: {
-		light: primaryLightScale,
-		dark: primaryDarkScale,
-	},
-	white: '#ffffff',
-	black: '#000000',
-	transparent: 'transparent',
-} as const;`;
+  neutral: {
+    light: lightColorScale,
+    dark: darkColorScale,
+  },
+  primary: {
+    // ...
+  },
+  // ... other colors
+};
+`;
 
-const PRIMITIVE_TOKENS_CODE = `import { rawColors } from '../raw/colors';
+const PRIMITIVE_CODE_CONTENT = `
+import { rawColors } from './rawColors';
 
 export const primitiveColors = {
-	neutral: rawColors.neutral,
-	primary: rawColors.primary,
-	warning: rawColors.warning,
-	success: rawColors.success,
-	info: rawColors.info,
-	error: rawColors.error,
-	white: rawColors.white,
-	black: rawColors.black,
-	transparent: rawColors.transparent,
-} as const;
+  neutral: rawColors.neutral,
+  accent: rawColors.accent,
+  // ... other colors
+};
+`;
 
-export type PrimitiveColors = typeof primitiveColors;`;
-
-const SEMANTIC_TOKENS_CODE = `import { primitiveColors } from '../primitive/colors';
-
+const SEMANTIC_CODE_CONTENT = `
 const buildColorPalette = (scale: ColorScale) => ({
 	content_1: scale['1'],
 	content_2: scale['2'],
@@ -74,157 +63,182 @@ const buildColorPalette = (scale: ColorScale) => ({
 });
 
 export const semanticColors = {
-	light: {
-		neutral: buildBasePalette(primitiveColors.neutral.light),
-		primary: buildColorPalette(primitiveColors.primary.light),
-		warning: buildColorPalette(primitiveColors.warning.light),
-		// ...
-	},
-	dark: {
-		primary: buildColorPalette(primitiveColors.primary.dark),
-		warning: buildColorPalette(primitiveColors.warning.dark),
-		// ...
-	},
-} as const;`;
+  light: {
+    neutral: buildColorPalette(rawColors.neutral.light),
+    primary: buildColorPalette(rawColors.primary.light),
+    // ... other colors
+  },
+  dark: {
+    neutral: buildColorPalette(rawColors.neutral.dark),
+    primary: buildColorPalette(rawColors.primary.dark),
+    // ... other colors
+  },
+};
+`;
 
-const LAYERS = [
-  {
-    id: 0,
-    title: 'Raw Value Layer',
-    subtitle: 'Base HSL Scales',
-    icon: Palette,
-    description: 'Simple Values, No Logic or Principles Involved',
-    code: RAW_COLORS_CODE,
-    fileName: 'packages/core/src/tokens/raw/colors.ts',
-  },
-  {
-    id: 1,
-    title: 'Primitive Layer',
-    subtitle: 'Design Atoms',
-    icon: Layers,
-    description: 'Principles Involved simple values',
-    code: PRIMITIVE_TOKENS_CODE,
-    fileName: 'packages/core/src/tokens/primitive/colors.ts',
-  },
-  {
-    id: 2,
-    title: 'Semantic Layer',
-    subtitle: 'Theme Logic',
-    icon: Zap,
-    description: 'Include purposes and context tokens',
-    code: SEMANTIC_TOKENS_CODE,
-    fileName: 'packages/core/src/tokens/semantic/colors.ts',
-  },
-];
+const THEME_CODE_CONTENT = `
+import { semanticColors } from './semanticColors';
+
+export const lightTheme: LightTheme = {
+	colors: semanticColors.light,
+	gradients: semanticGradients,
+	typography: semanticTypography,
+	text: primitiveTypography,
+  // ... other tokens
+};
+
+StyleSheet.configure({
+	themes, // lightTheme, darkTheme should be passed here
+});
+`;
 
 export function TokenArchitecture() {
-  const [activeLayer, setActiveLayer] = useState(0);
+  const STEPS = [
+    { key: 'raw', label: 'Raw', desc: 'Source values (HSL scales)', content: RAW_CODE_CONTENT },
+    { key: 'primitive', label: 'Primitive', desc: 'Scales & simple mapping', content: PRIMITIVE_CODE_CONTENT },
+    { key: 'semantic', label: 'Semantic', desc: 'Meaningful UI tokens', content: SEMANTIC_CODE_CONTENT },
+    { key: 'theme', label: 'Theme', desc: 'Runtime theme object', content: THEME_CODE_CONTENT },
+  ] as const;
+
+  type StepKey = (typeof STEPS)[number]['key'];
+  const [activeKey, setActiveKey] = useState<StepKey>('raw');
+  const activeStep = STEPS.find((s) => s.key === activeKey) ?? STEPS[0];
 
   return (
-    <section className="relative overflow-hidden border-y border-border bg-muted/30 py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        {/* Header */}
-        <div className="mb-16 text-center">
-          <h2 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Your Own Token <GradientText>Architecture</GradientText>
-          </h2>
-          <p className="mt-4 text-xl text-muted-foreground">
-            A three-tier token system designed for scalability.
-          </p>
-        </div>
+    <section className="relative overflow-hidden px-6 py-24 sm:py-32">
+      {/* Background accents */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-0 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-linear-to-br from-primary/18 via-primary/10 to-transparent blur-[120px] z-10 overflow-visible" />
+        <div className="absolute bottom-[-100px] right-1/3 h-[420px] w-[520px] rounded-full bg-linear-to-tr from-primary/14 via-primary/8 to-transparent blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.06),transparent_55%)]" />
+      </div>
 
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-16">
-          {/* Left: Interactive Diagram */}
-          {/* Left: Interactive Diagram */}
-          <div className="relative space-y-0">
-              {[...LAYERS].reverse().map((layer, index) => {
-                const isActive = activeLayer === layer.id;
-                const Icon = layer.icon;
-                const isLast = index === LAYERS.length - 1;
-
-                return (
-                  <div key={layer.id} className="relative pl-24 pb-16 last:pb-0">
-                    {/* Vertical Connecting Line */}
-                    {!isLast && (
-                       <div className="absolute left-[27px] top-[56px] bottom-0 w-0.5 bg-border/50" />
-                    )}
-
-                    {/* Timeline Node (Icon) */}
-                    <div 
-                      className={cn(
-                        "absolute left-0 top-0 flex h-14 w-14 items-center justify-center rounded-full border transition-all duration-300 z-10",
-                        isActive 
-                          ? "border-primary bg-background text-primary shadow-[0_0_0_4px_rgba(var(--primary),0.1)] scale-110" 
-                          : "border-border bg-muted/30 text-muted-foreground group-hover:border-primary/50 group-hover:text-foreground"
-                      )}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </div>
-
-                    {/* Card Content */}
-                    <button
-                      onClick={() => setActiveLayer(layer.id)}
-                      className={cn(
-                        'w-full text-left transition-all duration-300 rounded-xl border px-6 py-4 group relative overflow-hidden',
-                        isActive
-                          ? 'border-primary/50 bg-card shadow-lg ring-1 ring-primary/20'
-                          : 'border-border bg-card/50 hover:bg-card hover:border-primary/30'
-                      )}
-                    >
-                      {/* Active highlight glow */}
-                      {isActive && (
-                          <div className="absolute inset-0 bg-primary/5 pointer-events-none" />
-                      )}
-
-                      <div className="relative flex items-center justify-between">
-                         <div>
-                            <span className={cn(
-                              "text-xs font-bold uppercase tracking-wider",
-                              isActive ? "text-primary" : "text-muted-foreground"
-                            )}>
-                              Layer {3 - index}
-                            </span>
-                            <h3 className={cn("text-lg font-semibold transition-colors", isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground")}>
-                              {layer.title}
-                            </h3>
-                         </div>
-                         {/* Active Arrow Indicator */}
-                         <div className={cn(
-                            "transition-transform duration-300",
-                            isActive ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
-                         )}>
-                             <ArrowUp className="h-5 w-5 text-primary rotate-90" />
-                         </div>
-                      </div>
-                      
-                      <p className="mt-8 text-sm text-gray-400 group-hover:text-gray-300 transition-colors leading-relaxed">
-                        {layer.description}
-                      </p>
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-
-          {/* Right: Code Viewer */}
-          <div className="relative flex flex-col">
-            <div className="mb-2 flex items-center justify-between px-1">
-              <span className="text-xs font-mono text-muted-foreground">
-                {LAYERS.find(l => l.id === activeLayer)?.fileName}
-              </span>
-            </div>
-            
-            <div className="relative overflow-hidden rounded-xl border border-border bg-[#0d1117] shadow-xl">
-               <div className="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-[#0d1117] to-transparent z-10 pointer-events-none" />
-                <CodeBlock 
-                  code={LAYERS.find(l => l.id === activeLayer)?.code || ''} 
-                  language="typescript" 
-                  className="h-[500px] overflow-y-auto text-sm [&>pre]:!bg-transparent [&>pre]:p-4" 
-                />
-               <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#0d1117] to-transparent z-10 pointer-events-none" />
-            </div>
+      <div className="mx-auto max-w-6xl">
+        <MotionSection className="space-y-12">
+          {/* Section Header */}
+          <div className="mx-auto max-w-2xl text-center">
+            <MotionItem>
+              <p className="text-xs font-medium tracking-widest text-white/50">TOKEN PIPELINE</p>
+            </MotionItem>
+            <MotionItem>
+              <h2 className="mt-3 text-balance text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
+                Your design system, <GradientText>not ours</GradientText>
+              </h2>
+            </MotionItem>
+            <MotionItem>
+              <p className="mt-4 text-pretty text-base leading-relaxed text-white/60 sm:text-lg">
+                A clear pipeline from <span className="text-white/80">Raw → Primitive → Semantic → Theme</span>.
+                Change once, propagate everywhere—with type safety.
+              </p>
+            </MotionItem>
           </div>
-        </div>
+
+          {/* 2-column: steps + code */}
+          <div className="grid items-start gap-6 lg:grid-cols-12 lg:gap-10">
+            {/* Steps */}
+            <MotionItem className="lg:col-span-5">
+              <div className="space-y-3">
+                {STEPS.map((step, index) => {
+                  const isActive = step.key === activeKey;
+                  return (
+                    <button
+                      key={step.key}
+                      type="button"
+                      onClick={() => setActiveKey(step.key)}
+                      className={cn(
+                        'group relative w-full overflow-hidden rounded-2xl border p-5 text-left backdrop-blur-sm transition-all',
+                        isActive
+                          ? 'border-sky-500/30 bg-white/6 shadow-lg shadow-sky-500/10'
+                          : 'border-white/10 bg-white/2 hover:border-white/20 hover:bg-white/4'
+                      )}
+                    >
+                      <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                        <div className="absolute inset-0 bg-linear-to-br from-white/6 to-transparent" />
+                      </div>
+
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={cn(
+                            'flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-semibold transition-colors',
+                            isActive
+                              ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
+                              : 'border-white/10 bg-white/5 text-white/70 group-hover:bg-white/8 group-hover:text-white'
+                          )}
+                        >
+                          {index + 1}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="text-lg font-medium text-white">{step.label}</div>
+                            <span
+                              className={cn(
+                                'rounded-full border px-2.5 py-1 text-xs',
+                                isActive
+                                  ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
+                                  : 'border-white/10 bg-white/3 text-white/60'
+                              )}
+                            >
+                              {step.key}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-sm leading-relaxed text-white/60 sm:text-base">
+                            {step.desc}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </MotionItem>
+
+          {/* Code Editor Window */}
+            <MotionItem variant="scale" className="lg:col-span-7">
+              <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1117] shadow-2xl">
+                {/* Window Header */}
+                <div className="flex items-center justify-between gap-3 border-b border-white/5 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1.5">
+                      <div className="h-3 w-3 rounded-full bg-[#ff5f56]" />
+                      <div className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
+                      <div className="h-3 w-3 rounded-full bg-[#27c93f]" />
+                    </div>
+                    <span className="ml-2 text-xs text-gray-500">
+                      tokens/{activeStep.key}.ts
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-xs text-white/60">
+                      {activeStep.label}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Code Content */}
+                <div className="relative">
+                  <div className="absolute inset-x-0 top-0 h-6 bg-linear-to-b from-[#0d1117] to-transparent" />
+                  <pre key={activeStep.key} className="overflow-x-auto p-6 text-sm leading-relaxed">
+                    <code className="text-gray-300">{activeStep.content}</code>
+                  </pre>
+                  <div className="absolute inset-x-0 bottom-0 h-6 bg-linear-to-t from-[#0d1117] to-transparent" />
+                </div>
+              </div>
+            </MotionItem>
+          </div>
+
+          {/* CTA */}
+          <MotionItem>
+            <div className="flex justify-center pt-2">
+              <Link
+                href="/en/fundamental/token-architecture"
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-linear-to-r from-primary via-sky-500 to-primary px-8 font-medium text-white transition-all hover:shadow-lg hover:shadow-sky-500/25"
+              >
+                Read full token architecture
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </MotionItem>
+        </MotionSection>
       </div>
     </section>
   );
