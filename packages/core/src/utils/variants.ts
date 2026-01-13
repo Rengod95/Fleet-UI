@@ -1,18 +1,17 @@
-import type { FleetTheme } from '../types';
+import type { FleetBasePalette, FleetColorPalette, FleetTheme, FleetThemeColorSchemes } from '../types';
 
-type ThemePalette = FleetTheme['colors'][keyof FleetTheme['colors']];
-type ColoredPalette = Extract<ThemePalette, { solid: string }>;
-type ColorSchemes = keyof FleetTheme['colors'];
+type ThemePalette = FleetColorPalette | FleetBasePalette;
 type IconVariants = 'filled' | 'outlined' | 'flat' | 'ghost';
 
 export const paletteHasSolid = (
 	palette: ThemePalette
-): palette is ColoredPalette => {
+): palette is FleetColorPalette => {
 	'worklet';
+	if (typeof palette !== 'object') return false;
 	return 'solid' in palette;
 };
 
-export const getPaletteForScheme = <T extends ColorSchemes>(
+export const getPaletteForScheme = <T extends FleetThemeColorSchemes>(
 	theme: FleetTheme,
 	scheme: T
 ): ThemePalette => {
@@ -35,19 +34,27 @@ export const getPaletteForScheme = <T extends ColorSchemes>(
 	}
 };
 
+/**
+ * Default color schemes on Fleet UI, If you want to add a new color scheme, you need to add new scheme name here.
+ * @see types.ts file for more details.
+ */
+const DEFAULT_COLOR_SCHEMES = ['neutral', 'primary', 'error', 'success', 'warning', 'info'];
+
 export const getColorSchemePaletteEntries = (
 	theme: FleetTheme
-): [ColorSchemes, ThemePalette][] => {
+): [FleetThemeColorSchemes, ThemePalette][] => {
 	'worklet';
-	return (Object.keys(theme.colors) as ColorSchemes[]).map((scheme) => [
-		scheme,
-		getPaletteForScheme(theme, scheme),
+	const onlyPaletteSchemeFromSemanticColors = DEFAULT_COLOR_SCHEMES.filter((scheme) => scheme in theme.colors);
+
+	return onlyPaletteSchemeFromSemanticColors.map((scheme) => [
+		scheme as FleetThemeColorSchemes,
+		getPaletteForScheme(theme, scheme as FleetThemeColorSchemes),
 	]);
 };
 
 export const getIconColor = (
 	theme: FleetTheme,
-	colorScheme: ColorSchemes,
+	colorScheme: FleetThemeColorSchemes,
 	variant: IconVariants
 ) => {
 	'worklet';
