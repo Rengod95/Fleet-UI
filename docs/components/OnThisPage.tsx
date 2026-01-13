@@ -163,18 +163,18 @@ export function OnThisPage({
 
   return (
     <div className={cn('space-y-3 py-6', className)}>
-      <div className="text-fleet-body3Strong text-muted-foreground font-bold!">On this page</div>
-      <nav className="space-y-2">
+      <div className="text-fleet-caption1Strong text-muted-foreground font-bold!">On this page</div>
+      <nav className="space-y-0">
         {items.map((it) => (
           <a
             key={it.id}
             href={`#${it.id}`}
             className={cn(
-              'block rounded-md px-2 py-1.5 text-muted-foreground hover:bg-muted hover:text-foreground font-medium text-sm',
-              it.level === 1 && 'pl-3',
-              it.level === 2 && 'pl-3 text-base font-semibold!',
-              it.level === 3 && 'pl-6 text-sm text-foreground/80',
-              it.level === 4 && 'pl-9 text-xs text-foreground/60',
+              'block rounded-md px-2 py-2 text-muted-foreground hover:bg-muted hover:text-foreground font-medium text-sm tracking-normal',
+              it.level === 1 && 'pl-2 text-base',
+              it.level === 2 && 'pl-2 text-base font-semibold! text-foreground/80',
+              it.level === 3 && 'pl-6 text-sm text-foreground/60',
+              it.level === 4 && 'pl-8 text-xs text-foreground/50',
               activeId === it.id && 'bg-muted-foreground/20 text-foreground font-semibold',
             )}
             onClick={(e) => {
