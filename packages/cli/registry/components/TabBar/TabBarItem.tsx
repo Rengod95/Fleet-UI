@@ -46,7 +46,7 @@ export function TabBarItem({
 	onTextLayout,
 }: TabBarItemProps) {
 	const theme = useAnimatedTheme();
-	styles.useVariants({ size, colorScheme });
+	styles.useVariants({ size, colorScheme, isDisabled:disabled });
 
 	const activeProgress = useDerivedValue(() => {
 		return interpolate(
@@ -203,6 +203,12 @@ const styles = StyleSheet.create((theme) => {
 						paddingHorizontal: theme.spacing[5],
 					},
 				},
+				isDisabled:{
+					true:{
+						opacity:0.3
+					},
+					false:{}
+				}
 			},
 		},
 

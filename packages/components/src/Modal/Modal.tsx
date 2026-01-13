@@ -49,7 +49,7 @@ const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
 const TIMING_CONFIG_CONTENT = {
 	easing: Easing.bezier(0.2, 1, 0.43, 0.97),
-	duration: 300,
+	duration: 450,
 }
 
 const INITIAL_CONTENT_TRANSLATE_Y = 300;
@@ -320,7 +320,7 @@ ModalRoot.displayName = 'Modal.Root';
 // Styles
 // ============================================
 
-const styles = StyleSheet.create((theme) => ({
+const styles = StyleSheet.create((theme,rt) => ({
 	overlay: {
 		flex: 1,
 		justifyContent: 'center',
@@ -330,7 +330,7 @@ const styles = StyleSheet.create((theme) => ({
 
 	backdrop: {
 		...StyleSheet.absoluteFillObject,
-		backgroundColor: theme.colors.neutral.content_inversed,
+		backgroundColor: rt.colorScheme === 'dark' ? 'transparent' : theme.colors.neutral.content_inversed,
 	},
 
 	contentContainer: {

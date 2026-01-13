@@ -30,12 +30,12 @@ export interface DividerProps extends ViewProps {
 	horizontalMargin?: DividerHorizontalMargin;
 
 	/**
-	 * Divider colorScheme
-	 * - base: base neutral color
-	 * - inverted: current theme inversion (light ↔ dark)
-	 * @default 'base'
+	 * Divider inverted
+	 * - true: current theme inversion (light ↔ dark)
+	 * - false: base neutral color
+	 * @default false
 	 */
-	colorScheme?: DividerColorScheme;
+	inverted?: boolean;
 
 	/**
 	 * Divider vertical margin

@@ -665,7 +665,7 @@ Slider.displayName = 'Slider';
 // Styles
 // ============================================================================
 
-export const sliderStyles = StyleSheet.create((theme) => {
+export const sliderStyles = StyleSheet.create((theme,rt) => {
 	const paletteEntries = theme.utils.getColorSchemePaletteEntries(theme);
 
 	// Track compound variants for colorScheme
@@ -703,14 +703,14 @@ export const sliderStyles = StyleSheet.create((theme) => {
 				thumbVariant: 'circle' as const,
 				colorScheme: scheme,
 				styles: {
-					backgroundColor: palette.text_inversed,
+					backgroundColor: rt.colorScheme === 'dark' ? palette.text_1 : palette.text_inversed,
 				},
 			},
 			{
 				thumbVariant: 'oval' as const,
 				colorScheme: scheme,
 				styles: {
-					backgroundColor: palette.text_inversed,
+					backgroundColor: rt.colorScheme === 'dark' ? palette.text_1 : palette.text_inversed,
 				},
 			},
 			{
@@ -719,7 +719,7 @@ export const sliderStyles = StyleSheet.create((theme) => {
 				styles: {
 					backgroundColor: hasSolidColor
 						? palette.solid
-						: palette.text_inversed,
+						: rt.colorScheme === 'dark' ? palette.text_1 : palette.text_inversed,
 				},
 			},
 		];

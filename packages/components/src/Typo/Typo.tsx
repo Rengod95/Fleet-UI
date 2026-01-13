@@ -4,47 +4,9 @@ import { StyleSheet } from 'react-native-unistyles';
 import type { TypoProps } from './Typo.types';
 
 const styles = StyleSheet.create((theme) => {
-	const paletteEntries = theme.utils.getColorSchemePaletteEntries(theme);
-
-	const textCompoundVariants = paletteEntries.flatMap(([scheme, palette]) => {
-		const variants = ['h1', 'h1Strong', 'h1Weak', 'h2', 'h2Strong', 'h2Weak', 'h3', 'h3Strong', 'h3Weak', 'h4', 'h4Strong', 'h4Weak', 'h5', 'h5Strong', 'h5Weak', 'h6', 'h6Strong', 'h6Weak', 'body1', 'body1Strong', 'body1Weak', 'body2', 'body2Strong', 'body2Weak', 'body3', 'body3Strong', 'body3Weak', 'caption1', 'caption1Strong', 'caption1Weak', 'caption2', 'caption2Strong', 'caption2Weak'];
-		return variants.flatMap((variant) => {
-			return [{
-				colorScheme: scheme,
-				variant: variant,
-				colorWeight: 1,
-				styles: {
-					color: palette.text_1,
-				},
-			}, {
-				colorScheme: scheme,
-				variant: variant,
-				colorWeight: 2,
-				styles: {
-					color: palette.text_2,
-				},
-			},{
-				colorScheme: scheme,
-				variant: variant,
-				colorWeight: 3,
-				styles: {
-					color: palette.text_3,
-				},
-			},
-			{
-				colorScheme: scheme,
-				variant: variant,
-				colorWeight: 4,
-				styles: {
-					color: palette.text_4,
-				},
-			}]
-		});
-	});
-
 	return {
 		text: {
-			// color: theme.colors.neutral.text_1,
+			color: theme.colors.neutral.text_1,
 			variants: {
 				variant: {
 					h1: {
@@ -162,8 +124,7 @@ const styles = StyleSheet.create((theme) => {
 					},
 				},
 			},
-			compoundVariants: textCompoundVariants,
-		},
+       },
 	};
 });
 

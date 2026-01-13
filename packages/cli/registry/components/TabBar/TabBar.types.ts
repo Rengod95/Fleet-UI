@@ -74,7 +74,7 @@ export interface TabBarProps extends Omit<ViewProps, 'children'> {
 	 */
 	getItemAccessibilityLabel?: (item: TabBarItem, index: number) => string | undefined;
 	/** Array of accessibility labels for the tab items (highest priority) */
-	accessibilityLabels?: Array<string | undefined>;
+	accessibilityLabels?: string[] | undefined;
 
 	/**
 	 * Set the default hitSlop for the tab item

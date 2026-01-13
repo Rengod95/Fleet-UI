@@ -152,7 +152,7 @@ export const Divider = forwardRef<View, DividerProps>((props, ref) => {
 		variant = 'line',
 		size = 'md',
 		horizontalMargin = 'none',
-		colorScheme = 'base',
+		inverted = false,
 		style,
 		testID,
 		...rest
@@ -165,7 +165,7 @@ export const Divider = forwardRef<View, DividerProps>((props, ref) => {
 	});
 
   return (
-    <ScopedTheme invertedAdaptive={colorScheme === 'inverted'}>
+    <ScopedTheme invertedAdaptive={inverted}>
       <View
         ref={ref}
         accessibilityRole="none"
