@@ -1,6 +1,7 @@
 import { DemoFrame } from './DemoFrame';
 import type { ComponentDoc } from '../lib/component-docs';
 import { CodeBlock } from './CodeBlock';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 function SampleCodePanel({
   title,
@@ -14,11 +15,19 @@ function SampleCodePanel({
   if (!code?.trim() && !html?.trim()) return null;
 
   return (
-    <section className="rounded-xl bg-card p-4 shadow-sm">
-      <div className="text-fleet-body3Strong">{title}</div>
-      <div className="mt-3 max-h-full overflow-y-auto">
-        <CodeBlock className="codeblock-scroll h-[880px]" code={code} html={html} />
-      </div>
+    <section className="rounded-xl bg-card p-5 shadow-sm">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="sample-code" className="border-b-0">
+          <AccordionTrigger className="py-0 text-fleet-body1Strong hover:no-underline">
+            {title}
+          </AccordionTrigger>
+          <AccordionContent className="pb-0">
+            <div className="mt-3 max-h-full overflow-y-auto">
+              <CodeBlock className="codeblock-scroll h-[880px]" code={code} html={html} />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </section>
   );
 }
@@ -36,19 +45,19 @@ export function ComponentDocLayout({
   sampleCodeHtml?: string;
   locale?: 'en' | 'ko';
 }) {
-  const sampleCodeTitle = locale === 'ko' ? '샘플 코드' : 'Sample code';
+  const sampleCodeTitle = 'View Playground Code';
 
   return (
     <div className="not-prose">
       <div className="space-y-6">
-        <div className="grid gap-2 lg:grid-cols-3 lg:items-start">
+        <div className="flex flex-col align-center justify-center gap-8">
           {/* Left: Demo */}
-          <div className="lg:col-span-1">
+          <div>
             <DemoFrame slug={doc.slug} />
           </div>
 
           {/* Right: Sample code */}
-          <div className="lg:sticky lg:top-20 lg:col-span-2">
+          <div className="min-w-0 xl:flex-1 xl:sticky xl:top-20">
             <SampleCodePanel title={sampleCodeTitle} code={sampleCode} html={sampleCodeHtml} />
           </div>
         </div>
