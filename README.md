@@ -1,105 +1,223 @@
-# Fleet UI
+<p align="center">
+  <a href="https://fleet-ui.dev">
+    <img src="docs/assets/light-scheme-logo.svg" alt="Fleet UI Logo" width="200" />
+  </a>
+</p>
 
-A production-ready, fully animated React native UI Components library with Unistyles.
+<h1 align="center">Fleet UI</h1>
 
-## 🎯 MAIN Features
+<p align="center">
+  <strong>A production-ready, fully animated React Native UI SDK with Unistyles</strong>
+</p>
 
-- ✅ **Trendy Designr** : Production Ready Design, IOS Inspired Universable Animations.
-- ✅ **Animated**: Smooth animations written by reanimated only. high perfromance.
-- ✅ **Customizable**: Easy to customizing compoent by your own purposes.
-- ✅ **Few Dependencies**: only need to import configruation file and Unistyles, no provider needed.
-- ✅ **Copy-Paste**: copy, paste only what you need
-- ✅ **Modular**: Install only what you need
+<p align="center">
+  <a href="https://github.com/Rengod95/Fleet-UI/stargazers">
+    <img src="https://img.shields.io/github/stars/Rengod95/Fleet-UI?style=social" alt="GitHub Stars" />
+  </a>
+  <a href="https://www.npmjs.com/package/@fleet-ui/cli">
+    <img src="https://img.shields.io/npm/v/@fleet-ui/cli?label=%40fleet-ui%2Fcli&color=blue" alt="npm @fleet-ui/cli" />
+  </a>
+  <a href="https://www.npmjs.com/package/@fleet-ui/core">
+    <img src="https://img.shields.io/npm/v/@fleet-ui/core?label=%40fleet-ui%2Fcore&color=blue" alt="npm @fleet-ui/core" />
+  </a>
+  <a href="https://www.npmjs.com/package/@fleet-ui/components">
+    <img src="https://img.shields.io/npm/v/@fleet-ui/components?label=%40fleet-ui%2Fcomponents&color=blue" alt="npm @fleet-ui/components" />
+  </a>
+  <a href="https://github.com/Rengod95/Fleet-UI/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/license-Apache%202.0%20%2B%20Commons%20Clause-blue" alt="License" />
+  </a>
+</p>
 
+<p align="center">
+  <a href="https://fleet-ui.dev/en"><strong>📖 Documentation</strong></a> ·
+  <a href="https://fleet-ui.dev/en/introduce"><strong>🎯 Introduction</strong></a> ·
+  <a href="https://fleet-ui.dev/en/getting-started/install"><strong>🚀 Quick Start</strong></a> ·
+  <a href="https://fleet-ui.dev/ko"><strong>🇰🇷 한국어</strong></a>
+</p>
 
-## 🎯 Also Support
+---
+
+## What is Fleet UI?
+
+Fleet UI is a UI SDK for React Native that bundles **theming (react-native-unistyles) + animation (react-native-reanimated) + components** into a seamless workflow.
+
+It helps you build production-ready UIs faster while maintaining a consistent design based on **minimalism** and **fluid animations**.
+
+### Core Design Philosophy
+
+- **Universal Minimalism**: A minimal visual language centered on mobile UI/UX that looks natural anywhere.
+- **Radical Simplicity**: Design so naturally that users operate it without thinking.
+
+---
+
+## ✨ Features
+
+### Main Features
+
+| Feature | Description |
+|---------|-------------|
+| **🎨 Trendy Design** | Production-ready design, iOS-inspired universal animations |
+| **🎬 Animated** | Smooth animations written with Reanimated only. High performance |
+| **🛠️ Customizable** | Easy to customize components for your own purposes |
+| **📦 Few Dependencies** | Only need to import configuration file and Unistyles, no provider needed |
+| **📋 Copy-Paste** | Copy and paste only what you need |
+| **🧩 Modular** | Install only what you need |
+
+### What Fleet UI Provides
+
+Fleet UI isn't just a "component collection"—it also provides the **system those components depend on**.
+
+- **Mobile-first design**: Includes common mobile screen patterns
+- **Theme/token system**: Tokens designed in the `raw → primitive → semantic → theme` flow
+- **Variants system**: Combine axes like `colorScheme / variant / size ...` for predictable styles
+- **Accessibility (A11y) defaults**: role/state/interaction patterns aligned consistently
+- **Motion/interaction defaults**: Reanimated-based motion as component default behavior
+
+### Also Supports
 
 - ✅ **Cross-Platform**: Works seamlessly on iOS, Android, and Web
 - ✅ **Type-Safe**: Full TypeScript support
 - ✅ **Themeable**: Built-in light/dark mode support with Unistyles
 
+---
+
 ## 📦 Packages
 
-| Package | Version | Description |
-|---------|---------|-------------|
-| [`@fleet-ui/components`](./packages/components) | 0.0.1 | UI component library |
-| [`@fleet-ui/tokens`](./packages/tokens) | 0.0.1 | Design System bases, tokens (colors, spacing, typography) |
-| [`@fleet-ui/shared`](./packages/shared) | 0.0.1 | Shared utilities and types |
+| Package | NPM | Description |
+|---------|-----|-------------|
+| [`@fleet-ui/cli`](./packages/cli) | [![npm](https://img.shields.io/npm/v/@fleet-ui/cli?color=blue)](https://www.npmjs.com/package/@fleet-ui/cli) | CLI tool for local installation |
+| [`@fleet-ui/core`](./packages/core) | [![npm](https://img.shields.io/npm/v/@fleet-ui/core?color=blue)](https://www.npmjs.com/package/@fleet-ui/core) | Theme, tokens, and Unistyles configuration |
+| [`@fleet-ui/components`](./packages/components) | [![npm](https://img.shields.io/npm/v/@fleet-ui/components?color=blue)](https://www.npmjs.com/package/@fleet-ui/components) | UI component library |
+
+---
 
 ## 🚀 Quick Start
 
-### Track A (Local Install via CLI)
+Fleet UI offers **2 installation tracks**:
 
-This track copies Fleet UI code into your project so you can freely modify it.
+- **Track A (Local Install)**: Use CLI to bring code into your project, then modify/override it "like your own code" (like shadcn/ui)
+- **Track B (Package Install)**: Install via package manager, update through version upgrades
+
+> 💡 **Recommendation**: Track A is easier to manage in most cases. See [Choose a Track](https://fleet-ui.dev/en/getting-started/quick-start) for guidance.
+
+### Track A (CLI-Based Local Install)
 
 ```bash
-# Initialize local Fleet UI core under ./fleet-ui/core
+# Initialize Fleet UI core
 pnpm dlx @fleet-ui/cli init
 
-# Add components locally under ./fleet-ui/components
+# Add components
 pnpm dlx @fleet-ui/cli add Button Modal
 
-# Validate configuration (alias, entry import, dependencies)
+# Validate configuration
 pnpm dlx @fleet-ui/cli doctor
 ```
 
-Your entry file (Expo Router: `app/_layout.tsx`) will be patched to include:
+Your entry file (`app/_layout.tsx` for Expo Router) will include:
 
 ```ts
 import '@fleet-ui/local/core/unistyles';
 ```
 
-Required dependencies (must be installed in your app):
+### Track B (Package Install)
 
 ```bash
-pnpm add react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets expo-blur expo-image expo-linear-gradient react-native-safe-area-context react-native-svg
+# Install packages
+pnpm add @fleet-ui/core @fleet-ui/components
 ```
 
-### Installation
+Add to your entry file:
+
+```ts
+import '@fleet-ui/core/unistyles';
+```
+
+### Required Dependencies (Both Tracks)
 
 ```bash
-# Install Fleet UI packages
-pnpm add @fleet-ui/core @fleet-ui/components @fleet-ui/animations
-
-# Install required peer dependencies
-pnpm add react-native-unistyles react-native-nitro-modules react-native-edge-to-edge
-
-# Install optional dependencies (for animations)
-pnpm add react-native-reanimated react-native-gesture-handler
+pnpm add react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets
 ```
 
-> ⚠️ **Important**: Always use a fixed version of `react-native-nitro-modules` to avoid unexpected behaviors.
+**Optional dependencies** (for specific components):
 
-### Usage
+```bash
+# Expo environments
+npx expo install expo-blur expo-image expo-linear-gradient react-native-safe-area-context react-native-svg
+```
 
-```typescript
-import { Button, Input } from '@fleet-ui/components';
-import { useFadeIn } from '@fleet-ui/animations';
-import { space, borderRadius } from '@fleet-ui/tokens';
+---
 
-function MyApp() {
-  const { animatedStyle } = useFadeIn({ duration: 500 });
+## 🎨 Token System
 
+Fleet UI uses a hierarchical token system designed for **consistency**, **ease of change**, and **reduced decision cost**.
+
+```text
+Raw Value → Primitive → Semantic → Theme → (Component Consumption)
+```
+
+| Layer | Description |
+|-------|-------------|
+| **Raw Value** | Actual values (colors, numbers) |
+| **Primitive** | Rule-based minimal unit tokens (spacing scale, radius scale, color palette) |
+| **Semantic** | Purpose/context-based tokens (background/text/border/action/state) |
+| **Theme** | Final bundle used at runtime (light/dark) |
+
+### Reference Rules
+
+- ✅ Only reference lower layers (no reverse direction)
+- ✅ No circular references
+- ✅ Components consume only semantic where possible
+- ✅ Minimize layer skipping
+
+Learn more in the [Token Architecture documentation](https://fleet-ui.dev/en/fundamental/token-architecture).
+
+---
+
+## 💻 Usage Example
+
+```tsx
+import { Text, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
+
+const styles = StyleSheet.create((theme) => ({
+  container: {
+    backgroundColor: theme.colors.neutral.content_1,
+    padding: theme.spacing[4],
+    borderRadius: theme.rounded.md,
+  },
+  title: {
+    ...theme.typography.body1,
+    color: theme.colors.neutral.text_1,
+    fontWeight: theme.text.fontWeight.semibold,
+  },
+}));
+
+export function Example() {
   return (
-    <View style={{ padding: space.lg }}>
-      <Animated.View style={animatedStyle}>
-        <Button variant="primary" onPress={() => console.log('Pressed!')}>
-          Click Me
-        </Button>
-        <Input placeholder="Enter your name" />
-      </Animated.View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Hello Fleet UI</Text>
     </View>
   );
 }
 ```
 
+---
+
 ## 📚 Documentation
 
-- **[Component Guide](./packages/components/README.md)** - How to use and add components
-- **[Animation Guide](./packages/animations/README.md)** - Animation presets and hooks
-- **[Design Tokens](./packages/tokens/README.md)** - Design system tokens
-- **[Build Guide](./BUILD_GUIDE.md)** - Building and publishing packages
-- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute
+Visit the [official documentation](https://fleet-ui.dev) for comprehensive guides:
+
+| Section | Description |
+|---------|-------------|
+| [Introduction](https://fleet-ui.dev/en/introduce) | What Fleet UI solves and its design philosophy |
+| [Quick Start](https://fleet-ui.dev/en/getting-started/quick-start) | Choose the right track for your team |
+| [Installation](https://fleet-ui.dev/en/getting-started/install) | Step-by-step installation guide |
+| [Fundamental](https://fleet-ui.dev/en/fundamental) | Understanding the design system structure |
+| [Theming](https://fleet-ui.dev/en/fundamental/theming) | Theme registration and style composition |
+| [Token Architecture](https://fleet-ui.dev/en/fundamental/token-architecture) | Token hierarchy and file structure |
+| [FAQ](https://fleet-ui.dev/en/others/faq) | Common setup and build issues |
+
+---
 
 ## 🎮 Playground
 
@@ -119,6 +237,8 @@ pnpm --filter playground android
 pnpm --filter playground web
 ```
 
+---
+
 ## 🏗️ Development
 
 ### Prerequisites
@@ -130,8 +250,8 @@ pnpm --filter playground web
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/fleet-ui.git
-cd fleet-ui
+git clone https://github.com/Rengod95/Fleet-UI.git
+cd Fleet-UI
 
 # Install dependencies
 pnpm install
@@ -156,152 +276,56 @@ pnpm typecheck
 pnpm lint
 ```
 
-### Adding a New Component
-
-See [Component Guide](./packages/components/README.md#adding-new-components) for detailed instructions.
-
-Quick overview:
-
-1. Create component directory in `packages/components/src/`
-2. Add platform-specific implementations (`.native.tsx` and `.web.tsx`)
-3. Write tests (`.test.tsx`)
-4. Export from `index.ts`
-
-### Adding a New Animation
-
-See [Animation Guide](./packages/animations/README.md#adding-animation-presets) for detailed instructions.
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-pnpm test
-
-# Run tests with coverage
-pnpm test --coverage
-
-# Run tests for specific package
-pnpm --filter @fleet-ui/components test
-```
-
-## 📦 Building
-
-```bash
-# Build all packages
-pnpm build
-
-# Build specific package
-pnpm --filter @fleet-ui/components build
-
-# Clean build artifacts
-pnpm turbo clean
-```
-
-## 🚢 Publishing
-
-This project uses [Changesets](https://github.com/changesets/changesets) for version management.
-
-### Adding Changes
-
-```bash
-# Add a changeset
-pnpm changeset
-
-# Follow the prompts to:
-# 1. Select affected packages
-# 2. Choose version bump type
-# 3. Describe the changes
-```
-
-### Publishing
-
-```bash
-# Update versions
-pnpm changeset version
-
-# Publish to npm
-pnpm release
-```
+---
 
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
 
-### Code of Conduct
-
-This project follows a [Code of Conduct](./CODE_OF_CONDUCT.md). By participating, you agree to uphold this code.
+---
 
 ## 📄 License
 
-MIT © [Your Name/Organization]
+This project is licensed under the **Apache License 2.0 with Commons Clause**.
+
+✅ **You CAN:**
+- Use this SDK to build and ship your mobile applications (commercial or free)
+- Modify the code for your own app's needs
+
+🚫 **You CANNOT:**
+- **Sell** this SDK itself or a derivative version of it
+- Create a commercial UI toolkit, template, or design system product based on this code
+
+For more details, please see the [LICENSE](LICENSE) file.
+
+© [Rengod95](https://github.com/Rengod95)
+
+---
 
 ## 🔗 Links
 
-- [GitHub Repository](#)
-- [NPM Packages](#)
-- [Documentation](#)
-- [Issue Tracker](#)
+| Resource | Link |
+|----------|------|
+| **GitHub Repository** | [github.com/Rengod95/Fleet-UI](https://github.com/Rengod95/Fleet-UI) |
+| **Documentation** | [fleet-ui.dev](https://fleet-ui.dev) |
+| **NPM - @fleet-ui/cli** | [npmjs.com/package/@fleet-ui/cli](https://www.npmjs.com/package/@fleet-ui/cli) |
+| **NPM - @fleet-ui/core** | [npmjs.com/package/@fleet-ui/core](https://www.npmjs.com/package/@fleet-ui/core) |
+| **NPM - @fleet-ui/components** | [npmjs.com/package/@fleet-ui/components](https://www.npmjs.com/package/@fleet-ui/components) |
+
+---
 
 ## 💡 Inspiration
 
-This SDK was built following best practices from:
+Fleet UI was built following best practices from:
 
 - [React Native](https://reactnative.dev/)
 - [Expo](https://expo.dev/)
-- [React Native Unistyles](https://reactnativeunistyles.vercel.app/)
+- [React Native Unistyles](https://www.unistyl.es/)
 - [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)
+- [shadcn/ui](https://ui.shadcn.com/)
 
-## 🙏 Acknowledgements
+---
 
-Thanks to all contributors who have helped build this SDK!
-
-## 📊 Project Structure
-
-```
-fleet-ui/
-├── packages/
-│   ├── components/      # UI components
-│   ├── animations/      # Animation utilities
-│   ├── tokens/          # Design tokens
-│   └── shared/          # Shared utilities
-├── apps/
-│   ├── playground/      # React Native test app
-├── tools/
-│   ├── typescript-config/
-│   └── eslint-config/
-└── .github/
-    └── workflows/       # CI/CD pipelines
-```
-
-## 🎯 Roadmap
-
-- [ ] Add more components (Checkbox, Radio, Switch, etc.)
-- [ ] Add more animation presets
-- [ ] Improve accessibility
-- [ ] Add performance monitoring
-- [ ] Create CLI tool for scaffolding
-- [ ] Add theme generator
-- [ ] Improve documentation
-
-## 🐛 Known Issues
-
-See [GitHub Issues](#) for current known issues.
-
-## 📈 Stats
-
-![Build Status](#)
-![Test Coverage](#)
-![npm Downloads](#)
-![GitHub Stars](#)
-
-## 💬 Community
-
-- [Discord](#)
-- [Twitter](#)
-- [Discussions](#)
-
-## 🔐 Security
-
-
-For security vulnerabilities, please email security@yourorg.com instead of using the issue tracker.
-
+<p align="center">
+  Made with ❤️ for React Native developers
+</p>
