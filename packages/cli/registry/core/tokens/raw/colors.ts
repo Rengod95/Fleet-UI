@@ -185,7 +185,7 @@ const neutralLightScale: ColorScale = {
 
 // Neutral - Dark Scale (reversed)
 const neutralDarkScale: ColorScale = {
-	'11': 'hsla(0, 0%, 96%, 1)',
+	'11': 'hsla(0, 0%, 95%, 1)',
 	'10': 'hsla(0, 0%, 91%, 1)',
 	'9': 'hsla(0, 0%, 87%, 1)',
 	'8': 'hsla(0, 0%, 79%, 1)',

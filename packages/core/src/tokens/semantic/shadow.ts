@@ -49,7 +49,7 @@ export const createSemanticShadows = (
 		smooth_lg: createShadowString(primitiveShadow.lg, neutralShadowColor, 0.8),
 
 		// Semantic Shadows
-		card: createShadowString(primitiveShadow.card, neutralShadowColor), 
+		card: createShadowString(primitiveShadow.card, neutralShadowColor),
 		button: createShadowString(primitiveShadow.sm, neutralShadowColor),
 		button_primary: createShadowString(
 			primitiveShadow.sm,
@@ -57,9 +57,18 @@ export const createSemanticShadows = (
 			3.0 // Higher opacity/intensity for colored glow
 		),
 		overlay: createShadowString(primitiveShadow.lg, neutralShadowColor, 1.2), // Slightly stronger for overlay
-		inner: createShadowString(primitiveShadow.inner, neutralShadowColor, 1, true), // Hardcoded as per spec, or derive from neutral?
-		floating: createShadowString(primitiveShadow['2xl'],neutralShadowColor,0.8), // Softer floating
-		banner: createShadowString(primitiveShadow.banner,neutralShadowColor),
+		inner: createShadowString(
+			primitiveShadow.inner,
+			neutralShadowColor,
+			1,
+			true
+		), // Hardcoded as per spec, or derive from neutral?
+		floating: createShadowString(
+			primitiveShadow['2xl'],
+			neutralShadowColor,
+			0.8
+		), // Softer floating
+		banner: createShadowString(primitiveShadow.banner, neutralShadowColor),
 		toast: createShadowString(primitiveShadow.toast, neutralShadowColor),
 		thumb: createShadowString(primitiveShadow.sm, neutralShadowColor, 3),
 	};

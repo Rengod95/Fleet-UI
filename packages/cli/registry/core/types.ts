@@ -1,7 +1,6 @@
-import type { ImageStyle, TextStyle, ViewStyle } from 'react-native';
-import type { PrimitiveBreakpoints } from './tokens/primitive/breakpoints';
 import type { PrimitiveTypography } from './tokens';
 import type { PrimitiveBorderRadius } from './tokens/primitive/borderRadius';
+import type { PrimitiveBreakpoints } from './tokens/primitive/breakpoints';
 import type { PrimitiveSpacing } from './tokens/primitive/spacing';
 import type { PrimitiveZIndex } from './tokens/primitive/zIndex';
 import type {
@@ -35,19 +34,25 @@ export type FleetBasePalette = {
 	text_1: string;
 	text_inversed: string;
 	shadow: string;
-}
+};
 
 /* color palette does not include shadow (palette for accent colors like primary, error, success, warning, info) */
 export type FleetColorPalette = Omit<FleetBasePalette, 'shadow'> & {
 	solid: string;
-}
+};
 
 /* Basic color schemes on Fleet UI, If you want to add a new color scheme, you need to add new scheme name here. */
 /* NOTICE : If you want to add a new color scheme, Folllowing
 /* 1. Add new scheme name to the 'FleetThemeColorSchemes' type.
 /* 2. Adjust 'getPaletteForScheme' function to add new scheme name on @/utils/variants.ts file.
 */
-export type FleetThemeColorSchemes = 'neutral' | 'primary' | 'error' | 'success' | 'warning' | 'info';
+export type FleetThemeColorSchemes =
+	| 'neutral'
+	| 'primary'
+	| 'error'
+	| 'success'
+	| 'warning'
+	| 'info';
 
 /* FleetThemeMode is the general color scheme of the device.(ex. mobile lightmode, darkmode) */
 export type FleetThemeMode = keyof SemanticColors;
@@ -78,7 +83,6 @@ export type FleetThemeVariant<
 	colors: TColors;
 };
 
-
 /* LightTheme is the light theme of the Fleet UI. */
 export type LightTheme = FleetThemeVariant<SemanticColors['light']>;
 /* DarkTheme is the dark theme of the Fleet UI. */
@@ -92,7 +96,7 @@ export type FleetTheme = FleetThemeVariant;
  * 1. Add new theme object in unistyles.ts
  * 2. Add new theme's type to the top of this.
  * 3. add the theme the below 'FleetThemes' object interface.
- * 
+ *
  * @example const CUSTOM_THEME = { ... } // unistyles.ts file
  * @example export type CustomTheme = FleetThemeVariant<typeof CUSTOM_THEME>; // types.ts
  * @example export type FleetThemes = { // types.ts
@@ -122,8 +126,8 @@ declare module 'react-native-unistyles' {
 	interface UnistylesBreakpoints extends FleetBreakpoints {}
 }
 
-export type { PrimitiveBreakpoints } from './tokens/primitive/breakpoints';
 export type { PrimitiveBorderRadius } from './tokens/primitive/borderRadius';
+export type { PrimitiveBreakpoints } from './tokens/primitive/breakpoints';
 export type { PrimitiveShadow } from './tokens/primitive/shadow';
 export type { PrimitiveSpacing } from './tokens/primitive/spacing';
 export type { PrimitiveTypography } from './tokens/primitive/typography';

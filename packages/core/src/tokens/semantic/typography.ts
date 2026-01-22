@@ -1,7 +1,6 @@
 import { primitiveTypography } from '../primitive/typography';
 
-const { fontFamily, fontSize, fontWeight, lineHeight, letterSpacing } =
-	primitiveTypography;
+const { fontSize, fontWeight, lineHeight, letterSpacing } = primitiveTypography;
 
 /**
  * Semantic Typography Tokens
@@ -13,7 +12,6 @@ const { fontFamily, fontSize, fontWeight, lineHeight, letterSpacing } =
  * the fine adjustments for sub typography (±1~2px) are not in primitive, so we directly specify them based on the primitive values.
  */
 export const semanticTypography = {
-
 	// ============================================
 	// Heading Typography (h1 ~ h6)
 	// ============================================
@@ -250,7 +248,7 @@ export const semanticTypography = {
 	// ============================================
 	// Special Typography
 	// ============================================
-	
+
 	button: {
 		fontSize: fontSize.md,
 		fontWeight: fontWeight.semibold,
