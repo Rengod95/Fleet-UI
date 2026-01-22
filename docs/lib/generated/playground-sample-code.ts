@@ -6,7 +6,6 @@ export const playgroundSampleCode: Record<string, () => Promise<{ sampleCode: st
   "actionbutton": () => import("./playground-samples/actionbutton"),
   "bottom-sheet-modal": () => import("./playground-samples/bottom-sheet-modal"),
   "button": () => import("./playground-samples/button"),
-  "card": () => import("./playground-samples/card"),
   "checkbox": () => import("./playground-samples/checkbox"),
   "checkbox-card": () => import("./playground-samples/checkbox-card"),
   "chip": () => import("./playground-samples/chip"),

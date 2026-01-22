@@ -56,17 +56,6 @@ export const componentPreviews: Record<ComponentSlug, JSX.Element> = {
       <div className="h-9 w-24 rounded-md bg-background shadow-sm" />
     </div>
   ),
-  // card: (
-  //   <div className="flex w-full px-6 py-4">
-  //     <div className="w-full space-y-3 rounded-xl bg-background p-4 shadow-sm">
-  //       <div className="space-y-1">
-  //         <div className="h-4 w-1/2 rounded bg-muted/80" />
-  //         <div className="h-3 w-3/4 rounded bg-muted/40" />
-  //       </div>
-  //       <div className="h-16 rounded-lg bg-muted/20" />
-  //     </div>
-  //   </div>
-  // ),
   checkbox: (
     <div className="flex w-full flex-col gap-3 p-6 items-center justify-center">
       <div className="flex items-center gap-2">

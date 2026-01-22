@@ -24,10 +24,6 @@
         "source": "components/Button",
         "optionalPeerDeps": []
       },
-      "Card": {
-        "source": "components/Card",
-        "optionalPeerDeps": []
-      },
       "Checkbox": {
         "source": "components/Checkbox",
         "optionalPeerDeps": []
