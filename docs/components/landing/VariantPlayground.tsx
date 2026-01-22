@@ -98,8 +98,8 @@ function OptionGroup({
             className={cn(
               'rounded-md px-2.5 py-1 text-xs font-medium transition-all',
               value === option
-                ? 'bg-sky-500/20 text-sky-400 ring-1 ring-sky-500/50'
-                : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
+                ? 'bg-sky-500/20 text-sky-400'
+                : 'bg-muted-foreground/5 text-gray-400 hover:bg-muted-foreground/10 hover:text-white'
             )}
           >
             {option}
@@ -139,21 +139,21 @@ export function VariantPlayground() {
             <div className="space-y-8">
               <div className="space-y-4">
                 <MotionItem>
-                  <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                    Design Faster with{' '}
+                  <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+                    Design Faster with<br/>
                     <GradientText>Built-in Variants</GradientText>
                   </h2>
                 </MotionItem>
                 <MotionItem>
                   <p className="text-lg text-gray-400">
                     Mix and match props to create any style.
-                    Type-safe, consistent, zero CSS.
+                    Type-safe, consistency.
                   </p>
                 </MotionItem>
               </div>
 
               <MotionItem>
-                <div className="space-y-5 rounded-xl border border-white/10 bg-white/[0.02] p-5 backdrop-blur-sm">
+                <div className="space-y-5 rounded-xl border border-foreground/10 bg-muted-foreground/[0.02] p-5 backdrop-blur-sm">
                   <OptionGroup
                     label="variant"
                     options={VARIANTS}

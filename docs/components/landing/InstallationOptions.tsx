@@ -55,17 +55,17 @@ export function InstallationOptions() {
           {/* Header */}
           <div className="mx-auto max-w-2xl text-center">
             <MotionItem>
-              <p className="text-xs font-medium tracking-widest text-white/50">
+              <p className="text-xs font-medium tracking-widest text-foreground/50">
                 INSTALLATION
               </p>
             </MotionItem>
             <MotionItem>
-              <h2 className="mt-3 text-balance text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
+              <h2 className="mt-3 text-balance text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
                 Choose your <GradientText>installation</GradientText> Track
               </h2>
             </MotionItem>
             <MotionItem>
-              <p className="mt-4 text-pretty text-base leading-relaxed text-white/60 sm:text-lg">
+              <p className="mt-4 text-pretty text-base leading-relaxed text-foreground/60 sm:text-lg">
                 Pick the model that matches your team: a shadcn-style local install for full
                 ownership, or a package install for a stable, versioned workflow.
               </p>
@@ -86,10 +86,10 @@ export function InstallationOptions() {
                     type="button"
                     onClick={() => setActiveTrack(key)}
                     className={cn(
-                      'group relative w-full overflow-hidden rounded-2xl border p-4 text-left backdrop-blur-sm transition-all sm:p-5',
+                      'group relative w-full overflow-hidden rounded-2xl border p-4 text-left backdrop-blur-sm transition-all sm:p-5 cursor-pointer',
                       isActive
-                        ? 'border-sky-500/30 bg-white/6 shadow-lg shadow-sky-500/10'
-                        : 'border-white/10 bg-white/2 hover:border-white/20 hover:bg-white/4'
+                        ? 'border-sky-500 bg-card shadow-lg shadow-sky-500/10'
+                        : 'border-foreground/10 bg-muted-foreground/1 hover:border-foreground/20 hover:bg-muted-foreground/4'
                     )}
                   >
                     <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -99,13 +99,13 @@ export function InstallationOptions() {
                     <div className="flex items-start gap-4">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-12 mt-1">
-                          <div className="flex items-center gap-4 text-lg font-medium text-white">
+                          <div className="flex items-center gap-4 text-lg font-medium text-foreground">
                             <div
                               className={cn(
                                 'flex h-9 w-9 items-center justify-center rounded-xl border transition-colors',
                                 isActive
                                   ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
-                                  : 'border-white/10 bg-white/5 text-white/70 group-hover:bg-white/8 group-hover:text-white'
+                                  : 'border-foreground/10 bg-muted-foreground/5 text-foreground/70 group-hover:bg-muted-foreground/8 group-hover:text-foreground'
                               )}
                             >
                               <Icon className="h-5 w-5" />
@@ -117,22 +117,22 @@ export function InstallationOptions() {
                               'rounded-full border px-2.5 py-1 text-sm',
                               isActive
                                 ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
-                                : 'border-white/10 bg-white/3 text-white/60'
+                                : 'border-foreground/10 bg-muted-foreground/3 text-foreground/60'
                             )}
                           >
                             {option.badge}
                           </div>
                         </div>
 
-                        <p className="mt-4 px-1 text-sm leading-relaxed text-white/80 sm:text-base">
+                        <p className="mt-4 px-1 text-sm leading-relaxed text-foreground/80 sm:text-base">
                           {option.description}
                         </p>
 
-                        <div className="my-8 rounded-lg border border-white/10 bg-white/2 px-3 py-5">
-                          <div className="text-xs uppercase tracking-wider text-white/80 font-bold">
+                        <div className="my-8 rounded-lg border border-foreground/10 bg-muted-foreground/2 px-3 py-5">
+                          <div className="text-xs uppercase tracking-wider text-foreground/80 font-bold">
                             What you get
                           </div>
-                          <div className="mt-0.5 text-3xl font-semibold text-white">
+                          <div className="mt-0.5 text-3xl font-semibold text-foreground">
                             {option.emphasis}
                           </div>
                         </div>
@@ -141,7 +141,7 @@ export function InstallationOptions() {
 
                         <div className="mt-8 space-y-3">
                           {option.features.map((feature) => (
-                            <div key={feature} className="flex items-start gap-2 text-base text-white/80">
+                            <div key={feature} className="flex items-start gap-2 text-base text-foreground/80">
                               <Check className="mt-0.5 h-4 w-4 text-emerald-400" />
                               <span>{feature}</span>
                             </div>
@@ -149,10 +149,10 @@ export function InstallationOptions() {
                         </div>
 
                         <div className="mt-14 border-t border-white/10 pt-4">
-                          <div className="text-xs uppercase tracking-wider text-white/45">
+                          <div className="text-xs uppercase tracking-wider text-foreground/45">
                           <GradientText className="text-sm font-bold">Best for</GradientText>
                           </div>
-                          <div className="mt-1 text-base text-white/90">{option.idealFor}</div>
+                          <div className="mt-1 text-base text-foreground/90">{option.idealFor}</div>
                         </div>
                       </div>
                     </div>

@@ -45,11 +45,11 @@ export function BentoCard({
         className={cn(
           // Base styles
           'group relative overflow-hidden rounded-2xl',
-          'border border-white/10 bg-white/2',
+          'border border-border/70 bg-muted-foreground/5',
           'backdrop-blur-sm',
           // Transitions
           'transition-all duration-300 ease-out',
-          'hover:bg-white/4',
+          'hover:bg-card/40',
           'hover:shadow-lg',
           // Grid spanning
           wide && 'md:col-span-2',
@@ -61,7 +61,7 @@ export function BentoCard({
       >
         {/* Subtle gradient overlay on hover */}
         <div className="absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <div className="absolute inset-0 bg-linear-to-br from-white/2 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-br from-card/20 to-transparent" />
         </div>
         {children}
       </div>
@@ -126,7 +126,7 @@ export function BentoIcon({ children, accent = 'neutral' }: BentoIconProps) {
 
 export function BentoTitle({ children }: { children: ReactNode }) {
   return (
-    <h3 className="mb-2 text-2xl font-medium text-white sm:text-2xl leading-11">
+    <h3 className="mb-2 text-2xl font-medium text-muted-foreground sm:text-2xl leading-11">
       {children}
     </h3>
   );
@@ -134,7 +134,7 @@ export function BentoTitle({ children }: { children: ReactNode }) {
 
 export function BentoDescription({ children }: { children: ReactNode }) {
   return (
-    <p className="text-sm leading-relaxed text-gray-400 sm:text-base">
+    <p className="text-sm leading-relaxed text-muted-foreground/60 sm:text-base">
       {children}
     </p>
   );

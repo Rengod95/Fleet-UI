@@ -15,14 +15,14 @@ export function FinalCTA() {
         <MotionSection className="space-y-8">
           {/* Left-aligned content */}
           <MotionItem>
-            <h2 className="text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
+            <h2 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl">
               Ready to Ship{' '}
               <GradientText>Beautiful Apps?</GradientText>
             </h2>
           </MotionItem>
 
           <MotionItem>
-            <p className="max-w-xl text-xl text-gray-400">
+            <p className="max-w-xl text-xl text-gray-500">
               Start building in minutes. No configuration needed.
               Join developers who care about design quality.
             </p>
@@ -32,7 +32,7 @@ export function FinalCTA() {
             <div className="flex flex-col gap-4 pt-4 sm:flex-row">
               <Link
                 href="/en/getting-started/install"
-                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-sky-500 px-10 text-lg font-medium text-white shadow-lg shadow-sky-500/25 transition-all hover:bg-sky-400 hover:shadow-xl hover:shadow-sky-500/30"
+                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-sky-500 px-10 text-lg font-medium text-foreground shadow-lg shadow-sky-500/25 transition-all hover:bg-sky-400 hover:shadow-xl hover:shadow-sky-500/30"
               >
                 Get Started
                 <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -41,7 +41,7 @@ export function FinalCTA() {
                 href="https://github.com/Rengod95/Fleet-UI"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-14 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-10 text-lg font-medium text-white backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.05]"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-muted-foreground px-10 text-lg font-medium backdrop-blur-sm transition-all hover:border-foreground/20 hover:bg-muted-foreground/50 text-muted"
               >
                 <Github className="h-5 w-5" />
                 View on GitHub

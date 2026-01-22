@@ -45,12 +45,12 @@ export function ColorPalette() {
           {/* Section Header */}
           <div className="max-w-2xl space-y-4">
             <MotionItem>
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+              <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
                 Crafted <GradientText>Color System</GradientText>
               </h2>
             </MotionItem>
             <MotionItem>
-              <p className="text-lg text-gray-400">
+              <p className="text-lg text-muted-foreground">
                 11-step scales for every intent. Light and dark themes out of the box.
               </p>
             </MotionItem>
@@ -58,11 +58,11 @@ export function ColorPalette() {
 
           {/* Color Grid */}
           <MotionItem>
-            <div className="space-y-3 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-4 backdrop-blur-sm sm:p-6">
+            <div className="space-y-3 overflow-hidden rounded-2xl  border-foreground/10 bg-muted-foreground/[0.02] p-4 backdrop-blur-sm sm:p-6">
               {/* Header row */}
               <div className="mb-4 flex items-center gap-2">
                 <div className="w-20 shrink-0" />
-                <div className="flex flex-1 justify-between text-[10px] font-medium uppercase tracking-wider text-gray-500 sm:text-xs">
+                <div className="flex flex-1 justify-between text-[10px] font-medium uppercase tracking-wider text-muted-foreground sm:text-xs">
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((step) => (
                     <span key={step} className="w-full text-center">
                       {step}
@@ -109,7 +109,7 @@ export function ColorPalette() {
                   />
                   <div className="text-sm">
                     <span className="text-gray-400">Step {hoveredColor.step}: </span>
-                    <span className="font-mono text-white">{hoveredColor.color}</span>
+                    <span className="font-mono text-foreground">{hoveredColor.color}</span>
                   </div>
                 </div>
               )}

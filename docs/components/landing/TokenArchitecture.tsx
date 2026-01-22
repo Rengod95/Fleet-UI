@@ -118,16 +118,17 @@ export function TokenArchitecture() {
           {/* Section Header */}
           <div className="mx-auto max-w-2xl text-center">
             <MotionItem>
-              <p className="text-xs font-medium tracking-widest text-white/50">TOKEN PIPELINE</p>
+              <p className="text-xs font-medium tracking-widest text-foreground/50">TOKEN PIPELINE</p>
             </MotionItem>
             <MotionItem>
-              <h2 className="mt-3 text-balance text-3xl font-semibold text-white sm:text-4xl md:text-5xl">
+              <h2 className="mt-3 text-balance text-3xl font-semibold text-foreground sm:text-4xl md:text-5xl">
                 Your design system, <GradientText>not ours</GradientText>
               </h2>
             </MotionItem>
             <MotionItem>
-              <p className="mt-4 text-pretty text-base leading-relaxed text-white/60 sm:text-lg">
-                A clear pipeline from <span className="text-white/80">Raw → Primitive → Semantic → Theme</span>.
+              <p className="mt-4 text-pretty text-base leading-relaxed text-foreground/60 sm:text-lg">
+                A clear pipeline from <span className="text-foreground font-semibold">Raw → Primitive → Semantic → Theme</span>.
+                <br />
                 Change once, propagate everywhere—with type safety.
               </p>
             </MotionItem>
@@ -148,40 +149,30 @@ export function TokenArchitecture() {
                       className={cn(
                         'group relative w-full overflow-hidden rounded-2xl border p-5 text-left backdrop-blur-sm transition-all',
                         isActive
-                          ? 'border-sky-500/30 bg-white/6 shadow-lg shadow-sky-500/10'
-                          : 'border-white/10 bg-white/2 hover:border-white/20 hover:bg-white/4'
+                          ? 'border-sky-500 bg-card shadow-lg shadow-sky-500/10'
+                          : 'border-none bg-muted-foreground/10 hover:border-foreground/20 hover:bg-muted-foreground/20'
                       )}
                     >
                       <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                        <div className="absolute inset-0 bg-linear-to-br from-white/6 to-transparent" />
+                        <div className="absolute inset-0 bg-linear-to-br from-muted-foreground/6 to-transparent" />
                       </div>
 
                       <div className="flex items-start gap-4">
                         <div
                           className={cn(
-                            'flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-semibold transition-colors',
+                            'flex h-7 w-7 items-center justify-center rounded-xl text-lg font-semibold transition-colors',
                             isActive
-                              ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
-                              : 'border-white/10 bg-white/5 text-white/70 group-hover:bg-white/8 group-hover:text-white'
+                              ? 'bg-sky-500/30 text-sky-600'
+                              : 'bg-muted-foreground/20 text-foreground/70 group-hover:bg-muted-foreground/20 group-hover:text-foreground'
                           )}
                         >
                           {index + 1}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="text-lg font-medium text-white">{step.label}</div>
-                            <span
-                              className={cn(
-                                'rounded-full border px-2.5 py-1 text-xs',
-                                isActive
-                                  ? 'border-sky-500/20 bg-sky-500/10 text-sky-300'
-                                  : 'border-white/10 bg-white/3 text-white/60'
-                              )}
-                            >
-                              {step.key}
-                            </span>
+                            <div className="text-lg font-medium text-foreground">{step.label}</div>
                           </div>
-                          <p className="mt-2 text-sm leading-relaxed text-white/60 sm:text-base">
+                          <p className="mt-2 text-sm leading-relaxed text-foreground/60 sm:text-base">
                             {step.desc}
                           </p>
                         </div>
@@ -208,7 +199,7 @@ export function TokenArchitecture() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-xs text-white/60">
+                    <span className="rounded-full border border-foreground/10 bg-muted-foreground/3 px-2.5 py-1 text-xs text-foreground/60">
                       {activeStep.label}
                     </span>
                   </div>

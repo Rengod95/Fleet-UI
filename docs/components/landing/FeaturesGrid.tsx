@@ -82,7 +82,7 @@ function HighlightChips({ items }: { items: string[] }) {
           key={label}
           className={cn(
             'inline-flex items-center rounded-full px-2.5 py-1 text-sm',
-            'border border-white/10 bg-white/3 text-white',
+            'bg-muted-foreground/30 text-foreground/70',
             'transition-colors duration-300 group-hover:border-white/20 group-hover:bg-white/6'
           )}
         >
@@ -95,7 +95,7 @@ function HighlightChips({ items }: { items: string[] }) {
 
 export function FeaturesGrid() {
   return (
-    <section className="relative overflow-hidden border-y border-white/5 px-6 py-16 sm:px-10 sm:py-24 lg:px-12">
+    <section className="relative overflow-hidden border-y border-border px-6 py-16 sm:px-10 sm:py-24 lg:px-12">
       {/* Background accents */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-1/2 top-0 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-linear-to-br from-primary/18 via-primary/10 to-transparent blur-2xl" />
@@ -106,13 +106,13 @@ export function FeaturesGrid() {
       <div className="mx-auto max-w-6xl">
         <MotionSection className="space-y-10">
           <div className="mx-auto max-w-2xl text-center">
-            <p className="text-xs font-medium tracking-widest text-white/50">
+            <p className="text-xs font-medium tracking-widest text-muted-foreground/50">
               BUILT FOR REAL PRODUCTS
             </p>
-            <h2 className="mt-3 text-balance text-3xl font-semibold text-white sm:text-4xl">
+            <h2 className="mt-3 text-balance text-3xl font-semibold text-foreground sm:text-4xl">
               Scale your product with your own.
             </h2>
-            <p className="mt-4 text-pretty text-sm leading-relaxed text-white/60 sm:text-base">
+            <p className="mt-4 text-pretty text-sm leading-relaxed text-muted-foreground/60 sm:text-base">
               Token-first foundations, type-safe APIs, and UI-thread optimized motion—so you can ship
               fast without losing consistency.
             </p>

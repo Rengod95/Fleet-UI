@@ -37,7 +37,7 @@ export function HeroSection() {
         <MotionSection className="space-y-8">
           {/* Main Headline - Left Aligned */}
           <MotionItem>
-            <h1 className="max-w-4xl text-4xl font-light leading-tight tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl text-4xl font-light leading-tight tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
               <GradientText>Production-Ready UI SDK</GradientText>
               <br />
               for Series B Quality Apps.
@@ -77,7 +77,7 @@ export function HeroSection() {
             <div className="flex flex-col gap-4 pt-2 sm:flex-row">
               <Link
                 href="/en/getting-started/install"
-                className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary via-sky-500 to-primary px-8 font-medium text-white transition-all hover:bg-sky-400 hover:shadow-lg hover:shadow-sky-500/25"
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-primary via-sky-500 to-primary px-8 font-bold text-white transition-all hover:bg-sky-400 hover:shadow-lg hover:shadow-sky-500/25"
               >
                 Get Started
               </Link>
@@ -85,7 +85,7 @@ export function HeroSection() {
                 href="https://github.com/Rengod95/Fleet-UI"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.02] px-8 font-medium text-white backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.04]"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-border bg-card px-8 font-medium text-foreground backdrop-blur-sm transition-all hover:border-foreground/20 hover:bg-foreground/[0.04]"
               >
                 <Github className="h-4 w-4" />
                 View on GitHub
@@ -96,12 +96,12 @@ export function HeroSection() {
           {/* Tech Stack Badges */}
           <MotionItem>
             <div className="flex flex-wrap items-center gap-4 px-2">
-              <span className="text-xs uppercase tracking-wider text-gray-500">Built with</span>
+              <span className="text-xs uppercase tracking-wider  text-muted-foreground">Built with</span>
               <div className="flex flex-wrap gap-3">
                 {TECH_STACK.map((tech) => (
                   <span
                     key={tech}
-                    className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-1.5 text-sm text-gray-400"
+                    className="rounded-lg bg-card px-3 py-1.5 text-sm text-muted-foreground"
                   >
                     {tech}
                   </span>

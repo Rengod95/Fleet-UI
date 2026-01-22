@@ -40,7 +40,7 @@ export function ComponentShowcase() {
           {/* Section Header - Left Aligned */}
           <div className="max-w-2xl space-y-4">
             <MotionItem>
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl leading-wide">
+              <h2 className="text-3xl font-bold tracking-tight leading-[56px] text-foreground sm:text-4xl md:text-5xl leading-wide">
                 Mobile First Design,<br/>
                 <GradientText className='mt-2'>Animated by Default</GradientText>
               </h2>
