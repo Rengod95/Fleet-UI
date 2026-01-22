@@ -175,7 +175,7 @@ export function OnThisPage({
               it.level === 2 && 'pl-2 text-base font-semibold! text-foreground/80',
               it.level === 3 && 'pl-6 text-sm text-foreground/60',
               it.level === 4 && 'pl-8 text-xs text-foreground/50',
-              activeId === it.id && 'bg-muted-foreground/20 text-foreground font-semibold',
+              activeId === it.id && 'bg-muted-foreground/10 text-foreground font-bold',
             )}
             onClick={(e) => {
               e.preventDefault();

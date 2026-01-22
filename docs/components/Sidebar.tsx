@@ -42,7 +42,7 @@ export function DocsSidebarNav({
               const href = withLocale(item.href, locale);
               const isActive =
                 pathname === href ||
-                (href !== '/' && pathname.startsWith(href));
+                (href !== '/' && pathname === href);
               return (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
@@ -77,7 +77,7 @@ export function DocsSidebarNav({
           {components.map((c) => {
             const href = withLocale(`/components/${c.slug}`, locale);
             const isActive =
-              pathname === href || (href !== '/' && pathname.startsWith(href));
+              pathname === href || (href !== '/' && pathname === href);
 
             return (
               <SidebarMenuItem key={href}>
