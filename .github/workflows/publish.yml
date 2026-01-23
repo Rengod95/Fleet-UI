@@ -14,7 +14,7 @@ permissions:
   pull-requests: write
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "20.19.4"
   PNPM_VERSION: "10.22.0"
 
 jobs:
