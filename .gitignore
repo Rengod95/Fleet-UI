@@ -79,3 +79,5 @@ design-system/*
 TestScriptPlayground/
 apps/android
 apps/ios
+
+.claude
