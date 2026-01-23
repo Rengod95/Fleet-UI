@@ -1,4 +1,4 @@
-name: Publish
+name: Release
 
 on:
   push:
@@ -70,3 +70,30 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create git tags for published packages
+        if: steps.changesets.outputs.published == 'true'
+        env:
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+        run: |
+          node <<'NODE'
+          const { execSync } = require('child_process');
+          const published = JSON.parse(process.env.PUBLISHED_PACKAGES || '[]');
+
+          for (const pkg of published) {
+            const tag = `${pkg.name}@${pkg.version}`;
+            try {
+              execSync(`git rev-parse -q --verify refs/tags/${tag}`, {
+                stdio: 'ignore',
+              });
+              console.log(`Tag ${tag} already exists, skipping.`);
+            } catch {
+              execSync(`git tag -a "${tag}" -m "Release ${tag}"`);
+              console.log(`Created tag ${tag}`);
+            }
+          }
+          NODE
+
+      - name: Push git tags
+        if: steps.changesets.outputs.published == 'true'
+        run: git push --tags
