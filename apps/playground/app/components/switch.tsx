@@ -42,7 +42,11 @@ export default function SwitchScreen() {
 					description="Toggle your preferences with this versatile switch component."
 				/>
 
-				<Section title="Overview">
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic Switch example."
+				>
 					<View
 						style={[
 							commonStyles.column,
@@ -54,7 +58,6 @@ export default function SwitchScreen() {
 						]}
 					>
 						<Switch defaultChecked={false} size="lg" />
-						<Text style={commonStyles.label}>방가워요</Text>
 					</View>
 				</Section>
 
@@ -69,8 +72,8 @@ export default function SwitchScreen() {
 						<View style={commonStyles.row}>
 							{VARIANTS.map((variant) => (
 								<View key={variant} style={commonStyles.column}>
-									<Switch variant={variant} defaultChecked={false} />
 									<Text style={commonStyles.label}>{variant}</Text>
+									<Switch variant={variant} defaultChecked={false} />
 								</View>
 							))}
 						</View>
@@ -83,8 +86,8 @@ export default function SwitchScreen() {
 						<View style={commonStyles.row}>
 							{SIZES.map((size) => (
 								<View key={size} style={commonStyles.column}>
-									<Switch size={size} defaultChecked={false} />
 									<Text style={commonStyles.label}>{size}</Text>
+									<Switch size={size} defaultChecked={false} />
 								</View>
 							))}
 						</View>
@@ -92,8 +95,8 @@ export default function SwitchScreen() {
 						<View style={commonStyles.row}>
 							{SIZES.map((size) => (
 								<View key={size} style={commonStyles.column}>
-									<Switch size={size} defaultChecked={false} variant="lined" />
 									<Text style={commonStyles.label}>{size}</Text>
+									<Switch size={size} defaultChecked={false} variant="lined" />
 								</View>
 							))}
 						</View>
@@ -105,8 +108,8 @@ export default function SwitchScreen() {
 					<View style={commonStyles.row}>
 						{THUMB_SHAPES.map((shape) => (
 							<View key={shape} style={commonStyles.column}>
-								<Switch thumbShape={shape} defaultChecked={false} />
 								<Text style={commonStyles.label}>{shape}</Text>
+								<Switch thumbShape={shape} defaultChecked={false} />
 							</View>
 						))}
 					</View>
@@ -117,8 +120,8 @@ export default function SwitchScreen() {
 					<View style={commonStyles.row}>
 						{COLOR_SCHEMES.map((scheme) => (
 							<View key={scheme} style={commonStyles.column}>
-								<Switch colorScheme={scheme} defaultChecked={true} />
 								<Text style={commonStyles.label}>{scheme}</Text>
+								<Switch colorScheme={scheme} defaultChecked={true} />
 							</View>
 						))}
 					</View>
@@ -129,20 +132,20 @@ export default function SwitchScreen() {
 					<View style={commonStyles.row}>
 						{THUMB_SHADOWS.map((shadow) => (
 							<View key={shadow} style={commonStyles.column}>
-								<Switch thumbShadow={shadow} defaultChecked={false} />
 								<Text style={commonStyles.label}>{shadow}</Text>
+								<Switch thumbShadow={shadow} defaultChecked={false} />
 							</View>
 						))}
 					</View>
 				</Section>
 
 				{/* Rounded Options Section */}
-				<Section title="Rounded Options">
+				<Section title="Rounded">
 					<View style={commonStyles.row}>
 						{ROUNDED_OPTIONS.map((rounded) => (
 							<View key={rounded} style={commonStyles.column}>
-								<Switch rounded={rounded} defaultChecked={false} />
 								<Text style={commonStyles.label}>{rounded}</Text>
+								<Switch rounded={rounded} defaultChecked={false} />
 							</View>
 						))}
 					</View>
@@ -152,12 +155,12 @@ export default function SwitchScreen() {
 				<Section title="Disabled State">
 					<View style={commonStyles.row}>
 						<View style={commonStyles.column}>
-							<Switch defaultChecked={false} disabled />
 							<Text style={commonStyles.label}>On (Disabled)</Text>
+							<Switch defaultChecked={true} disabled />
 						</View>
 						<View style={commonStyles.column}>
-							<Switch defaultChecked={false} disabled />
 							<Text style={commonStyles.label}>Off (Disabled)</Text>
+							<Switch defaultChecked={false} disabled />
 						</View>
 					</View>
 				</Section>
@@ -167,7 +170,7 @@ export default function SwitchScreen() {
 					<View style={styles.controlledRow}>
 						<Switch
 							checked={controlledValue}
-							onValueChange={setControlledValue}
+							onCheckedChange={setControlledValue}
 						/>
 						<Text style={styles.stateText}>
 							State: {controlledValue ? 'ON' : 'OFF'}

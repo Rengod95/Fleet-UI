@@ -34,7 +34,6 @@ export * from './Accordion';
 export * from './ActionButton';
 export * from './BottomSheetModal';
 export * from './Button';
-export * from './Card';
 export * from './Checkbox';
 export * from './CheckboxCard';
 export * from './Chip';

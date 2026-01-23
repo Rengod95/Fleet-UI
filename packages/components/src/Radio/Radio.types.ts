@@ -1,4 +1,4 @@
-import type { PressableProps, StyleProp, ViewStyle } from 'react-native';
+import type { PressableProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
 
 export type RadioVariant = 'filled' | 'flat' | 'outlined';
 export type RadioSize = 'sm' | 'md' | 'lg';
@@ -73,4 +73,19 @@ export interface RadioProps extends Omit<PressableProps, 'children' | 'style'> {
 	 * Custom style
 	 */
 	style?: StyleProp<ViewStyle>;
+
+	/**
+	 * Label
+	 */
+	label?: string;
+
+	/**
+	 * Label position
+	 */
+	labelPosition?: 'left' | 'right';
+
+	/**
+	 * Label style
+	 */
+	labelStyle?: StyleProp<TextStyle>;
 }

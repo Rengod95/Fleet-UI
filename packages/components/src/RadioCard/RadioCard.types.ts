@@ -210,7 +210,7 @@ export interface RadioCardGroupProps
 // Context Types
 // ============================================================================
 
-export interface RadioCardGroupContextValue {
+export type RadioCardGroupContextValue = {
 	/**
 	 * Current selected value
 	 */
@@ -235,4 +235,4 @@ export interface RadioCardGroupContextValue {
 	 * Group name (accessibility)
 	 */
 	name?: string;
-}
+} | null;

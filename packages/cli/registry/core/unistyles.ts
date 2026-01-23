@@ -13,10 +13,9 @@
 
 import type { UnistylesThemes } from 'react-native-unistyles';
 import { StyleSheet } from 'react-native-unistyles';
-
-import { primitiveBreakpoints } from './tokens';
 import { darkTheme } from './theme/darkTheme';
 import { lightTheme } from './theme/lightTheme';
+import { primitiveBreakpoints } from './tokens';
 import type { FleetThemes } from './types';
 
 export const themes: UnistylesThemes & FleetThemes = {

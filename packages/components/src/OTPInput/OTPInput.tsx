@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useImperativeHandle, useMemo } from 'react';
 import { BlurEvent, FocusEvent, Platform, Pressable, TextInput, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import type { OTPInputProps, OTPInputRef } from './OTPInput.types';
+import type { OTPInputGap, OTPInputProps, OTPInputRef } from './OTPInput.types';
 import { OTPSlot } from './OTPSlot';
 import { useOTPInput } from './useOTPInput';
 
@@ -57,7 +57,7 @@ export const OTPInput = forwardRef<OTPInputRef, OTPInputProps>((props, ref) => {
 		shadow = 'none',
 		isDisabled = false,
 		isInvalid = false,
-		gap,
+		gap = 'md',
 
 		// Style overrides
 		containerStyle,
@@ -191,7 +191,7 @@ export const OTPInput = forwardRef<OTPInputRef, OTPInputProps>((props, ref) => {
 				accessible={false}
 				accessibilityElementsHidden
 				importantForAccessibility="no-hide-descendants"
-				style={[styles.contentWrapper]}
+				style={[styles.contentWrapper(gap)]}
 			>
 				{renderedContent}
 			</View>
@@ -237,28 +237,29 @@ const styles = StyleSheet.create((theme, rt) => ({
 		alignItems: 'center',
 		justifyContent: 'center',
 	},
-	contentWrapper: {
+	contentWrapper:(gap: OTPInputGap)=> ({
 		flexDirection: 'row',
 		alignItems: 'center',
 		justifyContent: 'center',
 		position: 'relative',
+		gap : ((gap: OTPInputGap): number => {
+			switch(gap){
+				case 'sm': return theme.spacing[3];
+				case 'md': return theme.spacing[4];
+				case 'lg': return theme.spacing[5];
+				case 'xl': return theme.spacing[6];
+				default: return gap as number;
+			}
+		})(gap),
 		variants: {
 			size: {
-				sm: {
-					gap: theme.spacing[3],
-				},
-				md: {
-					gap: theme.spacing[4],
-				},
-				lg: {
-					gap: theme.spacing[4],
-				},
-				xl: {
-					gap: theme.spacing[5],
-				},
+				sm: {},
+				md: {},
+				lg: {},
+				xl: {},
 			},
 		},
-	},
+	}),
 	hiddenInput: {
 		...StyleSheet.absoluteFillObject,
 		...Platform.select({

@@ -172,7 +172,7 @@ export const chipStyles = StyleSheet.create((theme, _rt) => {
 					variant: 'faded' as const,
 					inverted: false,
 					styles: {
-						color: palette.border_default,
+						color: palette.text_4,
 					},
 				},
 				{

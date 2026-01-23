@@ -290,10 +290,10 @@ const styles = StyleSheet.create((theme, rt) => ({
 					paddingHorizontal: 0,
 				},
 				sm: {
-					paddingHorizontal: theme.spacing[5],
+					paddingHorizontal: theme.spacing[4],
 				},
 				md: {
-					paddingHorizontal: theme.spacing[6],
+					paddingHorizontal: theme.spacing[5],
 				},
 				lg: {
 					paddingHorizontal: theme.spacing[8],

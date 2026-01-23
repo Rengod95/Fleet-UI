@@ -1,4 +1,4 @@
-import { ActionButton, Checkbox } from '@fleet-ui/components';
+import { ActionButton, Checkbox, Divider } from '@fleet-ui/components';
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { useUnistyles } from 'react-native-unistyles';
@@ -37,9 +37,26 @@ export default function CheckboxScreen() {
 					description="Controlled checkbox component with multiple variants, sizes, and animations powered by Reanimated."
 				/>
 
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic Checkbox example (controlled, flat variant)."
+				>
+					<View style={commonStyles.column}>
+						<View style={commonStyles.row}>
+							<Checkbox
+								variant="flat"
+								checked={interactiveChecked}
+								onCheckedChange={setInteractiveChecked}
+								label={`Checked: ${interactiveChecked ? 'true' : 'false'}`}
+							/>
+						</View>
+					</View>
+				</Section>
+
 				{/* Variants */}
 				<Section title="Variants">
-					<Text style={commonStyles.label}>Unchecked</Text>
+					<Text style={[commonStyles.label,{alignSelf:'flex-start'}]}>Unchecked</Text>
 					<View style={[commonStyles.row, { marginBottom: 24 }]}>
 						{VARIANTS.map((variant) => (
 							<View
@@ -50,12 +67,12 @@ export default function CheckboxScreen() {
 									variant={variant}
 									checked={false}
 									onCheckedChange={() => {}}
+									label={variant}
 								/>
-								<Text>{variant} unchecked</Text>
 							</View>
 						))}
 					</View>
-					<Text style={commonStyles.label}>Checked</Text>
+					<Text style={[commonStyles.label,{alignSelf:'flex-start'}]}>Checked</Text>
 					<View style={commonStyles.row}>
 						{VARIANTS.map((variant) => (
 							<View key={`${variant}-checked`} style={commonStyles.row}>
@@ -63,8 +80,8 @@ export default function CheckboxScreen() {
 									variant={variant}
 									checked={true}
 									onCheckedChange={() => {}}
+									label={variant}
 								/>
-								<Text>{variant} checked</Text>
 							</View>
 						))}
 					</View>
@@ -114,7 +131,7 @@ export default function CheckboxScreen() {
 				<Section title="Rounded">
 					<View style={[commonStyles.column, { alignItems: 'center' }]}>
 						{ROUNDED_OPTIONS.map((rounded) => (
-							<View key={rounded} style={[commonStyles.row, { minWidth: 96 }]}>
+							<View key={rounded} style={[commonStyles.row, { minWidth: 120, justifyContent: 'flex-start' }]}>
 								<Checkbox
 									rounded={rounded}
 									checked={true}
@@ -130,7 +147,7 @@ export default function CheckboxScreen() {
 				<Section title="Shadow">
 					<View style={[commonStyles.column, { alignItems: 'center' }]}>
 						{SHADOW_OPTIONS.map((shadow) => (
-							<View key={shadow} style={[commonStyles.row, { minWidth: 96 }]}>
+							<View key={shadow} style={[commonStyles.row, { minWidth: 120, justifyContent: 'flex-start' }]}>
 								<Checkbox
 									shadow={shadow}
 									checked={true}
@@ -143,111 +160,40 @@ export default function CheckboxScreen() {
 				</Section>
 
 				{/* States */}
-				<Section title="States">
-					<View style={[commonStyles.column, { alignItems: 'center' }]}>
+				<Section title="Disabled State">
+					<View style={[commonStyles.row, { alignItems: 'center' }]}>
 						<View style={[commonStyles.row, { minWidth: 192 }]}>
-							<Checkbox checked={false} onCheckedChange={() => {}} />
-							<Text style={commonStyles.label}>Unchecked</Text>
-						</View>
-						<View style={[commonStyles.row, { minWidth: 192 }]}>
-							<Checkbox checked={true} onCheckedChange={() => {}} />
-							<Text style={commonStyles.label}>Checked</Text>
-						</View>
-						<View style={[commonStyles.row, { minWidth: 192 }]}>
-							<Checkbox
-								checked={false}
-								indeterminate={true}
-								onCheckedChange={() => {}}
-							/>
-							<Text style={commonStyles.label}>Indeterminate</Text>
-						</View>
-					</View>
-					<View style={[commonStyles.column, { alignItems: 'center' }]}>
-						<View style={[commonStyles.row, { minWidth: 192 }]}>
-							<Checkbox
-								checked={false}
-								disabled={true}
-								onCheckedChange={() => {}}
-							/>
-							<Text style={commonStyles.label}>Disabled unchecked</Text>
-						</View>
-						<View style={[commonStyles.row, { minWidth: 192 }]}>
-							<Checkbox
-								checked={true}
-								disabled={true}
-								onCheckedChange={() => {}}
-							/>
-							<Text style={commonStyles.label}>Disabled checked</Text>
-						</View>
-						<View style={[commonStyles.row, { minWidth: 192 }]}>
-							<Checkbox
-								checked={false}
-								indeterminate={true}
-								disabled={true}
-								onCheckedChange={() => {}}
-							/>
-							<Text style={commonStyles.label}>Disabled indeterminate</Text>
-						</View>
-					</View>
-				</Section>
-
-				{/* Interactive Demo - Single Checkbox */}
-				<Section title="Interactive Demo - Single">
-					<View style={commonStyles.row}>
-						<Checkbox
-						// checked={interactiveChecked}
-						// onCheckedChange={setInteractiveChecked}
-						/>
-						<Text>{interactiveChecked ? 'Checked' : 'Unchecked'}</Text>
-					</View>
-				</Section>
-
-				{/* All Variants × All Color Schemes (Checked) */}
-				<Section title="Complete Matrix (Checked)">
-					{VARIANTS.map((variant) => (
-						<View key={variant}>
-							<Text style={commonStyles.label}>
-								{variant.charAt(0).toUpperCase() + variant.slice(1)}
-							</Text>
-							<View style={commonStyles.row}>
-								{COLOR_SCHEMES.map((colorScheme) => (
-									<View key={colorScheme} style={commonStyles.row}>
-										<Checkbox
-											variant={variant}
-											colorScheme={colorScheme}
-											checked={true}
-											onCheckedChange={() => {}}
-										/>
-										<Text>{colorScheme}</Text>
-									</View>
-								))}
+							<View style={[commonStyles.column, { minWidth: 192, alignItems:'flex-start' }]}>
+								<Checkbox
+									checked={false}
+									disabled={true}
+									onCheckedChange={() => {}}
+									label="Disabled unchecked"
+								/>
+								<Checkbox
+									checked={false}
+									onCheckedChange={() => {}}
+									label="unchecked"
+								/>
 							</View>
 						</View>
-					))}
-				</Section>
-
-				{/* All Variants × All Sizes */}
-				<Section title="Variants × Sizes">
-					{VARIANTS.map((variant) => (
-						<View key={variant}>
-							<Text style={commonStyles.label}>
-								{variant.charAt(0).toUpperCase() + variant.slice(1)}
-							</Text>
-							<View style={commonStyles.row}>
-								{SIZES.map((size) => (
-									<View key={size} style={commonStyles.column}>
-										<Checkbox
-											variant={variant}
-											size={size}
-											checked={true}
-											onCheckedChange={() => {}}
-										/>
-										<Text style={commonStyles.label}>{size}</Text>
-									</View>
-								))}
+						<Divider/>
+						<View style={[commonStyles.row, { minWidth: 192 }]}>
+							<View style={[commonStyles.column, { minWidth: 192, alignItems:'flex-start' }]}>
+								<Checkbox
+									checked={true}
+									disabled={true}
+									onCheckedChange={() => {}}
+									label="Disabled checked"
+								/>
+								<Checkbox
+									checked={true}
+									onCheckedChange={() => {}}
+									label="checked"
+								/>
 							</View>
 						</View>
-					))}
+					</View>
 				</Section>
 			</View>
 		</ScrollView>

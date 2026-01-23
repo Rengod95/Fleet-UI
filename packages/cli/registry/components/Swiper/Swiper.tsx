@@ -172,7 +172,7 @@ export const Swiper = forwardRef<View, SwiperProps>((props, ref) => {
 		return {
 			opacity: interpolate(
 				translateX.value,
-				[0, maxTranslate / 2],
+				[maxTranslate/3, maxTranslate / 2],
 				[0, 1],
 				Extrapolation.CLAMP
 			),
@@ -190,7 +190,7 @@ export const Swiper = forwardRef<View, SwiperProps>((props, ref) => {
 		return {
 			opacity: interpolate(
 				translateX.value,
-				[0, maxTranslate / 3],
+				[maxTranslate/5, maxTranslate / 2],
 				[1, 0],
 				Extrapolation.CLAMP
 			),
@@ -448,7 +448,7 @@ export const Swiper = forwardRef<View, SwiperProps>((props, ref) => {
 							{ width: '100%', height: '100%', overflow: 'hidden' },
 						]}
 					/>
-					{actionTitle && (
+					{/* {actionTitle && (
 						<Animated.Text
 							numberOfLines={1}
 							ellipsizeMode="tail"
@@ -456,7 +456,7 @@ export const Swiper = forwardRef<View, SwiperProps>((props, ref) => {
 						>
 							{actionTitle}
 						</Animated.Text>
-					)}
+					)} */}
 				</Animated.View>
 			);
 		}
@@ -465,7 +465,7 @@ export const Swiper = forwardRef<View, SwiperProps>((props, ref) => {
 			<Animated.View
 				style={[styles.progressBackground, progressBackgroundAnimatedStyle]}
 			>
-				{actionTitle && (
+				{/* {actionTitle && (
 					<View style={styles.textContainer}>
 						<Animated.Text
 							numberOfLines={1}
@@ -475,7 +475,7 @@ export const Swiper = forwardRef<View, SwiperProps>((props, ref) => {
 							{actionTitle}
 						</Animated.Text>
 					</View>
-				)}
+				)} */}
 			</Animated.View>
 		);
 	};
@@ -510,7 +510,18 @@ export const Swiper = forwardRef<View, SwiperProps>((props, ref) => {
 				>
 					{placeholder || 'Slide to confirm'}
 				</Animated.Text>
+				{actionTitle && (
+					<Animated.Text
+						numberOfLines={1}
+						ellipsizeMode="tail"
+						style={[styles.actionTitle, actionTitleAnimatedStyle]}
+					>
+						{actionTitle}
+					</Animated.Text>
+				)}
+
 			</View>
+			
 
 			{/* Swipeable Button */}
 			<GestureDetector gesture={panGesture}>
@@ -528,6 +539,11 @@ Swiper.displayName = 'Swiper';
 
 const styles = StyleSheet.create((theme) => ({
 	container: {
+		// override web width to 100% to prevent layout shrink.
+		_web:{
+			width: '100%',
+		},
+		width: '100%',
 		position: 'relative',
 		flexDirection: 'row',
 		alignItems: 'center',
@@ -797,13 +813,15 @@ const styles = StyleSheet.create((theme) => ({
 	},
 
 	textContainer: {
-		flex: 1,
+		width: '100%',
+		height: '100%',
 		alignItems: 'center',
 		justifyContent: 'center',
 		pointerEvents: 'none',
 	},
 
 	text: {
+		position: 'absolute',
 		textAlign: 'center',
 		color: theme.colors.neutral.text_4,
 
@@ -840,6 +858,9 @@ const styles = StyleSheet.create((theme) => ({
 	},
 
 	actionTitle: {
+		position: 'absolute',
+		textAlign: 'center',
+
 		fontWeight: theme.text.fontWeight.semibold,
 
 		variants: {

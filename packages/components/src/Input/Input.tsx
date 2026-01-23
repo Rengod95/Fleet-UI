@@ -266,7 +266,7 @@ const inputStyles = StyleSheet.create((theme) => {
 						minHeight: 42,
 					},
 					md: {
-						minHeight: 44,
+						minHeight: 48,
 					},
 					lg: {
 						minHeight: 56,
@@ -275,7 +275,7 @@ const inputStyles = StyleSheet.create((theme) => {
 						minHeight: 64,
 					},
 				},
-				radius: {
+				rounded: {
 					none: { borderRadius: 0 },
 					sm: { borderRadius: theme.rounded.sm },
 					md: { borderRadius: theme.rounded.md },
@@ -424,7 +424,7 @@ export const Input = forwardRef<TextInput, InputProps>((props, ref) => {
 		variant = 'bordered',
 		colorScheme = 'neutral',
 		size = 'md',
-		radius = 'md',
+		rounded = 'md',
 		label,
 		description,
 		errorMessage,
@@ -466,7 +466,7 @@ export const Input = forwardRef<TextInput, InputProps>((props, ref) => {
 		variant,
 		colorScheme:evaluatedColorScheme,
 		size,
-		radius,
+		rounded,
 		fullWidth,
 		isInvalid,
 		shadow,

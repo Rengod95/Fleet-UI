@@ -1,4 +1,4 @@
-import { Icon, State, type StateVariant } from '@fleet-ui/components';
+import { Button, Icon, State, type StateVariant } from '@fleet-ui/components';
 import { Rocket, Sparkles, Zap } from 'lucide-react-native';
 import { Image, ScrollView, Text, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
@@ -22,13 +22,13 @@ export default function StateExamplesScreen() {
 			<View style={commonStyles.content}>
 				<PageHeader
 					title="State"
-					description="특정 작업의 결과를 시각적으로 보여주는 페이지 컴포넌트입니다. 성공, 에러, 경고 등의 상태를 알리고 다양한 메시지나 액션을 제공합니다."
+					description="A page component that visually shows the result of a specific task. It displays statuses like success, error, warning, etc. and provides various messages and actions."
 				/>
 
-				{/* Basic Usage */}
 				<Section
-					title="Basic Usage"
-					description="기본적인 State 사용법. variant에 따라 자동으로 아이콘이 표시됩니다."
+					title="Overview"
+					value="overview"
+					description="The most basic State example."
 				>
 					<State
 						variant="success"
@@ -42,11 +42,12 @@ export default function StateExamplesScreen() {
 					/>
 				</Section>
 
-				{/* Variants */}
 				<Section
 					title="Variants"
-					description="variant prop으로 상태 유형을 설정합니다. 각 variant는 고유한 아이콘과 색상을 가집니다."
+					description="Set the state type with the variant prop. Each variant has a unique icon and color."
 				>
+					<View style={commonStyles.column}>
+						<Text style={commonStyles.label}>The Variant prop is control the icon, background visual style. The content text is samples.</Text>
 					{VARIANTS.map((variant) => (
 						<View key={variant} style={styles.variantItem}>
 							<Text style={styles.variantLabel}>{variant}</Text>
@@ -54,23 +55,27 @@ export default function StateExamplesScreen() {
 								variant={variant}
 								title={getVariantTitle(variant)}
 								description={getVariantDescription(variant)}
-							/>
+								button={
+									<State.Button >Confirm</State.Button>
+								}
+								/>
 						</View>
-					))}
+						))}
+						</View>
 				</Section>
 
 				{/* With Button */}
 				<Section
-					title="With Button"
-					description="State.Button을 사용하여 액션 버튼을 추가할 수 있습니다."
+					title="State.Button"
+					description="Use State.Button to add an action button. But Normal 'Button' component is recommended for most cases."
 				>
 					<State
 						variant="error"
-						title="연결에 실패했습니다"
-						description="네트워크 연결을 확인하고 다시 시도해 주세요."
+						title="Connection Failed"
+						description="Please check your network connection and try again."
 						button={
-							<State.Button onPress={() => console.log('다시 시도')}>
-								다시 시도
+							<State.Button onPress={() => console.log('Retry')}>
+								Retry
 							</State.Button>
 						}
 					/>
@@ -79,7 +84,7 @@ export default function StateExamplesScreen() {
 				{/* Custom Asset */}
 				<Section
 					title="Custom Asset"
-					description="asset prop으로 커스텀 아이콘이나 이미지를 표시할 수 있습니다."
+					description="Use the asset prop to display custom icons or images."
 				>
 					<State
 						variant="neutral"
@@ -88,11 +93,11 @@ export default function StateExamplesScreen() {
 								<Icon icon={Rocket} size="_2xl" colorScheme="primary" />
 							</View>
 						}
-						title="새로운 기능 출시"
-						description="더 빠르고 강력해진 새 버전을 만나보세요."
+						title="New Feature Released"
+						description="Try the new version that is faster and more powerful."
 						button={
-							<State.Button onPress={() => console.log('시작하기')}>
-								시작하기
+							<State.Button onPress={() => console.log('Start')}>
+								Start
 							</State.Button>
 						}
 					/>
@@ -104,8 +109,8 @@ export default function StateExamplesScreen() {
 								<Icon icon={Sparkles} size="_2xl" colorScheme="warning" />
 							</View>
 						}
-						title="특별 이벤트 진행 중"
-						description="지금 참여하면 특별한 혜택을 받을 수 있습니다."
+						title="Special Event in Progress"
+						description="You can get special benefits by participating now."
 					/>
 
 					<State
@@ -116,76 +121,27 @@ export default function StateExamplesScreen() {
 								style={styles.customImage}
 							/>
 						}
-						title="프로필 업데이트"
-						description="프로필 사진이 성공적으로 변경되었습니다."
+						title="Profile Updated"
+						description="The profile picture has been successfully changed."
 					/>
 				</Section>
 
 				{/* Ghost Variant */}
 				<Section
 					title="Ghost Variant"
-					description="ghost variant는 아이콘 프레임 없이 텍스트만 표시합니다."
+					description="The ghost variant only displays text without an icon frame."
 				>
 					<State
 						variant="ghost"
-						title="데이터가 없습니다"
-						description="아직 등록된 항목이 없습니다. 새 항목을 추가해 보세요."
+						title="No Data"
+						description="There is no registered item yet. Please add a new item."
 						button={
-							<State.Button onPress={() => console.log('추가하기')}>
-								항목 추가
+							<State.Button onPress={() => console.log('Add')}>
+								Add Item
 							</State.Button>
 						}
 					/>
 				</Section>
-
-				{/* Use Cases */}
-				<Section title="Use Cases" description="실제 사용 시나리오 예시">
-					{/* Empty State */}
-					<View style={styles.useCaseContainer}>
-						<Text style={styles.useCaseLabel}>Empty State</Text>
-						<State
-							variant="neutral"
-							asset={
-								<View style={styles.customIconFrame}>
-									<Icon icon={Zap} size="_2xl" colorScheme="info" />
-								</View>
-							}
-							title="검색 결과가 없습니다"
-							description="다른 키워드로 검색해 보세요."
-						/>
-					</View>
-
-					{/* Error State */}
-					<View style={styles.useCaseContainer}>
-						<Text style={styles.useCaseLabel}>Error State</Text>
-						<State
-							variant="error"
-							title="오류가 발생했습니다"
-							description="잠시 후 다시 시도해 주세요. 문제가 지속되면 고객센터로 문의해 주세요."
-							button={
-								<State.Button onPress={() => console.log('문의하기')}>
-									고객센터 문의
-								</State.Button>
-							}
-						/>
-					</View>
-
-					{/* Success State */}
-					<View style={styles.useCaseContainer}>
-						<Text style={styles.useCaseLabel}>Success State</Text>
-						<State
-							variant="success"
-							title="결제가 완료되었습니다"
-							description="주문 내역은 마이페이지에서 확인하실 수 있습니다."
-							button={
-								<State.Button onPress={() => console.log('주문 확인')}>
-									주문 내역 보기
-								</State.Button>
-							}
-						/>
-					</View>
-				</Section>
-
 				{/* Bottom Spacer */}
 				<View style={{ height: 40 }} />
 			</View>
@@ -196,24 +152,24 @@ export default function StateExamplesScreen() {
 // Helper functions
 function getVariantTitle(variant: StateVariant): string {
 	const titles: Record<StateVariant, string> = {
-		success: '성공',
-		error: '오류',
-		warning: '경고',
-		info: '안내',
-		neutral: '알림',
-		ghost: '알림 (Ghost)',
+		success: 'Success',
+		error: 'Error',
+		warning: 'Warning',
+		info: 'Info',
+		neutral: 'Neutral',
+		ghost: 'Neutral (Ghost)',
 	};
 	return titles[variant];
 }
 
 function getVariantDescription(variant: StateVariant): string {
 	const descriptions: Record<StateVariant, string> = {
-		success: '작업이 성공적으로 완료되었습니다.',
-		error: '오류가 발생했습니다. 다시 시도해 주세요.',
-		warning: '주의가 필요한 상황입니다.',
-		info: '참고할 정보가 있습니다.',
-		neutral: '일반적인 알림 메시지입니다.',
-		ghost: '아이콘 없이 텍스트만 표시합니다.',
+		success: 'The task has been successfully completed.',
+		error: 'An error has occurred. Please try again later.',
+		warning: 'A situation that requires attention.',
+		info: 'Information to note.',
+		neutral: 'A general notification message.',
+		ghost: 'Text only display without icon.',
 	};
 	return descriptions[variant];
 }

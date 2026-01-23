@@ -44,7 +44,7 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
 	 * The border radius of the input.
 	 * @default 'md'
 	 */
-	radius?: InputRadius;
+	rounded?: InputRadius;
 	/**
 	 * The label of the input.
 	 */

@@ -1,4 +1,4 @@
-import { StepIndicator } from '@fleet-ui/components';
+import { Button, StepIndicator } from '@fleet-ui/components';
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
@@ -61,14 +61,6 @@ export default function StepIndicatorScreen() {
 	const [controlledStep, setControlledStep] = useState(2);
 	const [interactiveStep, setInteractiveStep] = useState(0);
 
-	// Sample labels
-	const sampleLabels = [
-		{ stepIndex: 0, label: '시작' },
-		{ stepIndex: 1, label: '정보' },
-		{ stepIndex: 2, label: '확인' },
-		{ stepIndex: 3, label: '완료' },
-	];
-
 	return (
 		<ScrollView style={[commonStyles.container]}>
 			<View style={commonStyles.content}>
@@ -78,7 +70,7 @@ export default function StepIndicatorScreen() {
 				/>
 
 				{/* Overview */}
-				<Section title="Overview">
+				<Section title="Overview" value="overview" description="Most basic StepIndicator example.">
 					<View style={styles.indicatorContainer}>
 						<StepIndicator step={5} activeStep={2} />
 					</View>
@@ -132,6 +124,9 @@ export default function StepIndicatorScreen() {
 				{/* Controlled Mode */}
 				<Section title="Controlled Mode">
 					<View style={commonStyles.column}>
+						<Text style={commonStyles.label}>
+							Active Step: {controlledStep + 1} / 5
+						</Text>
 						<View style={styles.indicatorContainer}>
 							<StepIndicator
 								step={5}
@@ -139,26 +134,25 @@ export default function StepIndicatorScreen() {
 								onStepChange={setControlledStep}
 							/>
 						</View>
-						<Text style={styles.stateText}>
-							Active Step: {controlledStep + 1} / 5
-						</Text>
 						<View style={styles.buttonRow}>
-							<View
-								style={styles.stepButton}
-								onTouchEnd={() =>
+							<Button
+								variant="flat"
+								size="sm"
+								onPress={() =>
 									setControlledStep((prev) => Math.max(0, prev - 1))
 								}
 							>
-								<Text style={styles.stepButtonText}>Previous</Text>
-							</View>
-							<View
-								style={styles.stepButton}
-								onTouchEnd={() =>
+								Previous
+							</Button>
+							<Button
+								variant="flat"
+								size="sm"
+								onPress={() =>
 									setControlledStep((prev) => Math.min(4, prev + 1))
 								}
 							>
-								<Text style={styles.stepButtonText}>Next</Text>
-							</View>
+								Next
+							</Button>
 						</View>
 					</View>
 				</Section>
@@ -178,20 +172,6 @@ export default function StepIndicatorScreen() {
 						<Text style={styles.stateText}>
 							Tap a dot to navigate. Current: {interactiveStep + 1}
 						</Text>
-					</View>
-				</Section>
-
-				{/* With Labels */}
-				<Section title="With Labels">
-					<View style={[commonStyles.column, styles.labelContainer]}>
-						<View style={styles.indicatorContainer}>
-							<StepIndicator
-								step={4}
-								activeStep={1}
-								labels={sampleLabels}
-								showLabels
-							/>
-						</View>
 					</View>
 				</Section>
 
@@ -235,70 +215,6 @@ export default function StepIndicatorScreen() {
 									step={5}
 									activeStep={controlledStep}
 									animated={false}
-								/>
-							</View>
-						</View>
-					</View>
-				</Section>
-
-				{/* Sizes × Color Schemes */}
-				<Section title="Sizes × Color Schemes">
-					{SIZES.map((size) => (
-						<View key={size} style={commonStyles.column}>
-							<Text style={commonStyles.label}>{size}</Text>
-							<View style={commonStyles.column}>
-								{COLOR_SCHEMES.slice(0, 3).map((scheme) => (
-									<View key={scheme} style={styles.indicatorContainer}>
-										<StepIndicator
-											step={5}
-											activeStep={2}
-											size={size}
-											colorScheme={scheme}
-										/>
-									</View>
-								))}
-							</View>
-						</View>
-					))}
-				</Section>
-
-				{/* Use Case Examples */}
-				<Section title="Use Case Examples">
-					<View style={commonStyles.column}>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Image Carousel Indicator</Text>
-							<View style={[styles.indicatorContainer, styles.demoBox]}>
-								<StepIndicator
-									step={6}
-									activeStep={2}
-									size="sm"
-									colorScheme="neutral"
-									gap={6}
-								/>
-							</View>
-						</View>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Onboarding Steps</Text>
-							<View style={[styles.indicatorContainer, styles.demoBox]}>
-								<StepIndicator
-									step={4}
-									activeStep={1}
-									size="md"
-									colorScheme="primary"
-									labels={sampleLabels}
-									showLabels
-								/>
-							</View>
-						</View>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Tutorial Progress</Text>
-							<View style={[styles.indicatorContainer, styles.demoBox]}>
-								<StepIndicator
-									step={3}
-									activeStep={0}
-									size="lg"
-									colorScheme="success"
-									interactive
 								/>
 							</View>
 						</View>

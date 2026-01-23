@@ -252,7 +252,7 @@ export const buttonStyles = StyleSheet.create((theme, _rt) => {
 						elevation: 0,
 					},
 					sm: { boxShadow: theme.shadows.sm },
-					md: { boxShadow: theme.shadows.card },
+					md: { boxShadow: theme.shadows.md },
 					lg: { boxShadow: theme.shadows.lg },
 				},
 				disabled: {
@@ -263,8 +263,8 @@ export const buttonStyles = StyleSheet.create((theme, _rt) => {
 				fullWidth: {
 					true: {
 						alignSelf: 'stretch',
-						width: '100%',
 					},
+					false: {},
 				},
 				iconOnly: {
 					true: {
@@ -292,8 +292,8 @@ export const buttonStyles = StyleSheet.create((theme, _rt) => {
 				},
 				size: {
 					sm: {
-						fontSize: theme.typography.caption1.fontSize,
-						lineHeight: theme.typography.caption1.lineHeight,
+						fontSize: theme.typography.body2.fontSize,
+						lineHeight: theme.typography.body2.lineHeight,
 					},
 					md: {},
 					lg: {},

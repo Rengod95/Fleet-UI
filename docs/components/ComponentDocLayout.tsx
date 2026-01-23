@@ -1,51 +1,66 @@
 import { DemoFrame } from './DemoFrame';
 import type { ComponentDoc } from '../lib/component-docs';
 import { CodeBlock } from './CodeBlock';
-import { Callout } from './Callout';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-function Section({
+function SampleCodePanel({
   title,
-  children,
+  code,
+  html,
 }: {
   title: string;
-  children: React.ReactNode;
+  code?: string;
+  html?: string;
 }) {
+  if (!code?.trim() && !html?.trim()) return null;
+
   return (
-    <section className="rounded-xl bg-card p-4 shadow-sm">
-      <div className="text-fleet-body3Strong">{title}</div>
-      <div className="mt-2 text-fleet-body3 text-muted-foreground">{children}</div>
+    <section className="rounded-xl bg-card p-5 shadow-sm">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="sample-code" className="border-b-0">
+          <AccordionTrigger className="py-0 text-fleet-body1Strong hover:no-underline">
+            {title}
+          </AccordionTrigger>
+          <AccordionContent className="pb-0">
+            <div className="mt-3 max-h-full overflow-y-auto">
+              <CodeBlock className="codeblock-scroll h-[880px]" code={code} html={html} />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </section>
   );
-}
-
-function List({ items }: { items?: string[] }) {
-  if (!items?.length) return null;
-  return (
-    <ul className="list-disc space-y-1 pl-5">
-      {items.map((it) => (
-        <li key={it}>{it}</li>
-      ))}
-    </ul>
-  );
-}
-
-function DirectoryBlock({ lines }: { lines?: string[] }) {
-  if (!lines?.length) return null;
-  return <CodeBlock code={lines.join('\n')} />;
 }
 
 export function ComponentDocLayout({
   doc,
   content,
+  sampleCode,
+  sampleCodeHtml,
+  locale = 'en',
 }: {
   doc: ComponentDoc;
   content?: React.ReactNode;
+  sampleCode?: string;
+  sampleCodeHtml?: string;
+  locale?: 'en' | 'ko';
 }) {
+  const sampleCodeTitle = 'View Playground Code';
+
   return (
     <div className="not-prose">
       <div className="space-y-6">
-        {/* Demo iframe is always on top */}
-        <DemoFrame slug={doc.slug} />
+        <div className="flex flex-col align-center justify-center gap-8">
+          {/* Left: Demo */}
+          <div>
+            <DemoFrame slug={doc.slug} />
+          </div>
+
+          {/* Right: Sample code */}
+          <div className="min-w-0 xl:flex-1 xl:sticky xl:top-20">
+            <SampleCodePanel title={sampleCodeTitle} code={sampleCode} html={sampleCodeHtml} />
+          </div>
+        </div>
 
         <div>
           <h1 className="text-fleet-h2Strong">{doc.name}</h1>

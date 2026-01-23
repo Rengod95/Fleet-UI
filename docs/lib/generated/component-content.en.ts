@@ -6,7 +6,6 @@ export const componentContent: Record<string, () => Promise<{ default: React.Com
   "actionbutton": () => import("../../content/en/components/actionbutton.mdx"),
   "bottom-sheet-modal": () => import("../../content/en/components/bottom-sheet-modal.mdx"),
   "button": () => import("../../content/en/components/button.mdx"),
-  "card": () => import("../../content/en/components/card.mdx"),
   "checkbox": () => import("../../content/en/components/checkbox.mdx"),
   "checkbox-card": () => import("../../content/en/components/checkbox-card.mdx"),
   "chip": () => import("../../content/en/components/chip.mdx"),

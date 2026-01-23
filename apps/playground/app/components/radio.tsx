@@ -29,21 +29,40 @@ export default function RadioScreen() {
 					description="Controlled radio component with multiple variants, sizes, and animations powered by Reanimated."
 				/>
 
+				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic Radio example (controlled group)."
+				>
+					<View style={commonStyles.row}>
+						<View style={commonStyles.column}>
+							<Radio
+								variant="flat"
+								selected={groupSelected === 'option1'}
+								onSelect={() => setGroupSelected('option1')}
+								label="option1"
+							/>
+							<Radio
+								variant="flat"
+								selected={groupSelected === 'option2'}
+								onSelect={() => setGroupSelected('option2')}
+								label="option2"
+							/>
+						</View>
+					</View>
+				</Section>
+
 				{/* Variants */}
 				<Section title="Variants">
-					<View style={commonStyles.row}>
+					<View style={[commonStyles.fullWidthContainer, {alignItems:'center'}]}>
 						{VARIANTS.map((variant) => (
-							<View key={variant} style={commonStyles.column}>
-								<Radio variant={variant} selected={false} onSelect={() => {}} />
-								<Text style={commonStyles.label}>{variant} unselected</Text>
+							<View key={variant} style={[commonStyles.column, {width:'100%', alignItems:'flex-start'}]}>
+								<Radio variant={variant} selected={false} onSelect={() => {}} label={`${variant} unselected`} />
 							</View>
 						))}
-					</View>
-					<View style={commonStyles.row}>
 						{VARIANTS.map((variant) => (
-							<View key={`${variant}-selected`} style={commonStyles.column}>
-								<Radio variant={variant} selected={true} onSelect={() => {}} />
-								<Text style={commonStyles.label}>{variant} selected</Text>
+							<View key={`${variant}-selected`} style={[commonStyles.column, {width:'100%', alignItems:'flex-start'}]}>
+								<Radio variant={variant} selected={true} onSelect={() => {}} label={`${variant} selected`} />
 							</View>
 						))}
 					</View>
@@ -52,20 +71,18 @@ export default function RadioScreen() {
 				{/* Color Schemes × Variants */}
 				<Section title="Color Schemes">
 					{VARIANTS.map((variant) => (
-						<View key={variant}>
-							<Text style={commonStyles.sectionSubtitle}>
-								Variant: {variant}
-							</Text>
-							<View style={commonStyles.row}>
+						<View key={variant} style={commonStyles.column}>
+							<View style={[commonStyles.fullWidthContainer, {alignItems:'center'}]}>
+								<Text style={commonStyles.label}>{variant}</Text>
 								{COLOR_SCHEMES.map((colorScheme) => (
-									<View key={colorScheme} style={commonStyles.column}>
+									<View key={colorScheme} style={[commonStyles.column, {width:'100%', alignItems:'flex-start'}]}>
 										<Radio
 											variant={variant}
 											colorScheme={colorScheme}
 											selected={true}
 											onSelect={() => {}}
+											label={colorScheme}
 										/>
-										<Text style={commonStyles.label}>{colorScheme}</Text>
 									</View>
 								))}
 							</View>
@@ -77,9 +94,8 @@ export default function RadioScreen() {
 				<Section title="Sizes">
 					<View style={commonStyles.row}>
 						{SIZES.map((size) => (
-							<View key={size} style={commonStyles.column}>
-								<Radio size={size} selected={true} onSelect={() => {}} />
-								<Text style={commonStyles.label}>{size}</Text>
+							<View key={size} style={[commonStyles.column, {width:'100%'}]}>
+								<Radio size={size} selected={true} onSelect={() => {}} label={size} />
 							</View>
 						))}
 					</View>
@@ -87,11 +103,10 @@ export default function RadioScreen() {
 
 				{/* Shadow */}
 				<Section title="Shadow">
-					<View style={commonStyles.row}>
+					<View style={[commonStyles.row, {gap:20, paddingVertical:24, gap:24}]}>
 						{SHADOW_OPTIONS.map((shadow) => (
-							<View key={shadow} style={commonStyles.column}>
-								<Radio shadow={shadow} selected={true} onSelect={() => {}} />
-								<Text style={commonStyles.label}>{shadow}</Text>
+							<View key={shadow} style={[commonStyles.column, {width:'100%'}]}>
+								<Radio shadow={shadow} selected={true} onSelect={() => {}} label={shadow} />
 							</View>
 						))}
 					</View>
@@ -101,103 +116,39 @@ export default function RadioScreen() {
 				<Section title="States">
 					<View style={commonStyles.row}>
 						<View style={commonStyles.column}>
-							<Radio selected={false} onSelect={() => {}} />
 							<Text style={commonStyles.label}>Unselected</Text>
+							<Radio selected={false} onSelect={() => {}} />
 						</View>
 						<View style={commonStyles.column}>
-							<Radio selected={true} onSelect={() => {}} />
 							<Text style={commonStyles.label}>Selected</Text>
+							<Radio selected={true} onSelect={() => {}} />
 						</View>
 					</View>
 					<View style={commonStyles.row}>
 						<View style={commonStyles.column}>
-							<Radio selected={false} disabled={true} onSelect={() => {}} />
 							<Text style={commonStyles.label}>Disabled unselected</Text>
+							<Radio selected={false} disabled={true} onSelect={() => {}} />
 						</View>
 						<View style={commonStyles.column}>
-							<Radio selected={true} disabled={true} onSelect={() => {}} />
 							<Text style={commonStyles.label}>Disabled selected</Text>
+							<Radio selected={true} disabled={true} onSelect={() => {}} />
 						</View>
-					</View>
-				</Section>
-
-				{/* Interactive Demo - Single Radio (Uncontrolled) */}
-				<Section title="Interactive Demo - Single (Uncontrolled)">
-					<View style={commonStyles.row}>
-						<Radio
-							defaultSelected={false}
-							onSelect={(selected) => console.log('Selected:', selected)}
-						/>
-						<Text style={commonStyles.label}>
-							Click to select (uncontrolled)
-						</Text>
 					</View>
 				</Section>
 
 				{/* Interactive Demo - Radio Group (Controlled) */}
-				<Section title="Interactive Demo - Group (Controlled)">
+				<Section title="Controlled">
 					<View style={commonStyles.column}>
 						{['option1', 'option2', 'option3'].map((option) => (
 							<View key={option} style={commonStyles.row}>
 								<Radio
 									selected={groupSelected === option}
 									onSelect={() => setGroupSelected(option)}
+									label={groupSelected === option ? 'Selected' : 'Unselected' + ' ' + option}
 								/>
-								<Text style={commonStyles.label}>
-									{option}:{' '}
-									{groupSelected === option ? 'Selected' : 'Unselected'}
-								</Text>
 							</View>
 						))}
 					</View>
-				</Section>
-
-				{/* All Variants × All Color Schemes (Selected) */}
-				<Section title="Complete Matrix (Selected)">
-					{VARIANTS.map((variant) => (
-						<View key={variant}>
-							<Text style={commonStyles.sectionSubtitle}>
-								{variant.charAt(0).toUpperCase() + variant.slice(1)}
-							</Text>
-							<View style={commonStyles.row}>
-								{COLOR_SCHEMES.map((colorScheme) => (
-									<View key={colorScheme} style={commonStyles.column}>
-										<Radio
-											variant={variant}
-											colorScheme={colorScheme}
-											selected={true}
-											onSelect={() => {}}
-										/>
-										<Text style={commonStyles.label}>{colorScheme}</Text>
-									</View>
-								))}
-							</View>
-						</View>
-					))}
-				</Section>
-
-				{/* All Variants × All Sizes */}
-				<Section title="Variants × Sizes">
-					{VARIANTS.map((variant) => (
-						<View key={variant}>
-							<Text style={commonStyles.sectionSubtitle}>
-								{variant.charAt(0).toUpperCase() + variant.slice(1)}
-							</Text>
-							<View style={commonStyles.row}>
-								{SIZES.map((size) => (
-									<View key={size} style={commonStyles.column}>
-										<Radio
-											variant={variant}
-											size={size}
-											selected={true}
-											onSelect={() => {}}
-										/>
-										<Text style={commonStyles.label}>{size}</Text>
-									</View>
-								))}
-							</View>
-						</View>
-					))}
 				</Section>
 			</View>
 		</ScrollView>

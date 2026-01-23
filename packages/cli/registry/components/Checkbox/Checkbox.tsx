@@ -4,6 +4,7 @@ import {
 	type GestureResponderEvent,
 	type View,
 	Pressable,
+	Text,
 } from 'react-native';
 import Animated, {
 	Easing,
@@ -97,6 +98,11 @@ export const checkboxStyles = StyleSheet.create((theme, _rt) => {
 		});
 
 	return {
+		wrapper: {
+			flexDirection: 'row',
+			alignItems: 'center',
+			gap: theme.spacing[4],
+		},
 		container: {
 			justifyContent: 'center',
 			alignItems: 'center',
@@ -242,8 +248,11 @@ export const Checkbox = forwardRef<View, CheckboxProps>((props, ref) => {
 		onCheckedChange,
 		disabled = false,
 		accessibilityLabel,
+		label,
+		labelPosition = 'right',
 		testID,
 		style,
+		labelStyle,
 		onPress,
 		onPressIn,
 		onPressOut,
@@ -340,7 +349,7 @@ export const Checkbox = forwardRef<View, CheckboxProps>((props, ref) => {
 			onPressOut={handlePressOut}
 			disabled={disabled}
 			accessibilityRole="checkbox"
-			accessibilityLabel={accessibilityLabel}
+			accessibilityLabel={label && typeof label === 'string' ? label : accessibilityLabel}
 			accessibilityState={{
 				checked,
 				disabled,
@@ -349,7 +358,9 @@ export const Checkbox = forwardRef<View, CheckboxProps>((props, ref) => {
 			testID={testID}
 			{...rest}
 			hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+			style={checkboxStyles.wrapper}
 		>
+			{label && labelPosition === 'left' && <Text style={labelStyle}>{label}</Text>}
 			<Animated.View
 				style={[
 					checkboxStyles.container,
@@ -365,6 +376,7 @@ export const Checkbox = forwardRef<View, CheckboxProps>((props, ref) => {
 					/>
 				</Animated.View>
 			</Animated.View>
+			{label && labelPosition === 'right' && <Text style={labelStyle}>{label}</Text>}
 		</Pressable>
 	);
 });

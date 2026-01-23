@@ -45,6 +45,8 @@ export default function SliderScreen() {
 	// Uncontrolled Slider value observation
 	const [observedValue, setObservedValue] = useState([50]);
 	const [observedRangeValue, setObservedRangeValue] = useState([25, 75]);
+	const [customMinMaxValue, setCustomMinMaxValue] = useState([0, 1000]);
+	const [currentMinMaxValue, setCurrentMinMaxValue] = useState([0, 1000]);
 
 	return (
 		<ScrollView style={[commonStyles.container]}>
@@ -55,7 +57,7 @@ export default function SliderScreen() {
 				/>
 
 				{/* Overview */}
-				<Section title="Overview">
+				<Section title="Overview" value="overview" description="Most basic Slider example.">
 					<View
 						style={[
 							styles.sliderContainer,
@@ -67,7 +69,7 @@ export default function SliderScreen() {
 							},
 						]}
 					>
-						<Slider defaultValue={[50]} />
+						<Slider defaultValue={[50]} colorScheme="primary" />
 					</View>
 				</Section>
 
@@ -127,24 +129,6 @@ export default function SliderScreen() {
 					</View>
 				</Section>
 
-				{/* Track Variants × Color Schemes */}
-				<Section title="Track Variants × Color Schemes">
-					{TRACK_VARIANTS.map((trackVariant) => (
-						<View key={trackVariant} style={commonStyles.column}>
-							<Text style={commonStyles.label}>{trackVariant}</Text>
-							{COLOR_SCHEMES.slice(0, 3).map((scheme) => (
-								<View key={scheme} style={styles.sliderContainer}>
-									<Slider
-										trackVariant={trackVariant}
-										colorScheme={scheme}
-										defaultValue={[50]}
-									/>
-								</View>
-							))}
-						</View>
-					))}
-				</Section>
-
 				{/* Thumb Shadows */}
 				<Section title="Thumb Shadows">
 					<View style={commonStyles.column}>
@@ -174,7 +158,7 @@ export default function SliderScreen() {
 				</Section>
 
 				{/* Rounded Options */}
-				<Section title="Rounded Options">
+				<Section title="Rounded" description="Track rounded options.">
 					<View style={commonStyles.column}>
 						{ROUNDED_OPTIONS.map((rounded) => (
 							<View key={rounded} style={commonStyles.column}>
@@ -246,8 +230,9 @@ export default function SliderScreen() {
 				</Section>
 
 				{/* Value Observation (Uncontrolled) */}
-				<Section title="Value Observation">
+				<Section title="Value Observation" description="It's throttled by throttleMs prop.">
 					<View style={commonStyles.column}>
+						<Text style={commonStyles.label}>If you want to track the value, use onValueChange prop.</Text>
 						<View style={styles.sliderContainer}>
 							<Slider
 								defaultValue={[50]}
@@ -261,6 +246,7 @@ export default function SliderScreen() {
 				{/* Range Value Observation (Uncontrolled) */}
 				<Section title="Range Value Observation">
 					<View style={commonStyles.column}>
+						<Text style={commonStyles.label}>On range mode, onValueChange is called with both values with number array. the first value is the minimum value, the second value is the maximum value.</Text>
 						<View style={styles.sliderContainer}>
 							<Slider
 								thumbCount={2}
@@ -275,29 +261,6 @@ export default function SliderScreen() {
 					</View>
 				</Section>
 
-				{/* Step Configuration */}
-				<Section title="Step Configuration">
-					<View style={commonStyles.column}>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Step: 1 (default)</Text>
-							<View style={styles.sliderContainer}>
-								<Slider step={1} defaultValue={[50]} />
-							</View>
-						</View>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Step: 10</Text>
-							<View style={styles.sliderContainer}>
-								<Slider step={10} defaultValue={[50]} />
-							</View>
-						</View>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Step: 25</Text>
-							<View style={styles.sliderContainer}>
-								<Slider step={25} defaultValue={[50]} />
-							</View>
-						</View>
-					</View>
-				</Section>
 
 				{/* Min Steps Between Thumbs */}
 				<Section title="Min Steps Between Thumbs">
@@ -319,7 +282,6 @@ export default function SliderScreen() {
 							<View style={styles.sliderContainer}>
 								<Slider
 									thumbCount={2}
-									step={5}
 									minStepsBetweenThumbs={10}
 									defaultValue={[30, 70]}
 								/>
@@ -332,64 +294,13 @@ export default function SliderScreen() {
 				<Section title="Custom Min/Max Range">
 					<View style={commonStyles.column}>
 						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Range: 0-100 (default)</Text>
+							<Text style={commonStyles.label}>Range: 100-1000 (default)</Text>
+							<Text style={commonStyles.label}>Current Range: {currentMinMaxValue[0]} - {currentMinMaxValue[1]}</Text>
 							<View style={styles.sliderContainer}>
-								<Slider defaultValue={[50]} />
-							</View>
-						</View>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Range: -50 to 50</Text>
-							<View style={styles.sliderContainer}>
-								<Slider min={-50} max={50} defaultValue={[0]} />
-							</View>
-						</View>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Range: 0-1000</Text>
-							<View style={styles.sliderContainer}>
-								<Slider min={0} max={1000} step={50} defaultValue={[500]} />
+								<Slider thumbCount={2} min={100} max={1000} defaultValue={[100, 1000]} onValueChange={setCurrentMinMaxValue} />
 							</View>
 						</View>
 					</View>
-				</Section>
-
-				{/* Thumb Variants × Track Variants */}
-				<Section title="Thumb Variants × Track Variants">
-					{THUMB_VARIANTS.map((thumbVariant) => (
-						<View key={thumbVariant} style={commonStyles.column}>
-							<Text style={commonStyles.label}>{thumbVariant}</Text>
-							<View style={commonStyles.column}>
-								{TRACK_VARIANTS.map((trackVariant) => (
-									<View key={trackVariant} style={styles.sliderContainer}>
-										<Slider
-											thumbVariant={thumbVariant}
-											trackVariant={trackVariant}
-											defaultValue={[50]}
-										/>
-									</View>
-								))}
-							</View>
-						</View>
-					))}
-				</Section>
-
-				{/* Sizes × Thumb Variants */}
-				<Section title="Sizes × Thumb Variants">
-					{SIZES.map((size) => (
-						<View key={size} style={commonStyles.column}>
-							<Text style={commonStyles.label}>{size}</Text>
-							<View style={commonStyles.column}>
-								{THUMB_VARIANTS.map((thumbVariant) => (
-									<View key={thumbVariant} style={styles.sliderContainer}>
-										<Slider
-											size={size}
-											thumbVariant={thumbVariant}
-											defaultValue={[50]}
-										/>
-									</View>
-								))}
-							</View>
-						</View>
-					))}
 				</Section>
 			</View>
 		</ScrollView>

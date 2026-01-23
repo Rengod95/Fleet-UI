@@ -3,7 +3,6 @@ import {
 	Icon,
 	type ContextHeaderShadow,
 	type ContextHeaderSize,
-	type ContextHeaderPaddingHorizontal,
 } from '@fleet-ui/components';
 import { Alert, ScrollView, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
@@ -14,6 +13,7 @@ import {
 	Section,
 } from '../../common/views';
 import { EllipsisIcon, SaveIcon, SearchIcon, SettingsIcon, XIcon } from 'lucide-react-native';
+import { ContextHeaderPaddingHorizontal } from '@fleet-ui/components/src/ContextHeader/ContextHeader.types';
 
 const SIZES: ContextHeaderSize[] = ['sm', 'md', 'lg', 'xl'];
 const SHADOWS: ContextHeaderShadow[] = ['none', 'sm', 'md', 'lg'];
@@ -39,6 +39,19 @@ export default function ContextHeaderExamplesScreen() {
 				/>
 
 				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic ContextHeader example (minimal required props)."
+					sectionBodyStyle={{ padding: 0 }}
+				>
+					<ContextHeader
+						size="md"
+						title="Context Header"
+						onBackPress={handleBackPress}
+					/>
+				</Section>
+
+				<Section
 					title="Sizes"
 					description="Different height and typography sizes."
 					sectionBodyStyle={{ padding: 0 }}
@@ -51,6 +64,7 @@ export default function ContextHeaderExamplesScreen() {
 								title={`Size: ${size}`}
 								onBackPress={handleBackPress}
 								style={styles.header}
+								
 							/>
 						))}
 					</View>
@@ -79,6 +93,7 @@ export default function ContextHeaderExamplesScreen() {
 								title={`Shadow: ${shadow}`}
 								onBackPress={handleBackPress}
 								style={styles.headerWithMargin}
+								paddingHorizontal='sm'
 							/>
 						))}
 					</View>
@@ -94,12 +109,14 @@ export default function ContextHeaderExamplesScreen() {
 							titleAlign="center"
 							onBackPress={handleBackPress}
 							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 						<ContextHeader
 							title="Left Aligned"
 							titleAlign="left"
 							onBackPress={handleBackPress}
 							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 					</View>
 				</Section>
@@ -113,12 +130,15 @@ export default function ContextHeaderExamplesScreen() {
 							title="No Back Button"
 							showBackButton={false}
 							style={styles.header}
+							paddingHorizontal='sm'
+							
 						/>
 						<ContextHeader
 							title="With Right Action"
 							showBackButton={false}
 							right={<Icon icon={SettingsIcon} />}
 							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 					</View>
 				</Section>
@@ -132,11 +152,13 @@ export default function ContextHeaderExamplesScreen() {
 							title="Custom Left"
 							left={<Icon icon={XIcon} />}
 							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 						<ContextHeader
 							title="Empty Left (left=null)"
 							left={null}
 							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 					</View>
 				</Section>
@@ -151,6 +173,7 @@ export default function ContextHeaderExamplesScreen() {
 							onBackPress={handleBackPress}
 							right={<Icon icon={EllipsisIcon} />}
 							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 						<ContextHeader
 							title="Multiple Actions"
@@ -162,26 +185,7 @@ export default function ContextHeaderExamplesScreen() {
 								</View>
 							}
 							style={styles.header}
-						/>
-					</View>
-				</Section>
-
-				<Section
-					title="Background Color"
-					description="Custom background color override."
-				>
-					<View style={styles.headerContainer}>
-						<ContextHeader
-							title="Primary Background"
-							onBackPress={handleBackPress}
-							backgroundColor={theme.colors.primary.content_2}
-							style={styles.header}
-						/>
-						<ContextHeader
-							title="Neutral Background"
-							onBackPress={handleBackPress}
-							backgroundColor={theme.colors.neutral.content_2}
-							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 					</View>
 				</Section>
@@ -196,6 +200,7 @@ export default function ContextHeaderExamplesScreen() {
 							onBackPress={handleBackPress}
 							right={<Icon icon={EllipsisIcon} />}
 							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 					</View>
 				</Section>
@@ -216,6 +221,7 @@ export default function ContextHeaderExamplesScreen() {
 								</View>
 							}
 							style={styles.header}
+							paddingHorizontal='sm'
 						/>
 					</View>
 				</Section>
@@ -226,12 +232,14 @@ export default function ContextHeaderExamplesScreen() {
 
 const styles = StyleSheet.create((theme) => ({
 	headerContainer: {
+		width: '100%',
 		gap: theme.spacing[4],
 	},
 	header: {
 		// borderWidth: 1,
 		// borderColor: theme.colors.neutral.border_subtle,
 		borderRadius: theme.rounded.md,
+		backgroundColor: theme.colors.neutral.content_2,
 	},
 	headerWithMargin: {
 		borderWidth: 1,
@@ -241,6 +249,6 @@ const styles = StyleSheet.create((theme) => ({
 	},
 	rightActions: {
 		flexDirection: 'row',
-		gap: theme.spacing[2],
+		gap: theme.spacing[4],
 	},
 }));

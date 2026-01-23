@@ -43,28 +43,22 @@ export default function TableRowExamplesScreen() {
 			<View style={commonStyles.content}>
 				<PageHeader
 					title="TableRow"
-					description="A component that displays data in a key-value format with left (label) and right (value) aligned content. Based on Toss Design System TableRow."
+					description="A component that displays data in a key-value format with left (label) and right (value) aligned content. Inspired by Toss Design System TableRow."
 				/>
 
-				{/* Basic Usage */}
 				<Section
-					title="Basic Usage"
-					description="Simple TableRow with left label and right value."
+					title="Overview"
+					value="overview"
+					description="Most basic TableRow example."
 				>
-					<View style={styles.column}>
-						<TableRow
-							left="받는 분"
-							right="김토스"
-							leftVariant="flat"
-							rightVariant="ghost"
-						/>
-						<TableRow
-							left="받는 분 통장표시"
-							right="강토스"
-							leftVariant="flat"
-							rightVariant="ghost"
-						/>
-						<TableRow left="미리알림" right="이체 1일 전" />
+					<View style={commonStyles.fullWidthContainer}>
+						<View style={[styles.exampleCard, { width:'100%'}]}>
+							<Text style={styles.cardTitle}>Payment Receipt</Text>
+							<TableRow rightVariant='outlined' left="Payment Method" right="TossPay" />
+							<TableRow left="Payment Date" right="2024.12.06 14:30" />
+							<TableRow left="Payment Status" right="Completed" />
+							<TableRow leftVariant="flat" left="Amount" right="12,500$ (USD)" size="lg" />
+						</View>
 					</View>
 				</Section>
 
@@ -73,7 +67,7 @@ export default function TableRowExamplesScreen() {
 					title="Highlight"
 					description="Highlight the left or right content."
 				>
-					<View style={styles.column}>
+					<View style={[styles.column, {width:'100%'}]}>
 						<TableRow left="Default Left" right="Default Right" />
 						<TableRow
 							left="Left Highlighted"
@@ -97,26 +91,25 @@ export default function TableRowExamplesScreen() {
 				{/* Align Modes */}
 				<Section
 					title="Alignment"
-					description="space-between: Left and right at opposite ends. left: Both aligned to the left."
+					description="Align the left and right content to the left or space-between."
 				>
-					<View style={styles.column}>
+					<View style={[styles.column, {width:'100%'}]}>
 						<View style={styles.subsection}>
 							<Text style={styles.subsectionTitle}>
 								space-between (default)
 							</Text>
 							<TableRow
 								align="space-between"
-								left="받는 분 통장표시"
-								right="강토스"
-								highlightRight={true}
-								highlightLeft={false}
+								left="Recipient"
+								right="John Doe"
 							/>
 						</View>
 
 						<View style={styles.subsection}>
 							<Text style={styles.subsectionTitle}>left</Text>
-							<TableRow align="left" left="받는 분 통장표시" right="강토스" />
+							<TableRow align="left" left="Recipient" right="John Doe" />
 						</View>
+
 					</View>
 				</Section>
 
@@ -125,20 +118,20 @@ export default function TableRowExamplesScreen() {
 					title="Left Ratio"
 					description="Control the width ratio of the left section when align='left'."
 				>
-					<View style={styles.column}>
+					<View style={[styles.column, {width:'100%'}]}>
 						<View style={styles.subsection}>
 							<Text style={styles.subsectionTitle}>leftRatio={'{30}'}</Text>
 							<TableRow
 								align="left"
 								leftRatio={30}
-								left="받는 분"
-								right="김토스"
+								left="Recipient"
+								right="John Doe"
 							/>
 							<TableRow
 								align="left"
 								leftRatio={30}
-								left="통장표시"
-								right="강토스"
+								left="Account Number"
+								right="1234567890"
 							/>
 						</View>
 
@@ -147,14 +140,14 @@ export default function TableRowExamplesScreen() {
 							<TableRow
 								align="left"
 								leftRatio={50}
-								left="받는 분"
-								right="김토스"
+								left="Recipient"
+								right="John Doe"
 							/>
 							<TableRow
 								align="left"
 								leftRatio={50}
-								left="통장표시"
-								right="강토스"
+								left="Account Number"
+								right="1234567890"
 							/>
 						</View>
 
@@ -163,14 +156,14 @@ export default function TableRowExamplesScreen() {
 							<TableRow
 								align="left"
 								leftRatio={70}
-								left="받는 분"
-								right="김토스"
+								left="Recipient"
+								right="John Doe"
 							/>
 							<TableRow
 								align="left"
 								leftRatio={70}
-								left="통장표시"
-								right="강토스"
+								left="Account Number"
+								right="1234567890"
 							/>
 						</View>
 					</View>
@@ -178,7 +171,7 @@ export default function TableRowExamplesScreen() {
 
 				{/* Sizes */}
 				<Section title="Sizes" description="Size variants from sm to lg.">
-					<View style={styles.column}>
+					<View style={[styles.column, {width:'100%'}]}>
 						{SIZES.map((size) => (
 							<TableRow
 								key={size}
@@ -192,10 +185,10 @@ export default function TableRowExamplesScreen() {
 
 				{/* Container Variants */}
 				<Section
-					title="Container Variants"
-					description="leftVariant and rightVariant control the visual style of each section container."
+					title="Variants"
+					description="TableRow's variant can be applied separately to left and right."
 				>
-					<View style={styles.column}>
+					<View style={[styles.column, {width:'100%'}]}>
 						<View style={styles.subsection}>
 							<Text style={styles.subsectionTitle}>leftVariant options</Text>
 							{CONTAINER_VARIANTS.map((variant) => (
@@ -219,34 +212,28 @@ export default function TableRowExamplesScreen() {
 								/>
 							))}
 						</View>
-					</View>
-				</Section>
 
-				{/* Mixed Container Variants */}
-				<Section
-					title="Mixed Container Variants"
-					description="Combining different leftVariant and rightVariant styles."
-				>
-					<View style={styles.column}>
-						<TableRow
-							leftVariant="flat"
-							rightVariant="outlined"
-							left="flat"
-							right="outlined"
-						/>
-						<TableRow
-							leftVariant="outlined"
-							rightVariant="flat"
-							left="outlined"
-							right="flat"
-						/>
-						<TableRow
-							leftVariant="flat"
-							rightVariant="flat"
-							colorScheme="primary"
-							left="Primary"
-							right="Both flat"
-						/>
+						<View style={styles.subsection}>
+							<Text style={styles.subsectionTitle}>mixed variants are available.</Text>
+							<TableRow
+								leftVariant="flat"
+								rightVariant="outlined"
+								left="Flat"
+								right="Outlined"
+							/>
+							<TableRow
+								leftVariant="outlined"
+								rightVariant="ghost"
+								left="Flat"
+								right="Outlined"
+							/>
+							<TableRow
+								leftVariant="ghost"
+								rightVariant="flat"
+								left="Ghost"
+								right="Flat"
+							/>
+						</View>
 					</View>
 				</Section>
 
@@ -284,121 +271,52 @@ export default function TableRowExamplesScreen() {
 					title="Custom Content"
 					description="Using React components for left/right content."
 				>
-					<View style={styles.column}>
-						<TableRow
-							left="Text style override"
-							right="Primary link text"
-							disableRightTextStyle
-							rightTextStyle={styles.linkText}
-						/>
-						<TableRow
-							left="Status"
-							right={
-								<Chip size="sm" colorScheme="success">
-									Active
-								</Chip>
-							}
-							disableRightTextStyle
-						/>
-						<TableRow
-							left="Account"
-							right={
-								<View style={styles.row}>
-									<Text style={styles.valueText}>1234-5678-9012</Text>
-									<Icon icon={Copy} size="sm" />
-								</View>
-							}
-							disableRightTextStyle
-						/>
-						<TableRow
-							left={
-								<View style={styles.row}>
-									<Icon icon={Check} size="sm" />
-									<Text style={styles.labelText}>Verified</Text>
-								</View>
-							}
-							right="2024.01.15"
-							disableLeftTextStyle
-						/>
-					</View>
-				</Section>
-
-				{/* Real-world Examples */}
-				<Section
-					title="Real-world Examples"
-					description="Practical usage examples."
-				>
-					<View style={[styles.column, { gap: 32 }]}>
-						{/* Payment Receipt */}
-						<View style={styles.exampleCard}>
-							<Text style={styles.cardTitle}>Payment Receipt</Text>
-							<TableRow left="결제 금액" right="12,500원" size="lg" />
-							<TableRow left="결제 수단" right="토스페이" />
-							<TableRow left="결제 일시" right="2024.12.06 14:30" />
+					<View style={[styles.column, {width:'100%'}]}>
+						<View style={styles.subsection}>
+							<Text style={styles.subsectionTitle}>Text style overrides are available.</Text>
 							<TableRow
-								left="결제 상태"
+								left="Text style override"
+								right="Primary link text"
+								disableRightTextStyle
+								rightTextStyle={styles.linkText}
+							/>
+						</View>
+
+						<View style={styles.subsection}>
+							<Text style={styles.subsectionTitle}>left, and right prop can be passed with any ReactNode type.</Text>
+							<TableRow
+								left="Status"
 								right={
-									<Chip size="md" colorScheme="success">
-										완료
+									<Chip size="sm" colorScheme="success">
+										Active
 									</Chip>
 								}
 								disableRightTextStyle
 							/>
-						</View>
-
-						{/* Account Info */}
-						<View style={styles.exampleCard}>
-							<Text style={styles.cardTitle}>Account Information</Text>
-							<TableRow left="이름" right="홍길동" leftVariant="flat" />
 							<TableRow
-								left="이메일"
-								right="hong@example.com"
-								leftVariant="flat"
+								left="Account"
+								right={
+									<View style={styles.row}>
+										<Text style={styles.valueText}>1234-5678-9012</Text>
+										<Icon icon={Copy} size="sm" />
+									</View>
+								}
+								disableRightTextStyle
 							/>
 							<TableRow
-								left="전화번호"
-								right="010-1234-5678"
-								leftVariant="flat"
-							/>
-							<TableRow left="가입일" right="2024.01.01" leftVariant="flat" />
-						</View>
-
-						{/* Product Details */}
-						<View style={styles.exampleCard}>
-							<Text style={styles.cardTitle}>Product Details</Text>
-							<TableRow
-								align="left"
-								leftRatio={35}
-								left="상품명"
-								right="Premium Subscription"
-								rightVariant="ghost"
-								highlightRight={true}
-							/>
-							<TableRow
-								align="left"
-								leftRatio={35}
-								left="가격"
-								right="월 9,900원"
-								rightVariant="ghost"
-								highlightRight={true}
-							/>
-							<TableRow
-								align="left"
-								leftRatio={35}
-								left="혜택"
-								right="무제한 이용"
-							/>
-							<TableRow
-								align="left"
-								leftRatio={35}
-								left="링크"
-								right={'자세히 보기'}
-								rightVariant="flat"
-								colorScheme="primary"
+								left={
+									<View style={styles.row}>
+										<Icon icon={Check} size="sm" />
+										<Text style={styles.labelText}>Verified</Text>
+									</View>
+								}
+								right="2024.01.15"
+								disableLeftTextStyle
 							/>
 						</View>
 					</View>
 				</Section>
+
 			</View>
 		</ScrollView>
 	);

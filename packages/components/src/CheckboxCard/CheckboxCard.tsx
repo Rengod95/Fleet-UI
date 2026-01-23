@@ -75,13 +75,14 @@ export const checkboxCardStyles = StyleSheet.create((theme, _rt) => {
 		});
 
 	const textCompoundVariants = paletteEntries.flatMap(([scheme, palette]) => {
+		const hasSolidColor = theme.utils.paletteHasSolid(palette);
 			return [
 				{
 					colorScheme: scheme,
 					selected:true,
 					variant: 'filled' as const,
 					styles: {
-						color: palette.text_inversed,
+						color:  hasSolidColor ? palette.text_1 : palette.text_inversed,
 					},
 				},
 			];

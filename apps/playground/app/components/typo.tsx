@@ -15,7 +15,31 @@ const VARIANTS: TypoVariant[] = [
 	'body3',
 	'caption1',
 	'caption2',
-	'button',
+] as const;
+
+const SEMANTIC_WEAK_STRONG_VARIANTS: TypoVariant[] = [
+	'h1Weak',
+	'h1Strong',
+	'h2Weak',
+	'h2Strong',
+	'h3Weak',
+	'h3Strong',
+	'h4Weak',
+	'h4Strong',
+	'h5Weak',
+	'h5Strong',
+	'h6Weak',
+	'h6Strong',
+	'body1Weak',
+	'body1Strong',
+	'body2Weak',
+	'body2Strong',
+	'body3Weak',
+	'body3Strong',
+	'caption1Weak',
+	'caption1Strong',
+	'caption2Weak',
+	'caption2Strong',
 ] as const;
 
 export default function TypoExamplesScreen() {
@@ -30,68 +54,105 @@ export default function TypoExamplesScreen() {
 				/>
 
 				<Section
+					title="Overview"
+					value="overview"
+					description="Most basic Typo example."
+				>
+					<Typo variant="body1">Typo</Typo>
+				</Section>
+
+				<Section
 					title="Semantic variants"
 					description="Each variant maps directly to Layer 2 semantic typography tokens."
 				>
 					<View style={styles.variantList}>
 						{VARIANTS.map((variant) => (
 							<Typo key={variant} variant={variant} style={styles.variantItem}>
-								{variant.toUpperCase()} · The quick brown fox jumps over the
-								lazy dog.
+								{variant.toUpperCase()} · The Quick Brown fox
+							</Typo>
+						))}
+					</View>
+				</Section>
+
+				<Section title="Semanitc Weak Strong" description="Semanitc weak and strong variants are available for each variant.">
+					<View style={styles.variantList}>
+						{SEMANTIC_WEAK_STRONG_VARIANTS.map((variant) => (
+							<Typo key={variant} variant={variant} style={styles.variantItem}>
+								{variant.toUpperCase()}{'\n'}Sample Text
 							</Typo>
 						))}
 					</View>
 				</Section>
 
 				<Section
-					title="Extend layout"
+					title="Extend Prop"
 					description="Default text hugs its content width. Toggle extend to occupy the horizontal space while keeping the line height."
 				>
 					<View style={styles.extendColumn}>
 						<View style={styles.extendWrapper}>
-							<Typo variant="body2">
-								Default width — text shrinks to content and leaves surrounding
-								flex space untouched.
+							<Typo variant="body2" style={{backgroundColor: 'red', color: 'white'}}>
+								Default width
 							</Typo>
 						</View>
 						<View style={styles.extendWrapper}>
-							<Typo variant="body2" extend numberOfLines={1}>
-								Extend mode — width: 100% with height locked to the variant line
-								height. Useful for truncation inside rows.
+							<Typo variant="body2" extend numberOfLines={1} style={{backgroundColor: 'blue', color: 'white'}}>
+								Extend Mode (width: 100%)
 							</Typo>
 						</View>
 					</View>
 				</Section>
 
-				<Section
-					title="Style overrides"
-					description="Use the style prop to tap directly into semantic colors and layout tweaks."
-				>
+				<Section title="Color Scheme" description="Color scheme is used to control the color of the text.">
 					<View style={styles.variantList}>
-						<Typo
-							variant="body1"
-							style={{ color: theme.colors.primary.text_1 }}
-						>
-							Primary action copy using theme.colors.primary.text_1
+						<Typo variant="body2" colorScheme="neutral">
+							Neutral
 						</Typo>
-						<Typo
-							variant="body1"
-							style={{
-								color: theme.colors.success.text_1,
-								textTransform: 'uppercase',
-								letterSpacing: 1,
-							}}
-						>
-							Success emphasis with uppercase tracking
+					</View>
+					<View style={styles.variantList}>
+						<Typo variant="body2" colorScheme="primary">
+							Primary
 						</Typo>
-						<Typo
-							variant="body1"
-							style={{
-								color: theme.colors.warning.text_1,
-								textAlign: 'center',
-							}}
-						>
-							Centered warning helper text using theme.tokens
+					</View>
+					<View style={styles.variantList}>
+						<Typo variant="body2" colorScheme="success">
+							Success
+						</Typo>
+					</View>
+					<View style={styles.variantList}>
+						<Typo variant="body2" colorScheme="warning">
+							Warning
+						</Typo>
+					</View>
+					<View style={styles.variantList}>
+						<Typo variant="body2" colorScheme="error">
+							Error
+						</Typo>
+					</View>
+					<View style={styles.variantList}>
+						<Typo variant="body2" colorScheme="info">
+							Info
+						</Typo>
+					</View>
+				</Section>
+				<Section title="Color Weight" description="Color weight is used to control the weight of the text.">
+					<View style={[styles.variantList, { backgroundColor: '#666666' }]}>
+						<Typo variant="body2" colorWeight={1} colorScheme="success">
+							Weight 1
+						</Typo>
+					</View>
+					<View style={[styles.variantList, { backgroundColor: '#666666' }]}>
+						<Typo variant="body2" colorWeight={2} colorScheme="success">
+							Weight 2
+						</Typo>
+					</View>
+					<View style={[styles.variantList, { backgroundColor: '#666666' }]}>
+						<Typo variant="body2" colorScheme="success" colorWeight={3}>
+							Weight 3
+						</Typo>
+					</View>
+					<View style={[styles.variantList, { backgroundColor: '#666666' }]}>
+						<Typo variant="body2" colorWeight={4} colorScheme="success">
+							Weight 4
 						</Typo>
 					</View>
 				</Section>
@@ -102,7 +163,7 @@ export default function TypoExamplesScreen() {
 
 const styles = StyleSheet.create((theme) => ({
 	variantList: {
-		gap: theme.spacing[3],
+		gap: theme.spacing[5],
 		width: '100%',
 	},
 	variantItem: {

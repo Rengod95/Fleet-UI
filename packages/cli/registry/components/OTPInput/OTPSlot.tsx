@@ -306,7 +306,7 @@ const slotStyles = StyleSheet.create((theme) => {
 						backgroundColor: 'transparent',
 						borderColor: theme.colors.neutral.border_default,
 						borderWidth: 0,
-						borderBottomWidth: StyleSheet.hairlineWidth,
+						borderBottomWidth: 1,
 						borderRadius: 0,
 					},
 					faded: {
@@ -350,7 +350,7 @@ const slotStyles = StyleSheet.create((theme) => {
 				},
 				isDisabled: {
 					true: {
-						opacity: 0.5,
+						opacity: 0.3,
 					},
 				},
 				isActive: {

@@ -19,10 +19,6 @@ export const components = [
     "slug": "button"
   },
   {
-    "name": "Card",
-    "slug": "card"
-  },
-  {
     "name": "Checkbox",
     "slug": "checkbox"
   },

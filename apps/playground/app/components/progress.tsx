@@ -1,4 +1,4 @@
-import { Progress } from '@fleet-ui/components';
+import { Button, Progress } from '@fleet-ui/components';
 import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
@@ -63,10 +63,10 @@ export default function ProgressScreen() {
 
 	// Sample labels
 	const sampleLabels = [
-		{ stepIndex: 0, label: '시작' },
-		{ stepIndex: 1, label: '정보 입력' },
-		{ stepIndex: 2, label: '확인' },
-		{ stepIndex: 3, label: '완료' },
+		{ stepIndex: 0, label: 'Start' },
+		{ stepIndex: 1, label: 'Input Information' },
+		{ stepIndex: 2, label: 'Confirm' },
+		{ stepIndex: 3, label: 'Complete' },
 	];
 
 	return (
@@ -78,7 +78,11 @@ export default function ProgressScreen() {
 				/>
 
 				{/* Overview */}
-				<Section title="Overview">
+				<Section
+					title="Overview"
+					value="overview"
+					description="The most basic Progress example."
+				>
 					<View style={styles.progressContainer}>
 						<Progress
 							step={5}
@@ -86,6 +90,16 @@ export default function ProgressScreen() {
 							thumbVariant="number"
 							trackVariant="lined"
 							colorScheme="neutral"
+						/>
+					</View>
+					<View style={styles.progressContainer}>
+						<Progress
+							step={5}
+							activeStep={2}
+							thumbVariant="none"
+							trackVariant="lined"
+							colorScheme="neutral"
+							thumbGap='none'
 						/>
 					</View>
 				</Section>
@@ -99,14 +113,14 @@ export default function ProgressScreen() {
 								style={[[commonStyles.column, { width: '100%' }]]}
 							>
 								<View style={styles.progressContainer}>
+									<Text style={commonStyles.label}>{variant}</Text>
 									<Progress
 										step={5}
 										activeStep={2}
 										trackVariant={variant}
-										thumbVariant="number"
+										thumbVariant="none"
 									/>
 								</View>
-								<Text style={commonStyles.label}>{variant}</Text>
 							</View>
 						))}
 					</View>
@@ -150,33 +164,22 @@ export default function ProgressScreen() {
 					</View>
 				</Section>
 
-				{/* Thumb Variants with Flat Track */}
-				<Section title="Thumb Variants (Flat Track)">
-					<View style={commonStyles.column}>
-						{THUMB_VARIANTS.map((variant) => (
-							<View key={variant} style={commonStyles.column}>
-								<Text style={commonStyles.label}>{variant}</Text>
-								<View style={styles.progressContainer}>
-									<Progress
-										step={5}
-										activeStep={2}
-										thumbVariant={variant}
-										trackVariant="flat"
-									/>
-								</View>
-							</View>
-						))}
-					</View>
-				</Section>
-
 				{/* Sizes */}
 				<Section title="Sizes">
 					<View style={commonStyles.column}>
 						{SIZES.map((size) => (
 							<View key={size} style={commonStyles.column}>
-								<Text style={commonStyles.label}>{size}</Text>
+								<Text style={commonStyles.label}>FLAT - {size}</Text>
 								<View style={styles.progressContainer}>
 									<Progress step={5} activeStep={2} size={size} />
+								</View>
+							</View>
+						))}
+						{SIZES.map((size) => (
+							<View key={size} style={commonStyles.column}>
+								<Text style={commonStyles.label}>LINED - {size}</Text>
+								<View style={styles.progressContainer}>
+									<Progress step={5} activeStep={2} size={size} trackVariant='lined' />
 								</View>
 							</View>
 						))}
@@ -197,27 +200,8 @@ export default function ProgressScreen() {
 					</View>
 				</Section>
 
-				{/* Track Variants × Color Schemes */}
-				<Section title="Track Variants × Color Schemes">
-					{TRACK_VARIANTS.map((trackVariant) => (
-						<View key={trackVariant} style={commonStyles.column}>
-							<Text style={commonStyles.label}>{trackVariant}</Text>
-							{COLOR_SCHEMES.slice(0, 3).map((scheme) => (
-								<View key={scheme} style={styles.progressContainer}>
-									<Progress
-										step={5}
-										activeStep={2}
-										trackVariant={trackVariant}
-										colorScheme={scheme}
-									/>
-								</View>
-							))}
-						</View>
-					))}
-				</Section>
-
 				{/* Rounded Options */}
-				<Section title="Rounded Options">
+				<Section title="Rounded">
 					<View style={commonStyles.column}>
 						{ROUNDED_OPTIONS.map((rounded) => (
 							<View key={rounded} style={commonStyles.column}>
@@ -236,15 +220,28 @@ export default function ProgressScreen() {
 				</Section>
 
 				{/* Different Step Counts */}
-				<Section title="Step Counts">
+				<Section title="Step Counts" description='Progress step count is based on 1-based index. if you want to set 4 steps, you should set step=4.'>
 					<View style={commonStyles.column}>
-						{[3, 5, 7, 10].map((stepCount) => (
+						{[3, 5,].map((stepCount) => (
 							<View key={stepCount} style={commonStyles.column}>
-								<Text style={commonStyles.label}>{stepCount} steps</Text>
+								<Text style={commonStyles.label}>Thumb Variant - None, {stepCount} steps total, activeStep=3</Text>
 								<View style={styles.progressContainer}>
 									<Progress
 										step={stepCount}
-										activeStep={Math.floor(stepCount / 2)}
+										activeStep={3}
+									/>
+								</View>
+							</View>
+						))}
+						{[3, 5,].map((stepCount) => (
+							<View key={stepCount} style={commonStyles.column}>
+								<Text style={commonStyles.label}>Thumb Variant - Circle, {stepCount} steps total, activeStep=3</Text>
+								<View style={styles.progressContainer}>
+									<Progress
+										step={stepCount}
+										trackVariant="lined"
+										thumbVariant="circle"
+										activeStep={3} 
 									/>
 								</View>
 							</View>
@@ -256,32 +253,34 @@ export default function ProgressScreen() {
 				<Section title="Controlled Mode">
 					<View style={commonStyles.column}>
 						<View style={styles.progressContainer}>
+							<Text style={commonStyles.label}>
+								Active Step: {controlledStep} / 5
+							</Text>
 							<Progress
 								step={5}
 								activeStep={controlledStep}
 								onStepChange={setControlledStep}
 							/>
 						</View>
-						<Text style={styles.stateText}>
-							Active Step: {controlledStep} / 5
-						</Text>
 						<View style={styles.buttonRow}>
-							<View
-								style={styles.stepButton}
-								onTouchEnd={() =>
+							<Button
+								variant="flat"
+								size="sm"
+								onPress={() =>
 									setControlledStep((prev) => Math.max(0, prev - 1))
 								}
 							>
-								<Text style={styles.stepButtonText}>Previous</Text>
-							</View>
-							<View
-								style={styles.stepButton}
-								onTouchEnd={() =>
+								Previous
+							</Button>
+							<Button
+								variant="flat"
+								size="sm"
+								onPress={() =>
 									setControlledStep((prev) => Math.min(5, prev + 1))
 								}
 							>
-								<Text style={styles.stepButtonText}>Next</Text>
-							</View>
+								Next
+							</Button>
 						</View>
 					</View>
 				</Section>
@@ -319,95 +318,8 @@ export default function ProgressScreen() {
 					</View>
 				</Section>
 
-				{/* Animation Toggle */}
-				<Section title="Animation Toggle">
-					<View style={commonStyles.column}>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>Animated (default)</Text>
-							<View style={styles.progressContainer}>
-								<Progress step={5} activeStep={controlledStep} animated />
-							</View>
-						</View>
-						<View style={commonStyles.column}>
-							<Text style={commonStyles.label}>No Animation</Text>
-							<View style={styles.progressContainer}>
-								<Progress
-									step={5}
-									activeStep={controlledStep}
-									animated={false}
-								/>
-							</View>
-						</View>
-					</View>
-				</Section>
-
-				{/* Sizes × Track Variants */}
-				<Section title="Sizes × Track Variants">
-					{SIZES.map((size) => (
-						<View key={size} style={commonStyles.column}>
-							<Text style={commonStyles.label}>{size}</Text>
-							<View style={commonStyles.column}>
-								{TRACK_VARIANTS.map((trackVariant) => (
-									<View key={trackVariant} style={styles.progressContainer}>
-										<Progress
-											step={5}
-											activeStep={2}
-											size={size}
-											trackVariant={trackVariant}
-										/>
-									</View>
-								))}
-							</View>
-						</View>
-					))}
-				</Section>
-
-				{/* Complete Example */}
-				<Section title="Complete Example">
-					<View style={commonStyles.column}>
-						<View style={[commonStyles.column, { marginTop: 16 }]}>
-							<Text style={commonStyles.label}>Checkout Steps</Text>
-							<View style={styles.progressContainer}>
-								<Progress
-									step={3}
-									activeStep={1}
-									trackVariant="flat"
-									thumbVariant="number"
-									colorScheme="success"
-									size="lg"
-									rounded="lg"
-								/>
-							</View>
-						</View>
-						<View style={[commonStyles.column, { marginTop: 16 }]}>
-							<Text style={commonStyles.label}>Form Completion</Text>
-							<View style={styles.progressContainer}>
-								<Progress
-									step={6}
-									activeStep={4}
-									trackVariant="lined"
-									thumbVariant="circle"
-									colorScheme="info"
-									size="sm"
-								/>
-							</View>
-						</View>
-						<View style={[commonStyles.column, { marginTop: 16 }]}>
-							<Text style={commonStyles.label}>Simple Progress</Text>
-							<View style={styles.progressContainer}>
-								<Progress
-									step={5}
-									activeStep={3}
-									trackVariant="flat"
-									thumbVariant="number"
-									colorScheme="primary"
-									size="md"
-									rounded="md"
-								/>
-							</View>
-						</View>
-					</View>
-				</Section>
+				
+				<View style={{ height: 100 }} />
 			</View>
 		</ScrollView>
 	);

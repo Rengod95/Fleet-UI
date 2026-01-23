@@ -313,10 +313,8 @@ export const SectionHeader = forwardRef<View, SectionHeaderProps>(
 			...rest
 		} = props;
 
-		const { theme } = useUnistyles();
-
 		const paddingHorizontal = padding ?? 0;
-		const headerGap = gap ?? 3;
+		const headerGap = gap ?? 0;
 
 		styles.useVariants({ size });
 
@@ -386,9 +384,10 @@ const SectionBase = forwardRef<View, SectionProps>((props, ref) => {
 		rightIcon,
 		children,
 		size = 'md',
-		gap,
-		padding,
-		contentSpacing,
+		contentGap,
+		contentPaddingVertical,
+		contentPaddingHorizontal,
+		contentTopMargin,
 		titleRatio = DEFAULT_TITLE_RATIO,
 		subtitlePosition = 'bottom',
 		headerStyle,
@@ -398,8 +397,10 @@ const SectionBase = forwardRef<View, SectionProps>((props, ref) => {
 		...rest
 	} = props;
 
-	const paddingX = padding ?? 0;
-	const bodyGap = contentSpacing ?? 5;
+	const evaluatedPaddingHorizontal = contentPaddingHorizontal ?? 0;
+	const evaluatedPaddingVertical = contentPaddingVertical ?? 0;
+	const evaluatedContentTopMargin = contentTopMargin ?? 16;
+	const evaluatedGap = contentGap ?? 8;
 
 	return (
 		<View ref={ref} style={[styles.container, style]} testID={testID} {...rest}>
@@ -409,8 +410,7 @@ const SectionBase = forwardRef<View, SectionProps>((props, ref) => {
 				right={right}
 				rightIcon={rightIcon}
 				size={size}
-				gap={gap}
-				padding={padding}
+				gap={4}
 				titleRatio={titleRatio}
 				subtitlePosition={subtitlePosition}
 				style={headerStyle}
@@ -421,8 +421,10 @@ const SectionBase = forwardRef<View, SectionProps>((props, ref) => {
 				<View
 					style={[
 						styles.body({
-							gap: bodyGap,
-							paddingX,
+							gap : evaluatedGap,
+							paddingHorizontal : evaluatedPaddingHorizontal,
+							paddingVertical : evaluatedPaddingVertical,
+							contentTopMargin : evaluatedContentTopMargin,
 						}),
 						contentStyle,
 					]}
@@ -524,11 +526,12 @@ const styles = StyleSheet.create((theme) => {
 				},
 			},
 		},
-		body: ({ gap, paddingX }: { gap: number; paddingX: number }) => ({
+		body: ({ gap, paddingHorizontal, paddingVertical, contentTopMargin }: { gap: number; paddingHorizontal: number; paddingVertical: number; contentTopMargin: number }) => ({
 			width: '100%',
 			gap,
-			paddingHorizontal: paddingX,
-			paddingTop: gap,
+			paddingHorizontal,
+			paddingVertical,
+			marginTop: contentTopMargin,
 		}),
 		rightAction: {
 			borderRadius: theme.rounded.md,

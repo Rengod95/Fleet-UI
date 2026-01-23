@@ -1,15 +1,17 @@
 import { Stack } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
-import { useUnistyles } from 'react-native-unistyles';
+import { useUnistyles ,StyleSheet} from 'react-native-unistyles';
+import { View } from 'react-native';
 
 export default function ComponentsLayout() {
 	const { theme } = useUnistyles();
 	const { embed } = useLocalSearchParams<{ embed?: string }>();
 	const isEmbed = embed === '1' || embed === 'true';
 	return (
+		<View style={styles.container}>
 		<Stack
 			screenOptions={{
-				headerShown: !isEmbed,
+				headerShown: false,
 				headerStyle: {
 					backgroundColor: theme.colors.neutral.content_1,
 				},
@@ -188,5 +190,14 @@ export default function ComponentsLayout() {
 				}}
 			/>
 		</Stack>
+		</View>
 	);
 }
+
+const styles = StyleSheet.create((theme,rt) => ({
+	container:{
+		maxWidth:720,
+		flex:1,
+		backgroundColor: theme.colors.background,
+	}
+}))

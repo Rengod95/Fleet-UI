@@ -22,22 +22,27 @@ export default function DividerExamplesScreen() {
 			<View style={commonStyles.content}>
 				<PageHeader
 					title="Divider"
-					description="콘텐츠 영역이나 섹션을 시각적으로 구분하는 수평 구분선. line(얇은 선)과 thick(두꺼운 선) 스타일을 지원합니다."
+					description="Separate content sections with a visual horizontal line. Supports line (thin) and thick (thick) styles."
 				/>
+
+				<Section
+					title="Overview"
+					value="overview"
+					description="Basic Divider example (line variant)."
+				>
+					<Text style={commonStyles.label}>Divider</Text>
+					<Divider variant="line" />
+				</Section>
 
 				{/* Variants */}
 				<Section
 					title="Variants"
-					description="line: 일반적인 얇은 구분선, thick: 섹션 단위 구분을 위한 두꺼운 선"
+					description="line: thin horizontal line, thick: thick horizontal line for section separation"
 				>
-					<View style={styles.demoContainer}>
-						<Text style={commonStyles.label}>line (default)</Text>
-						<Divider variant="line" />
-					</View>
-					<View style={styles.demoContainer}>
-						<Text style={commonStyles.label}>thick</Text>
-						<Divider variant="thick" />
-					</View>
+					<Text style={commonStyles.label}>line (default)</Text>
+					<Divider variant="line" />
+					<Text style={commonStyles.label}>thick</Text>
+					<Divider variant="thick" />
 				</Section>
 
 				{/* Sizes - Line Variant */}
@@ -46,10 +51,10 @@ export default function DividerExamplesScreen() {
 					description="sm: hairlineWidth, md: 1px (default), lg: 4px"
 				>
 					{SIZES.map((size) => (
-						<View key={size} style={styles.demoContainer}>
+						<>
 							<Text style={commonStyles.label}>size: {size}</Text>
 							<Divider variant="line" size={size} />
-						</View>
+						</>
 					))}
 				</Section>
 
@@ -59,35 +64,35 @@ export default function DividerExamplesScreen() {
 					description="sm: 4px, md: 16px (default), lg: 24px"
 				>
 					{SIZES.map((size) => (
-						<View key={size} style={styles.demoContainer}>
+						<>
 							<Text style={commonStyles.label}>size: {size}</Text>
 							<Divider variant="thick" size={size} />
-						</View>
+						</>
 					))}
 				</Section>
 
 				{/* Padded */}
 				<Section
-					title="Padded"
-					description="좌우 패딩을 적용하여 구분선의 너비를 조절합니다."
+					title="Horizontal Margin"
+					description="Apply horizontal margin to adjust the width of the divider."
 				>
 					{PADDED.map((padded) => (
-						<View key={padded} style={styles.demoContainer}>
-							<Text style={commonStyles.label}>padded: {padded}</Text>
-							<Divider padded={padded} />
+						<View style={{width: '100%', gap: theme.spacing[5]}}>
+							<Text style={commonStyles.label}>{padded}</Text>
+							<Divider horizontalMargin={padded} />
 						</View>
 					))}
 				</Section>
 
 				{/* Padded with Thick Variant */}
 				<Section
-					title="Padded + Thick"
-					description="두꺼운 구분선에도 패딩을 적용할 수 있습니다."
+					title="Horizontal Margin + Thick"
+					description="Apply horizontal margin to the thick divider."
 				>
 					{PADDED.map((padded) => (
-						<View key={padded} style={styles.demoContainer}>
-							<Text style={commonStyles.label}>padded: {padded}</Text>
-							<Divider variant="thick" size="sm" padded={padded} />
+						<View style={{width: '100%', gap: theme.spacing[5]}}>
+							<Text style={commonStyles.label}>{padded}</Text>
+							<Divider variant="thick" size="sm" horizontalMargin={padded} />
 						</View>
 					))}
 				</Section>
@@ -95,23 +100,23 @@ export default function DividerExamplesScreen() {
 				{/* Color Schemes */}
 				<Section
 					title="Color Schemes"
-					description="base: 기본 색상, inverted: 테마 반전 (ScopedTheme 활용)"
+					description="base: default color, inverted: theme inversion (use ScopedTheme)"
 				>
-					<View style={styles.demoContainer}>
-						<Text style={commonStyles.label}>colorScheme: base (default)</Text>
-						<Divider colorScheme="base" />
-					</View>
+					<>
+						<Text style={commonStyles.label}>inverted: false (default)</Text>
+						<Divider inverted={false} />
+					</>
 
-					<View style={styles.demoContainer}>
-						<Text style={commonStyles.label}>colorScheme: inverted</Text>
-						<Divider colorScheme="inverted" />
-					</View>
+					<>
+						<Text style={commonStyles.label}>inverted: true</Text>
+						<Divider inverted={true} />
+					</>
 				</Section>
 
 				{/* Inverted on Dark Background */}
 				<Section
-					title="Inverted 사용 예시"
-					description="어두운 배경에서 inverted 사용"
+					title="Inverted Example"
+					description="Use inverted on dark background"
 				>
 					<View
 						style={[
@@ -127,7 +132,7 @@ export default function DividerExamplesScreen() {
 						>
 							Dark Background
 						</Text>
-						<Divider colorScheme="inverted" />
+						<Divider inverted={true} />
 						<Text
 							style={[
 								styles.darkBackgroundText,
@@ -140,15 +145,16 @@ export default function DividerExamplesScreen() {
 				</Section>
 
 				{/* Use Cases */}
-				<Section title="사용 사례" description="실제 사용 시나리오 예시">
+				<Section title="Use Cases" description="Real-world usage scenario examples">
+					<View style={{width: '100%', gap: theme.spacing[5]}}>
 					{/* List Item Separation */}
 					<Text
 						style={[
-							styles.useCaseTitle,
-							{ color: theme.colors.neutral.text_1 },
+							commonStyles.label,
+							{ color: theme.colors.neutral.text_1, marginTop: 12 },
 						]}
 					>
-						1. 리스트 항목 구분
+						1. List item separation
 					</Text>
 					<View style={styles.listContainer}>
 						<View style={styles.listItem}>
@@ -167,11 +173,11 @@ export default function DividerExamplesScreen() {
 					{/* Section Separation */}
 					<Text
 						style={[
-							styles.useCaseTitle,
-							{ color: theme.colors.neutral.text_1, marginTop: 24 },
+							commonStyles.label,
+							{ color: theme.colors.neutral.text_1, marginTop: 12 },
 						]}
 					>
-						2. 섹션 구분
+						2. Section separation
 					</Text>
 					<View style={styles.sectionContainer}>
 						<View style={styles.section}>
@@ -206,11 +212,11 @@ export default function DividerExamplesScreen() {
 					{/* Card Internal Separation */}
 					<Text
 						style={[
-							styles.useCaseTitle,
-							{ color: theme.colors.neutral.text_1, marginTop: 24 },
+							commonStyles.label,
+							{ color: theme.colors.neutral.text_1, marginTop: 12 },
 						]}
 					>
-						3. 카드 내부 구분 (패딩 적용)
+						3. Card internal separation (padding applied)
 					</Text>
 					<View
 						style={[
@@ -226,43 +232,12 @@ export default function DividerExamplesScreen() {
 						>
 							Card Title
 						</Text>
-						<Divider padded="md" />
+						<Divider horizontalMargin="md" />
 						<Text style={{ color: theme.colors.neutral.text_2 }}>
 							Card content with padded divider that doesn't extend to the edges.
 						</Text>
 					</View>
-				</Section>
-
-				{/* All Combinations */}
-				<Section
-					title="Variant + Size 조합"
-					description="모든 variant와 size 조합 표시"
-				>
-					{VARIANTS.map((variant) => (
-						<View key={variant} style={styles.combinationGroup}>
-							<Text
-								style={[
-									styles.combinationTitle,
-									{ color: theme.colors.neutral.text_1 },
-								]}
-							>
-								{variant}
-							</Text>
-							{SIZES.map((size) => (
-								<View key={`${variant}-${size}`} style={styles.demoContainer}>
-									<Text
-										style={[
-											styles.label,
-											{ color: theme.colors.neutral.text_2 },
-										]}
-									>
-										{variant} + {size}
-									</Text>
-									<Divider variant={variant} size={size} />
-								</View>
-							))}
-						</View>
-					))}
+					</View>
 				</Section>
 			</View>
 		</ScrollView>
@@ -302,8 +277,9 @@ const styles = StyleSheet.create((theme) => ({
 		gap: 0,
 	},
 	section: {
-		paddingVertical: 16,
-		paddingHorizontal: 0,
+		borderColor: theme.colors.neutral.border_subtle,
+		paddingVertical: theme.spacing[6],
+		paddingHorizontal: theme.spacing[6],
 	},
 	sectionTitle: {
 		fontSize: theme.typography.h4.fontSize,
@@ -312,7 +288,7 @@ const styles = StyleSheet.create((theme) => ({
 	},
 	cardContainer: {
 		borderRadius: theme.rounded.lg,
-		borderWidth: 1,
+		boxShadow: theme.shadows.smooth_md,
 		padding: 16,
 		gap: 12,
 	},

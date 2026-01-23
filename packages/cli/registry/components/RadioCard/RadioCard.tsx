@@ -235,7 +235,7 @@ export const RadioCard = forwardRef<View, RadioCardProps>((props, ref) => {
 				style={[
 					radioCardStyles.container,
 					containerAnimatedStyle,
-					isDisabled && { opacity: 0.5 },
+					isDisabled && { opacity: 0.3 },
 					style,
 				]}
 			>
@@ -323,23 +323,32 @@ export const radioCardStyles = StyleSheet.create((theme, _rt) => {
 					styles: {
 						backgroundColor: hasSolidColor
 							? palette.content_3
-							: palette.content_2,
-						borderColor: palette.border_subtle,
+							: palette.content_3,
+						borderColor: hasSolidColor ? palette.border_subtle : palette.text_1,
 					},
 				},
 			];
 		});
 
 	const textCompoundVariants = paletteEntries.flatMap(([scheme, palette]) => {
-			return [
+		const hasSolidColor = theme.utils.paletteHasSolid(palette);
+		return [
 				{
 					colorScheme: scheme,
 					selected:true,
 					variant: 'filled' as const,
 					styles: {
-						color: palette.text_inversed,
+						color: hasSolidColor ? palette.text_2: palette.text_inversed,
 					},
 				},
+				// {
+				// 	colorScheme: scheme,
+				// 	selected:true,
+				// 	variant: 'flat' as const,
+				// 	styles: {
+				// 		color: hasSolidColor ? 'black': palette.text_3,
+				// 	},
+				// }
 			];
 	});
 
@@ -385,11 +394,13 @@ export const radioCardStyles = StyleSheet.create((theme, _rt) => {
 						backgroundColor: theme.colors.neutral.content_1,
 						borderColor: theme.colors.neutral.border_subtle,
 					 },
-					flat: { borderWidth: 0,
+					flat: { 
+						borderWidth: 0,
 						backgroundColor: theme.colors.neutral.content_1,
 						borderColor:'transparent',
 					 },
-					fade: { borderWidth: 1,
+					fade: { 
+						borderWidth: 1,
 						backgroundColor: theme.colors.neutral.content_2,
 						borderColor: theme.colors.neutral.border_subtle,
 					 },
@@ -486,10 +497,8 @@ export const radioCardStyles = StyleSheet.create((theme, _rt) => {
 					},
 				},
 				selected: {
-					true: {
-					},
-					false: {
-					},
+					true: {},
+					false: {},
 				},
 				colorScheme: {
 					primary: {},

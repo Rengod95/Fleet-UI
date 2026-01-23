@@ -44,7 +44,7 @@ export default async function ComponentsIndexPage({
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="flex flex-wrap gap-6">
         {components.map((c) => {
           const Preview = componentPreviews[c.slug];
 
@@ -52,9 +52,9 @@ export default async function ComponentsIndexPage({
             <Link
               key={c.slug}
               href={withLocale(`/components/${c.slug}`, locale)}
-              className="group relative overflow-hidden rounded-xl border bg-card/70 px-4 py-6 transition-all hover:border-primary shadow-lg"
+              className="group relative overflow-hidden rounded-2xl bg-card px-4 py-6 transition-all hover:border-primary shadow-sm no-underline"
             >
-              <div className="flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg text-muted-foreground transition-colors group-hover:bg-primary/5 group-hover:text-primary h-56">
+              <div className="flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg text-muted-foreground transition-colors group-hover:bg-primary/5 group-hover:text-primary h-48 lg:h-64 lg:w-64">
                 {Preview ? (
                   Preview
                 ) : (
@@ -64,7 +64,7 @@ export default async function ComponentsIndexPage({
                 )}
               </div>
               <div className="flex items-center justify-between gap-3 pt-4">
-                <div className="text-fleet-h6Strong text-muted-foreground">{c.name}</div>
+                <div className="text-fleet-body2 text-muted-foreground">{c.name}</div>
                 
               </div>
             </Link>

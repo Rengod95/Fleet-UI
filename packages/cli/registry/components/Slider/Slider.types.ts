@@ -91,11 +91,11 @@ export interface SliderProps extends Omit<ViewProps, 'children'> {
 	 */
 	max?: number;
 
-	/**
-	 * Step increment
-	 * @default 1
-	 */
-	step?: number;
+	// /**
+	//  * Step increment
+	//  * @default 1
+	//  */
+	// step?: number;
 
 	/**
 	 * Minimum steps between thumbs (for dual thumb mode)

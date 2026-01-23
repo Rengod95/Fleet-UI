@@ -45,6 +45,10 @@ const buildColorPalette = (scale: ColorScale) => ({
 
 export const semanticColors = {
 	light: {
+		white: primitiveColors.white,
+		black: primitiveColors.black,
+		transparent: primitiveColors.transparent,
+		background: 'hsl(0, 0%, 100%)',
 		neutral: buildBasePalette(primitiveColors.neutral.light),
 		primary: buildColorPalette(primitiveColors.primary.light),
 		warning: buildColorPalette(primitiveColors.warning.light),
@@ -56,6 +60,7 @@ export const semanticColors = {
 		white: primitiveColors.white,
 		black: primitiveColors.black,
 		transparent: primitiveColors.transparent,
+		background: 'hsl(0, 0%, 2%)',
 		neutral: buildBasePalette(primitiveColors.neutral.dark),
 		primary: buildColorPalette(primitiveColors.primary.dark),
 		warning: buildColorPalette(primitiveColors.warning.dark),

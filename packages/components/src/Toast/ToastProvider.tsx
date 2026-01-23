@@ -51,7 +51,7 @@ const resolveHorizontal = (insets: ToastInsets | undefined) => {
 	return 0;
 };
 
-const DEFAULT_DURATION = 4000;
+const DEFAULT_DURATION = 3500;
 const DEFAULT_THRESHOLD = 48;
 const DEFAULT_HORIZONTAL_INSET = 16;
 const DEFAULT_VERTICAL_INSET = 8;
@@ -65,7 +65,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 	const safeArea = useSafeAreaInsets?.();
 
 	const [toast, setToast] = useState<ToastInternalState | null>(null);
-	const timerRef = useRef<NodeJS.Timeout | null>(null);
+	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const clearTimer = () => {
 		if (timerRef.current) {
@@ -74,15 +74,14 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 		}
 	};
 
-	const hide = useCallback(
-		(id?: string) => {
-			if (!toast) return;
-			if (id && toast._id !== id) return;
+	const hide = useCallback((id?: string) => {
+		setToast((prev) => {
+			if (!prev) return prev;
+			if (id && prev._id !== id) return prev;
 			clearTimer();
-			setToast((prev) => (prev ? { ...prev, visible: false } : prev));
-		},
-		[toast]
-	);
+			return { ...prev, visible: false };
+		});
+	}, []);
 
 	const show = useCallback(
 		(options: ToastShowOptions): ToastHandle => {
@@ -110,7 +109,9 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 			});
 
 			if (duration && duration > 0) {
-				timerRef.current = setTimeout(() => hide(id), duration);
+				timerRef.current = setTimeout(() => {
+					hide(id);
+				}, duration);
 			}
 
 			options.onShow?.();
@@ -134,12 +135,6 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 			clearTimer();
 		};
 	}, [hide, show]);
-
-	const handleExited = useCallback(() => {
-		if (!toast) return;
-		toast.onClose?.();
-		setToast(null);
-	}, [toast]);
 
 	const contextValue = useMemo<ToastContextValue>(
 		() => ({
@@ -183,11 +178,9 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 				>
 					{toast ? (
 						<Toast
-							// @ts-expect-error
+							{...toast}
 							visible={toast.visible}
 							onRequestClose={() => hide(toast._id)}
-							onExited={handleExited}
-							{...toast}
 							testID={toast.testID}
 						/>
 					) : null}

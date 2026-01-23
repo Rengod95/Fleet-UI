@@ -39,19 +39,24 @@ export interface SectionProps extends Omit<ViewProps, 'children'> {
 	size?: SectionSize;
 	/**
 	 * Vertical spacing between elements inside the header.
-	 * @default 3
+	 * @default 8
 	 */
-	gap?: SectionSpacing;
+	contentGap?: SectionSpacing;
 	/**
 	 * Horizontal padding applied to both header and body.
 	 * @default 0
 	 */
-	padding?: SectionSpacing;
+	contentPaddingVertical?: SectionSpacing;
 	/**
 	 * Spacing between header and body, and also the body's top padding.
-	 * @default 5
+	 * @default 0
 	 */
-	contentSpacing?: SectionSpacing;
+	contentPaddingHorizontal?: SectionSpacing;
+	/**
+	 * Top margin of the content.
+	 * @default 12
+	 */
+	contentTopMargin?: SectionSpacing;
 	/**
 	 * Title area ratio (the rest is allocated to the right area).
 	 * @default 70

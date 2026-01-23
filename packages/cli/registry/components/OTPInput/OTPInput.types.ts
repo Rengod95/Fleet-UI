@@ -17,6 +17,7 @@ export type OTPInputColorScheme =
 	| 'info';
 export type OTPInputVariant = 'flat' | 'bordered' | 'underlined' | 'faded';
 export type OTPInputSize = 'sm' | 'md' | 'lg' | 'xl';
+export type OTPInputGap = 'sm' | 'md' | 'lg' | 'xl' | number;
 export type OTPInputRounded = 'none' | 'sm' | 'md' | 'lg' | 'full';
 export type OTPInputShadow = 'none' | 'sm' | 'md' | 'lg';
 
@@ -245,7 +246,7 @@ export interface OTPInputProps
 	 * Slot spacing (theme.spacing index)
 	 * Determined automatically by size if not specified
 	 */
-	gap?: number;
+	gap?: OTPInputGap;
 
 	// ============================================
 	// Style Overrides

@@ -102,7 +102,6 @@ export interface ToastProviderProps {
 export interface ToastProps extends ToastContentProps {
 	visible: boolean;
 	onRequestClose: () => void;
-	onExited: () => void;
 }
 
 export interface ToastHandle {

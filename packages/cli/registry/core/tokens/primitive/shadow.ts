@@ -25,7 +25,7 @@ export const primitiveShadow = {
 		{ x: 0, y: 4, blur: 6, spread: -2, opacity: 0.05 },
 		{ x: 0, y: -4, blur: 6, spread: -2, opacity: 0.05 },
 	],
-	
+
 	xl: [
 		{ x: 0, y: 20, blur: 25, spread: -4, opacity: 0.1 },
 		{ x: 0, y: 10, blur: 10, spread: -3, opacity: 0.05 },
@@ -46,12 +46,8 @@ export const primitiveShadow = {
 		{ x: 0, y: 16, blur: 56, spread: 0, opacity: 0.1 },
 		{ x: 0, y: 24, blur: 80, spread: 0, opacity: 0.1 },
 	],
-	inner:[
-		{ x: 0, y: 0, blur: 6, spread: 0, opacity: 0.13 },
-	],
-	banner: [
-		{ x: 0, y: 30, blur: 60, spread: -10, opacity: 0.5 },
-	]
+	inner: [{ x: 0, y: 0, blur: 6, spread: 0, opacity: 0.13 }],
+	banner: [{ x: 0, y: 30, blur: 60, spread: -10, opacity: 0.5 }],
 } as const;
 
 export type PrimitiveShadow = typeof primitiveShadow;
