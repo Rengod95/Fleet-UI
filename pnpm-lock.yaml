@@ -297,7 +297,7 @@ importers:
   packages/components:
     dependencies:
       '@fleet-ui/core':
-        specifier: ^0.2.0
+        specifier: ^0.2.1
         version: link:../core
       '@gorhom/bottom-sheet':
         specifier: '>=5.2.6'

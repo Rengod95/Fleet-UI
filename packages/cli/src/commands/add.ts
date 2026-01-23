@@ -3,6 +3,7 @@ import { DEFAULT_ALIAS_PREFIX, DEFAULT_COMPONENTS_DIR } from '../lib/constants';
 import { resolveProjectRoot } from '../lib/detectProject';
 import { readFleetUiConfig } from '../lib/fleetUiJson';
 import { copyDir, ensureDir, exists, readText, writeText } from '../lib/fs';
+import { logger } from '../lib/logger';
 import { runInit } from './init';
 import { loadRegistryManifest, resolveRegistryPath } from '../lib/registry';
 import { replaceCoreImports } from '../lib/replaceImports';
@@ -20,21 +21,27 @@ export async function runAdd(names: string[], opts: AddOptions) {
 
 	// Ensure init
 	if (!readFleetUiConfig(projectRoot)) {
+		logger.info('Project not initialized, running init first...');
 		await runInit({ cwd: projectRoot, alias: aliasPrefix, componentsDir });
 	}
 
 	const manifest = loadRegistryManifest();
-
 	const compsTargetAbs = path.join(projectRoot, componentsDir);
 	ensureDir(compsTargetAbs);
 
-	const exported: string[] = [];
+	logger.section(`Adding ${names.length} component(s)`);
+
+	const added: string[] = [];
+	const skipped: string[] = [];
+	const notFound: string[] = [];
 
 	for (const rawName of names) {
 		const name = rawName.trim();
 		const meta = manifest.components.available[name];
+
 		if (!meta) {
-			console.warn(`[fleet-ui] Unknown component: ${name}. Available: ${Object.keys(manifest.components.available).join(', ')}`);
+			notFound.push(name);
+			logger.error(`Unknown component: ${name}`);
 			continue;
 		}
 
@@ -42,8 +49,8 @@ export async function runAdd(names: string[], opts: AddOptions) {
 		const dstAbs = path.join(compsTargetAbs, name);
 
 		if (exists(dstAbs)) {
-			console.warn(`[fleet-ui] Component already exists (skipped): ${path.relative(projectRoot, dstAbs)}`);
-			exported.push(name);
+			skipped.push(name);
+			logger.skip(`${name} (already exists)`);
 			continue;
 		}
 
@@ -69,11 +76,12 @@ export async function runAdd(names: string[], opts: AddOptions) {
 			if (after !== before) writeText(f, after);
 		}
 
-		console.log(`[fleet-ui] Added ${name}: ${path.relative(projectRoot, dstAbs)}`);
-		exported.push(name);
+		added.push(name);
+		logger.success(`${name} → ${path.relative(projectRoot, dstAbs)}`);
 	}
 
 	// Update barrel file
+	const exported = [...added, ...skipped];
 	if (exported.length) {
 		const indexPath = path.join(compsTargetAbs, 'index.ts');
 		const existing = exists(indexPath) ? readText(indexPath) : '';
@@ -83,6 +91,21 @@ export async function runAdd(names: string[], opts: AddOptions) {
 		}
 		const sorted = Array.from(lines).sort();
 		writeText(indexPath, `${sorted.join('\n')}\n`);
+		logger.detail('Updated components/index.ts');
+	}
+
+	// Summary
+	logger.newline();
+	if (added.length) {
+		logger.success(`Added ${added.length} component(s): ${added.join(', ')}`);
+	}
+	if (skipped.length) {
+		logger.info(`Skipped ${skipped.length} (already exist): ${skipped.join(', ')}`);
+	}
+	if (notFound.length) {
+		logger.warn(`Not found: ${notFound.join(', ')}`);
+		logger.detail('Available components:');
+		logger.command(Object.keys(manifest.components.available).join(', '));
 	}
 }
 

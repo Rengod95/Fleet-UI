@@ -1,155 +1,181 @@
-import { ScrollView, Text, View, Linking } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import {
 	ActionButton,
-	LayoutTop,
-	Section,
+	ContextHeader,
+	Icon,
+	IconButton,
 	Item,
 	ItemContent,
-	ItemTitle,
 	ItemDescription,
-	Icon,
 	ItemMedia,
-	ContextHeader,
+	ItemTitle,
+	LayoutTop,
+	Section,
 } from '@fleet-ui/components';
+import { router } from 'expo-router';
 import {
 	Component,
-	Sparkles,
-	Workflow,
-	Palette,
-	Github,
 	FileText,
-	User,
+	Github,
 	Info,
+	Palette,
+	Rocket,
+	SunDim,
+	User,
 } from 'lucide-react-native';
-import { Link, router } from 'expo-router';
+import { Linking, ScrollView, View } from 'react-native';
+import {
+	StyleSheet,
+	UnistylesRuntime,
+	useUnistyles,
+} from 'react-native-unistyles';
 
 export default function Home() {
+	const handleThemeToggle = () => {
+		UnistylesRuntime.setTheme(
+			UnistylesRuntime.themeName === 'light' ? 'dark' : 'light'
+		);
+	};
 	useUnistyles();
 
 	return (
-		<ScrollView style={styles.container}>
-			<View style={styles.content}>
-				<LayoutTop
-					size="sm"
-					title={
-						<LayoutTop.TitleTypo>Fleet UI Playground</LayoutTop.TitleTypo>
-					}
-					subtitleBottom={
-						<LayoutTop.SubtitleTypo>
-							Explore components and design system
-						</LayoutTop.SubtitleTypo>
-					}
+		<View style={styles.container}>
+			<ScrollView style={styles.scrollContainer}>
+				<ContextHeader
+					showBackButton={false}
+					paddingHorizontal="md"
+					right={<IconButton icon={<SunDim />} onPress={handleThemeToggle} />}
 				/>
-
-				<Section title="Navigation" size="md">
-					<View style={styles.gridContainer}>
-						<View style={styles.gridRow}>
-							<ActionButton
-								size="xl"
-								variant="flat"
-								colorScheme="success"
-								title="Components"
-								contentRounded="lg"
-								onPress={() => router.push('/components')}
-							>
-								<Icon icon={Component} size='lg' strokeWidth={1.5} />
-							</ActionButton>
-							<ActionButton
-								variant="flat"
-								colorScheme="primary"
-								size="xl"
-								title="Scenarios"
-								contentRounded="lg"
-								onPress={() => router.push('/scenarios')}
-							>
-								<Icon icon={Workflow} size='xl' strokeWidth={1.5} />
-							</ActionButton>
-							<ActionButton
-								variant="flat"
-								colorScheme="error"
-								size="xl"
-								title="Theme Demo"
-								contentRounded="lg"
-								onPress={() => router.push('/theme-demo')}
-							>
-								<Icon icon={Palette} size='xl' strokeWidth={1.5} />
-							</ActionButton>
-						</View>
-
-						<View style={styles.gridRow}>
-							
-						</View>
-					</View>
-				</Section>
-
-				<Section title="Resources" size="md" contentSpacing={8}>
-					<Item
-						variant="filled"
-						onPress={() =>
-							Linking.openURL('https://github.com/Rengod95/fleet-ui')
+				<View style={styles.content}>
+					<LayoutTop
+						size="sm"
+						title={
+							<LayoutTop.TitleTypo>Fleet UI Playground</LayoutTop.TitleTypo>
 						}
-					>
-						<ItemMedia mediaType="icon" variant="flat" >
-							<Icon icon={Github} size='lg' strokeWidth={1.5} />
-						</ItemMedia>
-						
-						<ItemContent>
-							<ItemTitle>GitHub</ItemTitle>
-							<ItemDescription>View source code and contribute</ItemDescription>
-						</ItemContent>
-					</Item>
+						subtitleBottom={
+							<LayoutTop.SubtitleTypo>
+								Explore components and design system
+							</LayoutTop.SubtitleTypo>
+						}
+					/>
 
-					<Item
-						variant="filled"
-						onPress={() => Linking.openURL('https://fleet-ui.dev')}
-					>
-						<ItemMedia mediaType="icon" variant="flat" >
-							<Icon icon={FileText} size='lg' strokeWidth={1.5} />
-						</ItemMedia>
-						<ItemContent>
-							<ItemTitle>Official Docs</ItemTitle>
-							<ItemDescription>
-								Complete guides and API reference
-							</ItemDescription>
-						</ItemContent>
-					</Item>
-				</Section>
+					<Section title="Navigation" size="md">
+						<View style={styles.gridContainer}>
+							<View style={styles.gridRow}>
+								<ActionButton
+									size="xl"
+									variant="flat"
+									colorScheme="success"
+									title="Components"
+									contentRounded="lg"
+									onPress={() => router.push('/components')}
+								>
+									<Icon icon={Component} size="lg" strokeWidth={1.5} />
+								</ActionButton>
+								<ActionButton
+									variant="flat"
+									colorScheme="primary"
+									size="xl"
+									title="Scenarios"
+									contentRounded="lg"
+									onPress={() => router.push('/scenarios')}
+								>
+									<Icon icon={Rocket} size="xl" strokeWidth={1.5} />
+								</ActionButton>
+								<ActionButton
+									variant="flat"
+									colorScheme="error"
+									size="xl"
+									title="Theme Demo"
+									contentRounded="lg"
+									onPress={() => router.push('/theme-demo')}
+								>
+									<Icon icon={Palette} size="xl" strokeWidth={1.5} />
+								</ActionButton>
+							</View>
 
-				<Section title="About" size="md">
-					<Item variant="flat">
-						<ItemMedia mediaType="icon" variant="flat" verticalAlign='top' >
-							<Icon icon={Info} size='lg' strokeWidth={1.5} />
-						</ItemMedia>
-						<ItemContent>
-							<ItemTitle>Fleet UI</ItemTitle>
-							<ItemDescription>
-								A cross-platform component and animation library for React and
-								React Native. All components work seamlessly on iOS, Android,
-								and Web.
-							</ItemDescription>
-						</ItemContent>
-					</Item>
+							<View style={styles.gridRow}></View>
+						</View>
+					</Section>
 
-					<Item variant="flat">
-						<ItemMedia mediaType="icon" variant="flat">
-							<Icon icon={User} size='lg' strokeWidth={1.5} />
-						</ItemMedia>
-						<ItemContent>
-							<ItemTitle>Developer</ItemTitle>
-							<ItemDescription>
-								Made by Rengod95
-							</ItemDescription>
-						</ItemContent>
-					</Item>
-				</Section>
-			</View>
-		</ScrollView>
+					<Section title="Resources" size="md" contentGap={8}>
+						<Item
+							variant="filled"
+							onPress={() =>
+								Linking.openURL('https://github.com/Rengod95/fleet-ui')
+							}
+						>
+							<ItemMedia mediaType="icon" variant="flat">
+								<Icon icon={Github} size="lg" strokeWidth={1.5} />
+							</ItemMedia>
+
+							<ItemContent>
+								<ItemTitle>GitHub</ItemTitle>
+								<ItemDescription>
+									View source code and contribute
+								</ItemDescription>
+							</ItemContent>
+						</Item>
+
+						<Item
+							variant="filled"
+							onPress={() => Linking.openURL('https://fleet-ui.dev')}
+						>
+							<ItemMedia mediaType="icon" variant="flat">
+								<Icon icon={FileText} size="lg" strokeWidth={1.5} />
+							</ItemMedia>
+							<ItemContent>
+								<ItemTitle>Official Docs</ItemTitle>
+								<ItemDescription>
+									Complete guides and API reference
+								</ItemDescription>
+							</ItemContent>
+						</Item>
+					</Section>
+
+					<Section title="About" size="md">
+						<Item variant="flat">
+							<ItemMedia mediaType="icon" variant="flat" verticalAlign="top">
+								<Icon icon={Info} size="lg" strokeWidth={1.5} />
+							</ItemMedia>
+							<ItemContent>
+								<ItemTitle>Fleet UI</ItemTitle>
+								<ItemDescription>
+									A cross-platform component and animation library for React and
+									React Native. All components work seamlessly on iOS, Android,
+									and Web.
+								</ItemDescription>
+							</ItemContent>
+						</Item>
+
+						<Item variant="flat">
+							<ItemMedia mediaType="icon" variant="flat">
+								<Icon icon={User} size="lg" strokeWidth={1.5} />
+							</ItemMedia>
+							<ItemContent>
+								<ItemTitle>Developer</ItemTitle>
+								<ItemDescription>Made by Rengod95</ItemDescription>
+							</ItemContent>
+						</Item>
+					</Section>
+				</View>
+			</ScrollView>
+		</View>
 	);
 }
 
 const styles = StyleSheet.create((theme, rt) => ({
 	container: {
+		flex: 1,
+		backgroundColor: theme.colors.neutral.content_1,
+		height: rt.screen.height,
+		_web: {
+			maxWidth: 720,
+			marginHorizontal: 'auto',
+			justifyContent: 'center',
+			alignItems: 'center',
+		},
+	},
+	scrollContainer: {
 		paddingTop: rt.insets.top,
 		paddingBottom: rt.insets.bottom,
 		flex: 1,
@@ -165,11 +191,11 @@ const styles = StyleSheet.create((theme, rt) => ({
 		gap: theme.spacing[5],
 	},
 	gridRow: {
-		flex:1,
+		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'space-around',
 	},
 	gridItem: {
-		aspectRatio:1,
+		aspectRatio: 1,
 	},
 }));

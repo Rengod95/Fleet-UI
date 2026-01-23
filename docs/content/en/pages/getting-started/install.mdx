@@ -184,7 +184,25 @@ pnpm dlx @fleet-ui/cli init --core-dir src/fleet-ui/core --components-dir src/fl
 
 # Example: Change alias prefix
 pnpm dlx @fleet-ui/cli init --alias @fleet-ui/local
+
+# Example: Specify entry file manually (useful when auto-detection fails)
+pnpm dlx @fleet-ui/cli init --entry src/App.tsx
+
+# Example: Specify entry file in monorepo or custom project structure
+pnpm dlx @fleet-ui/cli init --cwd ./apps/mobile --entry app/index.tsx
 ```
+
+#### Full List of init Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--cwd <path>` | Project root directory | Current directory |
+| `--core-dir <path>` | Core templates installation path | `fleet-ui/core` |
+| `--components-dir <path>` | Components installation path | `fleet-ui/components` |
+| `--alias <prefix>` | Alias prefix | `@fleet-ui/local` |
+| `--entry <path>` | Entry file path (auto-detected if not specified) | Auto-detect |
+
+> **Tip**: If entry file auto-detection fails, use the `--entry` option to specify it manually. This is useful for monorepos or custom project structures.
 
 ---
 

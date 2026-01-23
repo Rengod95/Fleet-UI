@@ -184,7 +184,25 @@ pnpm dlx @fleet-ui/cli init --core-dir src/fleet-ui/core --components-dir src/fl
 
 # 예: alias prefix를 바꾸고 싶을 때
 pnpm dlx @fleet-ui/cli init --alias @fleet-ui/local
+
+# 예: 엔트리 파일을 직접 지정할 때 (자동 감지가 안 될 때 유용해요)
+pnpm dlx @fleet-ui/cli init --entry src/App.tsx
+
+# 예: 모노레포나 커스텀 구조에서 엔트리 파일 지정
+pnpm dlx @fleet-ui/cli init --cwd ./apps/mobile --entry app/index.tsx
 ```
+
+#### init 옵션 전체 목록
+
+| 옵션 | 설명 | 기본값 |
+|------|------|--------|
+| `--cwd <path>` | 프로젝트 루트 디렉터리 | 현재 디렉터리 |
+| `--core-dir <path>` | core 템플릿 설치 경로 | `fleet-ui/core` |
+| `--components-dir <path>` | 컴포넌트 설치 경로 | `fleet-ui/components` |
+| `--alias <prefix>` | alias prefix | `@fleet-ui/local` |
+| `--entry <path>` | 엔트리 파일 경로 (지정하지 않으면 자동 감지) | 자동 감지 |
+
+> **Tip**: 엔트리 파일 자동 감지가 실패하면 `--entry` 옵션으로 직접 지정하세요. 모노레포나 커스텀 프로젝트 구조에서 유용해요.
 
 ---
 

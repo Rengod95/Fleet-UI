@@ -7,7 +7,7 @@ export type FleetUiConfig = {
 	aliasPrefix: string;
 	coreDir: string;
 	componentsDir: string;
-	entryFile: string;
+	entryFile?: string;
 };
 
 export function fleetUiJsonPath(projectRoot: string) {

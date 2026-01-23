@@ -4,6 +4,7 @@ import { resolveProjectRoot } from '../lib/detectProject';
 import { detectEntryFile } from '../lib/detectEntry';
 import { readFleetUiConfig } from '../lib/fleetUiJson';
 import { exists, readJson, readText } from '../lib/fs';
+import { logger } from '../lib/logger';
 import { detectPackageManager, formatInstallCommand } from '../lib/packageManager';
 
 type DoctorOptions = {
@@ -15,15 +16,20 @@ export async function runDoctor(opts: DoctorOptions) {
 	const projectRoot = resolveProjectRoot(opts.cwd);
 	const aliasPrefix = opts.alias ?? DEFAULT_ALIAS_PREFIX;
 
-	const issues: { title: string; details: string }[] = [];
+	logger.section('Running diagnostics');
+
+	const issues: { title: string; details: string; fix?: string }[] = [];
 
 	// fleet-ui.json
 	const cfg = readFleetUiConfig(projectRoot);
 	if (!cfg) {
 		issues.push({
 			title: 'fleet-ui.json not found',
-			details: `Run: fleet-ui init (project root: ${projectRoot})`,
+			details: 'Project has not been initialized',
+			fix: 'fleet-ui init',
 		});
+	} else {
+		logger.success('fleet-ui.json found');
 	}
 
 	// entry import
@@ -39,8 +45,11 @@ export async function runDoctor(opts: DoctorOptions) {
 		if (!content.includes(expected)) {
 			issues.push({
 				title: 'Entry is missing Fleet UI unistyles import',
-				details: `Add this to ${path.relative(projectRoot, entry.entryFile)}:\n${expected}`,
+				details: path.relative(projectRoot, entry.entryFile),
+				fix: expected,
 			});
+		} else {
+			logger.success(`Entry import configured (${path.relative(projectRoot, entry.entryFile)})`);
 		}
 	}
 
@@ -49,18 +58,21 @@ export async function runDoctor(opts: DoctorOptions) {
 	if (!exists(tsconfigPath)) {
 		issues.push({
 			title: 'tsconfig.json not found',
-			details: 'Create tsconfig.json and add compilerOptions.paths for @fleet-ui/local/* → fleet-ui/*',
+			details: 'TypeScript configuration is missing',
 		});
 	} else {
-		const ts = readJson<any>(tsconfigPath);
-		const paths = ts?.compilerOptions?.paths ?? {};
+		const ts = readJson<Record<string, unknown>>(tsconfigPath);
+		const compilerOptions = ts?.compilerOptions as Record<string, unknown> | undefined;
+		const paths = (compilerOptions?.paths as Record<string, string[]>) ?? {};
 		const key = `${aliasPrefix}/*`;
 		const val = paths[key];
 		if (!Array.isArray(val) || val[0] !== 'fleet-ui/*') {
 			issues.push({
-				title: 'TypeScript paths alias missing or incorrect',
-				details: `In tsconfig.json set:\n  compilerOptions.baseUrl = \".\"\n  compilerOptions.paths[\"${key}\"] = [\"fleet-ui/*\"]`,
+				title: 'TypeScript paths alias missing',
+				details: `compilerOptions.paths["${key}"] should be ["fleet-ui/*"]`,
 			});
+		} else {
+			logger.success('TypeScript paths configured');
 		}
 	}
 
@@ -70,28 +82,36 @@ export async function runDoctor(opts: DoctorOptions) {
 	if (!babelPath) {
 		issues.push({
 			title: 'babel.config.* not found',
-			details: 'Add babel-plugin-module-resolver with alias @fleet-ui/local → ./fleet-ui',
+			details: 'Babel configuration required for module resolution',
 		});
 	} else {
 		const babel = readText(babelPath);
+		let babelOk = true;
 		if (!babel.includes('module-resolver')) {
+			babelOk = false;
 			issues.push({
 				title: 'babel-plugin-module-resolver not configured',
-				details: `Add module-resolver plugin in ${path.relative(projectRoot, babelPath)} with alias '${aliasPrefix}': './fleet-ui'`,
+				details: `In ${path.relative(projectRoot, babelPath)}`,
+				fix: `alias { '${aliasPrefix}': './fleet-ui' }`,
 			});
 		}
 		if (babel.includes('react-native-unistyles/plugin') && !babel.includes('autoProcessImports')) {
+			babelOk = false;
 			issues.push({
-				title: 'Unistyles plugin should include autoProcessImports',
-				details: `In ${path.relative(projectRoot, babelPath)} add: autoProcessImports: ['${aliasPrefix}']`,
+				title: 'Unistyles autoProcessImports not set',
+				details: `In ${path.relative(projectRoot, babelPath)}`,
+				fix: `autoProcessImports: ['${aliasPrefix}']`,
 			});
+		}
+		if (babelOk) {
+			logger.success('Babel configured');
 		}
 	}
 
 	// required deps
 	const pkgJsonPath = path.join(projectRoot, 'package.json');
 	if (!exists(pkgJsonPath)) {
-		issues.push({ title: 'package.json not found', details: `Expected ${pkgJsonPath}` });
+		issues.push({ title: 'package.json not found', details: 'Project root may be incorrect' });
 	} else {
 		const pkg = readJson<{ dependencies?: Record<string, string>; devDependencies?: Record<string, string> }>(pkgJsonPath);
 		const deps = { ...(pkg.dependencies ?? {}), ...(pkg.devDependencies ?? {}) };
@@ -100,27 +120,43 @@ export async function runDoctor(opts: DoctorOptions) {
 		if (missing.length) {
 			const pm = detectPackageManager(projectRoot);
 			issues.push({
-				title: 'Missing required dependencies (Fleet UI will not run)',
-				details: `Install:\n  ${formatInstallCommand(pm, missing as unknown as string[])}`,
+				title: 'Missing required dependencies',
+				details: missing.join(', '),
+				fix: formatInstallCommand(pm, missing as unknown as string[]),
 			});
+		} else {
+			logger.success('Required dependencies installed');
 		}
 		if (missingDev.length) {
 			const pm = detectPackageManager(projectRoot);
 			issues.push({
-				title: 'Missing required dev dependencies (alias resolution)',
-				details: `Install:\n  ${formatInstallCommand(pm, missingDev as unknown as string[], true)}`,
+				title: 'Missing dev dependencies',
+				details: missingDev.join(', '),
+				fix: formatInstallCommand(pm, missingDev as unknown as string[], true),
 			});
+		} else {
+			logger.success('Dev dependencies installed');
 		}
 	}
 
+	logger.newline();
+
 	if (!issues.length) {
-		console.log('[fleet-ui] ✅ doctor: all good');
+		logger.success('All checks passed! Fleet UI is properly configured.');
 		return;
 	}
 
-	console.log(`[fleet-ui] doctor found ${issues.length} issue(s):`);
-	for (const it of issues) {
-		console.log(`\n- ${it.title}\n${it.details}`);
+	logger.error(`Found ${issues.length} issue(s):`);
+	logger.newline();
+
+	for (let i = 0; i < issues.length; i++) {
+		const issue = issues[i];
+		logger.warn(`${i + 1}. ${issue.title}`);
+		logger.detail(issue.details);
+		if (issue.fix) {
+			logger.command(issue.fix);
+		}
+		logger.newline();
 	}
 }
 
