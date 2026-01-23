@@ -39,9 +39,32 @@ function help() {
 	console.log(`fleet-ui (local install track)
 
 Usage:
-  fleet-ui init [--cwd <path>] [--core-dir <path>] [--components-dir <path>] [--alias <prefix>]
-  fleet-ui add <names...> [--cwd <path>] [--components-dir <path>] [--alias <prefix>]
-  fleet-ui doctor [--cwd <path>] [--alias <prefix>]
+  fleet-ui init [options]
+  fleet-ui add <names...> [options]
+  fleet-ui doctor [options]
+
+Init Options:
+  --cwd <path>            Project root directory
+  --core-dir <path>       Core templates directory (default: fleet-ui/core)
+  --components-dir <path> Components directory (default: fleet-ui/components)
+  --alias <prefix>        Alias prefix (default: @fleet-ui/local)
+  --entry <path>          Entry file path (auto-detected if not specified)
+
+Add Options:
+  --cwd <path>            Project root directory
+  --components-dir <path> Components directory
+  --alias <prefix>        Alias prefix
+
+Doctor Options:
+  --cwd <path>            Project root directory
+  --alias <prefix>        Alias prefix
+
+Examples:
+  fleet-ui init
+  fleet-ui init --entry src/App.tsx
+  fleet-ui init --entry app/_layout.tsx --alias @my-ui/local
+  fleet-ui add Button Modal Input
+  fleet-ui doctor
 `);
 }
 
@@ -64,6 +87,7 @@ async function main() {
 			coreDir: typeof opts['core-dir'] === 'string' ? (opts['core-dir'] as string) : undefined,
 			componentsDir: typeof opts['components-dir'] === 'string' ? (opts['components-dir'] as string) : undefined,
 			alias: typeof opts.alias === 'string' ? (opts.alias as string) : undefined,
+			entry: typeof opts.entry === 'string' ? (opts.entry as string) : undefined,
 		});
 		return;
 	}

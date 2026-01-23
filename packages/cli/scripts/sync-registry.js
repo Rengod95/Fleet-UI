@@ -13,6 +13,24 @@
 const fs = require('node:fs');
 const path = require('node:path');
 
+// Simple logger for scripts
+const CYAN = '\x1b[36m';
+const GREEN = '\x1b[32m';
+const YELLOW = '\x1b[33m';
+const RED = '\x1b[31m';
+const DIM = '\x1b[2m';
+const RESET = '\x1b[0m';
+
+const log = {
+	info: (msg) => console.log(`${CYAN}fleet-ui${RESET} → ${msg}`),
+	success: (msg) => console.log(`${CYAN}fleet-ui${RESET} ${GREEN}✓${RESET} ${msg}`),
+	warn: (msg) => console.log(`${CYAN}fleet-ui${RESET} ${YELLOW}⚠${RESET} ${msg}`),
+	error: (msg) => console.log(`${CYAN}fleet-ui${RESET} ${RED}✗${RESET} ${msg}`),
+	detail: (msg) => console.log(`         ${DIM}›${RESET} ${msg}`),
+	section: (title) => console.log(`\n${CYAN}fleet-ui${RESET} ${DIM}━━━${RESET} ${title} ${DIM}━━━${RESET}`),
+	newline: () => console.log(''),
+};
+
 const repoRoot = path.resolve(__dirname, '../../..');
 const srcCore = path.join(repoRoot, 'packages/core/src');
 const srcComponents = path.join(repoRoot, 'packages/components/src');
@@ -70,25 +88,38 @@ function isComponentDir(name) {
 }
 
 function main() {
-	if (!fs.existsSync(srcCore)) throw new Error(`missing: ${srcCore}`);
-	if (!fs.existsSync(srcComponents)) throw new Error(`missing: ${srcComponents}`);
+	log.section('Syncing registry');
 
-	// clean
+	// Validate sources
+	if (!fs.existsSync(srcCore)) {
+		log.error(`Source not found: ${srcCore}`);
+		process.exit(1);
+	}
+	if (!fs.existsSync(srcComponents)) {
+		log.error(`Source not found: ${srcComponents}`);
+		process.exit(1);
+	}
+
+	// Clean
+	log.info('Cleaning registry...');
 	mkdirp(registryRoot);
 	rmrf(outCore);
 	rmrf(outComponents);
 
-	// core
+	// Core
+	log.info('Syncing core...');
 	copyDir(srcCore, outCore);
-	// rewrite core unistyles.ts example
 	const coreUnistyles = path.join(outCore, 'unistyles.ts');
 	if (fs.existsSync(coreUnistyles)) {
 		rewriteInFile(coreUnistyles, [["import '@fleet-ui/core/unistyles';", "import '@fleet-ui/local/core/unistyles';"]]);
 	}
+	log.detail('Core files copied');
 
-	// components
+	// Components
+	log.info('Syncing components...');
 	mkdirp(outComponents);
-	// copy global.d.ts (if exists)
+
+	// Copy global.d.ts (if exists)
 	const globalDts = path.join(srcComponents, 'global.d.ts');
 	if (fs.existsSync(globalDts)) {
 		writeText(path.join(outComponents, 'global.d.ts'), readText(globalDts));
@@ -104,17 +135,30 @@ function main() {
 		copyDir(srcDir, dstDir);
 		available[name] = { source: `components/${name}`, optionalPeerDeps: [] };
 	}
+	log.detail(`${Object.keys(available).length} components copied`);
 
-	// rewrite imports inside all component files
+	// Rewrite imports
+	log.info('Rewriting imports...');
+	let rewriteCount = 0;
 	for (const file of listFilesRecursive(outComponents)) {
 		if (!file.endsWith('.ts') && !file.endsWith('.tsx') && !file.endsWith('.d.ts')) continue;
-		rewriteInFile(file, [
+		const before = readText(file);
+		let after = before;
+		for (const [from, to] of [
 			["'@fleet-ui/core", "'@fleet-ui/local/core"],
 			['"@fleet-ui/core', '"@fleet-ui/local/core'],
-		]);
+		]) {
+			after = after.split(from).join(to);
+		}
+		if (after !== before) {
+			writeText(file, after);
+			rewriteCount++;
+		}
 	}
+	log.detail(`${rewriteCount} files updated`);
 
-	// manifest
+	// Manifest
+	log.info('Writing manifest...');
 	const manifest = {
 		schema: 1,
 		aliasPrefix: '@fleet-ui/local',
@@ -123,7 +167,8 @@ function main() {
 	};
 	writeText(path.join(registryRoot, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
 
-	console.log(`[fleet-ui] synced registry: core + ${Object.keys(available).length} components`);
+	log.newline();
+	log.success(`Registry synced: core + ${Object.keys(available).length} components`);
 }
 
 main();
