@@ -6,11 +6,11 @@ export const commonStyles = StyleSheet.create((theme, rt) => ({
 		paddingBottom: rt.insets.bottom,
 		flex: 1,
 		backgroundColor: theme.colors.background,
-
 	},
 	content: {
 		padding: theme.spacing[5],
 		gap: theme.spacing[7],
+		backgroundColor: theme.colors.background,
 	},
 	row: {
 		flexDirection: 'row',
@@ -25,7 +25,6 @@ export const commonStyles = StyleSheet.create((theme, rt) => ({
 		gap: theme.spacing[5],
 		alignItems: 'center',
 		justifyContent: 'center',
-		
 	},
 	column: {
 		width: '100%',

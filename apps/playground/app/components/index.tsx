@@ -1,9 +1,17 @@
-import { useMemo, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
-import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import { Icon, Input, Item, ItemContent, ItemTitle, LayoutTop, Section } from '@fleet-ui/components';
-import { Search } from 'lucide-react-native';
+import {
+	Icon,
+	Input,
+	Item,
+	ItemContent,
+	ItemTitle,
+	LayoutTop,
+	Section,
+} from '@fleet-ui/components';
 import { Link } from 'expo-router';
+import { Search } from 'lucide-react-native';
+import { useMemo, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 
 const COMPONENTS = [
 	{
@@ -195,7 +203,7 @@ const COMPONENTS = [
 		description: '전역 알림 토스트 (top/bottom, drag dismiss)',
 		icon: '🍞',
 	},
-		{
+	{
 		id: 'card',
 		name: 'Card',
 		description: 'Container component',
@@ -212,7 +220,9 @@ export default function ComponentsIndex() {
 			COMPONENTS.filter(
 				(component) =>
 					component.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-					component.description.toLowerCase().includes(searchQuery.toLowerCase())
+					component.description
+						.toLowerCase()
+						.includes(searchQuery.toLowerCase())
 			),
 		[searchQuery]
 	);
@@ -220,32 +230,47 @@ export default function ComponentsIndex() {
 	return (
 		<View style={styles.container}>
 			<View style={styles.header}>
-			<Input
-				size='md'
-				variant='filled'
-				colorScheme='primary'
-				value={searchQuery}
-				onChangeText={setSearchQuery}
-				placeholder="Search components..."
-				endContent={<Icon icon={Search} />}
-			    />
+				<Input
+					size="md"
+					variant="filled"
+					colorScheme="primary"
+					value={searchQuery}
+					onChangeText={setSearchQuery}
+					placeholder="Search components..."
+					endContent={<Icon icon={Search} />}
+				/>
 			</View>
 			<ScrollView style={styles.scrollContainer}>
 				<View style={styles.content}>
-					<LayoutTop size='sm' title={<LayoutTop.TitleTypo>Components</LayoutTop.TitleTypo>} subtitleBottom={<LayoutTop.SubtitleTypo>Browse available UI components. Tap on a component to see examples and
-						usage.</LayoutTop.SubtitleTypo>}/>
-					<Section title="Component List" size='md' contentStyle={{ marginTop: 8 }}>
+					<LayoutTop
+						size="sm"
+						title={<LayoutTop.TitleTypo>Components</LayoutTop.TitleTypo>}
+						subtitleBottom={
+							<LayoutTop.SubtitleTypo>
+								Browse available UI components. Tap on a component to see
+								examples and usage.
+							</LayoutTop.SubtitleTypo>
+						}
+					/>
+					<Section
+						title="Component List"
+						size="md"
+						contentStyle={{ marginTop: 8 }}
+					>
 						<View style={styles.grid}>
-						{filteredComponents.map((component) => (
-							<Link href={`/components/${component.id}`} asChild>
-							<Item variant="filled" style={{height:56, paddingHorizontal: 20}}>
-								<ItemContent>
-									<ItemTitle size='lg'>{component.name}</ItemTitle>
-									{/* <ItemDescription size='md'>{description}</ItemDescription> */}
-								</ItemContent>
-							</Item>
-						</Link>
-						))}
+							{filteredComponents.map((component) => (
+								<Link href={`/components/${component.id}`} asChild>
+									<Item
+										variant="filled"
+										style={{ height: 56, paddingHorizontal: 20 }}
+									>
+										<ItemContent>
+											<ItemTitle size="lg">{component.name}</ItemTitle>
+											{/* <ItemDescription size='md'>{description}</ItemDescription> */}
+										</ItemContent>
+									</Item>
+								</Link>
+							))}
 						</View>
 					</Section>
 				</View>
@@ -254,13 +279,13 @@ export default function ComponentsIndex() {
 	);
 }
 
-const styles = StyleSheet.create((theme,rt) => ({
+const styles = StyleSheet.create((theme, rt) => ({
 	container: {
 		padding: theme.spacing[5],
 		paddingTop: rt.insets.top,
 		paddingBottom: rt.insets.bottom,
 		flex: 1,
-		backgroundColor: theme.colors.neutral.content_1,
+		backgroundColor: theme.colors.background,
 	},
 	header: {
 		// paddingHorizontal: theme.spacing[5],
@@ -271,7 +296,6 @@ const styles = StyleSheet.create((theme,rt) => ({
 		flex: 1,
 	},
 	content: {
-		
 		gap: theme.spacing[5],
 	},
 	description: {
@@ -281,7 +305,7 @@ const styles = StyleSheet.create((theme,rt) => ({
 		lineHeight: 20,
 	},
 	grid: {
-		flex:1,
+		flex: 1,
 		width: '100%',
 		gap: theme.spacing[4],
 	},

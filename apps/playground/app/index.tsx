@@ -1,8 +1,6 @@
 import {
 	ActionButton,
-	ContextHeader,
 	Icon,
-	IconButton,
 	Item,
 	ItemContent,
 	ItemDescription,
@@ -19,32 +17,16 @@ import {
 	Info,
 	Palette,
 	Rocket,
-	SunDim,
 	User,
 } from 'lucide-react-native';
 import { Linking, ScrollView, View } from 'react-native';
-import {
-	StyleSheet,
-	UnistylesRuntime,
-	useUnistyles,
-} from 'react-native-unistyles';
+
+import { StyleSheet } from 'react-native-unistyles';
 
 export default function Home() {
-	const handleThemeToggle = () => {
-		UnistylesRuntime.setTheme(
-			UnistylesRuntime.themeName === 'light' ? 'dark' : 'light'
-		);
-	};
-	useUnistyles();
-
 	return (
 		<View style={styles.container}>
 			<ScrollView style={styles.scrollContainer}>
-				<ContextHeader
-					showBackButton={false}
-					paddingHorizontal="md"
-					right={<IconButton icon={<SunDim />} onPress={handleThemeToggle} />}
-				/>
 				<View style={styles.content}>
 					<LayoutTop
 						size="sm"
@@ -166,7 +148,7 @@ export default function Home() {
 const styles = StyleSheet.create((theme, rt) => ({
 	container: {
 		flex: 1,
-		backgroundColor: theme.colors.neutral.content_1,
+		backgroundColor: theme.colors.background,
 		height: rt.screen.height,
 		_web: {
 			maxWidth: 720,
@@ -179,7 +161,6 @@ const styles = StyleSheet.create((theme, rt) => ({
 		paddingTop: rt.insets.top,
 		paddingBottom: rt.insets.bottom,
 		flex: 1,
-		backgroundColor: theme.colors.neutral.content_1,
 	},
 	content: {
 		padding: theme.spacing[5],

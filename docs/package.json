@@ -7,10 +7,11 @@
     "gen:components": "tsx scripts/generate-components-index.ts",
     "gen:component-docs": "tsx scripts/generate-component-content.ts",
     "gen:playground-samples": "tsx scripts/generate-playground-sample-code.ts",
+    "gen:llms": "tsx scripts/generate-llms-txt.ts",
     "check:i18n": "tsx scripts/check-i18n-sync.ts --mode=warn",
     "check:i18n:strict": "tsx scripts/check-i18n-sync.ts --mode=strict",
-    "dev": "pnpm gen:theme && pnpm gen:components && pnpm gen:playground-samples && pnpm gen:component-docs && pnpm check:i18n && next dev --webpack",
-    "build": "pnpm gen:theme && pnpm gen:components && pnpm gen:playground-samples && pnpm gen:component-docs && pnpm check:i18n && next build --webpack",
+    "dev": "pnpm gen:theme && pnpm gen:components && pnpm gen:playground-samples && pnpm gen:component-docs && pnpm gen:llms && pnpm check:i18n && next dev --webpack",
+    "build": "pnpm gen:theme && pnpm gen:components && pnpm gen:playground-samples && pnpm gen:component-docs && pnpm gen:llms && pnpm check:i18n && next build --webpack",
     "start": "next start",
     "lint": "eslint"
   },

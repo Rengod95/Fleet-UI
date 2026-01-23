@@ -1,14 +1,20 @@
-import '@fleet-ui/core/unistyles';
-import { ToastProvider } from '@fleet-ui/components';
+import '@fleet-ui/local/core/unistyles';
+import { IconButton, ToastProvider } from '@fleet-ui/components';
 // import '@fleet-ui/core';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { SunDim } from 'lucide-react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useUnistyles } from 'react-native-unistyles';
+import { UnistylesRuntime, useUnistyles } from 'react-native-unistyles';
 // Initialize Fleet UI theming with Unistyles
 
 export default function RootLayout() {
-	const { theme } = useUnistyles();
+	const { theme, rt } = useUnistyles();
+	const handleThemeToggle = () => {
+		UnistylesRuntime.setTheme(
+			UnistylesRuntime.themeName === 'light' ? 'dark' : 'light'
+		);
+	};
 
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
@@ -17,7 +23,7 @@ export default function RootLayout() {
 				<Stack
 					screenOptions={{
 						headerStyle: {
-							backgroundColor: theme.colors.neutral.content_1,
+							backgroundColor: theme.colors.background,
 						},
 						headerTintColor: theme.colors.neutral.text_1,
 						headerTitleStyle: {
@@ -51,6 +57,15 @@ export default function RootLayout() {
 					/>
 				</Stack>
 			</ToastProvider>
+			<IconButton
+				icon={<SunDim />}
+				onPress={handleThemeToggle}
+				style={{
+					position: 'absolute',
+					right: theme.spacing[7],
+					bottom: theme.spacing[7] + rt.insets.bottom,
+				}}
+			/>
 		</GestureHandlerRootView>
 	);
 }
