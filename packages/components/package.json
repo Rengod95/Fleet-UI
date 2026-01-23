@@ -1,6 +1,6 @@
 {
 	"name": "@fleet-ui/components",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Cross-platform UI components for Fleet UI",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
@@ -30,7 +30,7 @@
 		"test": "jest"
 	},
 	"dependencies": {
-		"@fleet-ui/core": "^0.2.0"
+		"@fleet-ui/core": "^0.2.1"
 	},
 	"peerDependencies": {
 		"lucide-react-native": "^0.477.0",
