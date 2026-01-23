@@ -243,7 +243,7 @@ pnpm --filter playground web
 
 ### Prerequisites
 
-- Node.js >= 18.0.0
+- Node.js >= 20.19.4
 - pnpm >= 9.0.0
 
 ### Setup
