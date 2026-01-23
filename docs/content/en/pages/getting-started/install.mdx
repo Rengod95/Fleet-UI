@@ -67,6 +67,31 @@ import '@fleet-ui/core/unistyles';
 
 Fleet UI assumes runtime dependencies commonly used together in React Native apps.
 
+#### Version Compatibility Table
+
+Fleet UI prioritizes **stability over bleeding-edge versions**. We base our dependencies on versions that have been released for 1-2 months and have proven minor patch stability. If you need to use newer or older dependency versions, refer to the table below.
+
+> **Note**: Reanimated 4 only works with React Native **New Architecture**. If you're using the old architecture, use Reanimated 3.x instead.
+
+| React Native | Reanimated | Worklets | Expo SDK | Status |
+|--------------|------------|----------|----------|--------|
+| 0.83.x | 4.2.x | 0.7.x | 55 | Latest |
+| 0.82.x | 4.2.x | 0.7.x | 55 | Latest |
+| **0.81.x** | **4.1.x** | **0.6.x** | **54** | **✅ Fleet UI Default** |
+| 0.81.x | 4.2.x | 0.7.x | 54 | Supported |
+| 0.80.x | 4.1.x | 0.5.x~0.7.x | 53 | Supported |
+| 0.79.x | 4.1.x | 0.5.x~0.7.x | 52 | Legacy |
+| 0.78.x | 4.0.x~4.1.x | 0.4.x~0.7.x | 51 | Legacy |
+
+**Fleet UI v0.2.0 tested combination:**
+- React: `19.1.0`
+- React Native: `0.81.5`
+- Reanimated: `4.1.5`
+- Worklets: `0.6.1`
+- Expo SDK: `54`
+
+For detailed compatibility information, see the [Reanimated Compatibility Guide](https://docs.swmansion.com/react-native-reanimated/docs/guides/compatibility/).
+
 #### 1. Common to All Tracks
 
 These 4 are **needed in almost all environments**, and missing them can affect behavior.
