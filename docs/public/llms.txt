@@ -1,0 +1,2778 @@
+# Fleet UI
+
+> React Native UI SDK: theming (react-native-unistyles) + animation (react-native-reanimated) + components
+
+Fleet UI provides production-ready UI components with consistent design, fluid animations, and a systematic token architecture.
+
+---
+
+## Package Architecture
+
+### @fleet-ui/core
+- **Role**: Design token system + theme configuration
+- **Exports**: tokens, themes (light/dark), utility hooks
+- **Entry**: `import '@fleet-ui/core/unistyles'` (required in app entry)
+
+### @fleet-ui/components
+- **Role**: UI components consuming core tokens
+- **Depends on**: @fleet-ui/core (peer dependency)
+- **Pattern**: Components use `useStyles()` hook with theme tokens
+
+### Interaction Flow
+1. App imports `@fleet-ui/core/unistyles` → registers themes with Unistyles
+2. Components import from `@fleet-ui/components`
+3. Components access `theme.*` via `useStyles()` → consume semantic tokens
+4. Theme switch (light/dark) automatically propagates to all components
+
+---
+
+## Token System
+
+### Pipeline
+raw → primitive → semantic → theme → runtime(Unistyles)
+
+### Layers
+- **Raw**: 11-step color scales per scheme (primary, neutral, error, success, warning, info)
+- **Primitive**: spacing (0..20), rounded (none→full), typography atoms, shadow geometry
+- **Semantic**: colors (content_1..4, text_1..4, border_*, solid), typography (h1..h6, body1..3), shadows (card, button, overlay)
+- **Theme**: light/dark bundles combining semantic + primitive
+
+### Token Access
+```ts
+theme.colors.primary.solid      // accent color
+theme.colors.neutral.content_1  // background
+theme.colors.neutral.text_1     // text
+theme.typography.h1             // heading style object
+theme.rounded.md                // 16px radius
+theme.shadows.card              // shadow string
+theme.spacing[4]                // spacing value
+```
+
+---
+
+## Installation
+
+### Track A (CLI/Local - like Shadcn)
+```bash
+pnpm dlx @fleet-ui/cli init
+pnpm dlx @fleet-ui/cli add Button Modal
+```
+Import: `import { Button } from '@fleet-ui/local/components'`
+
+### Track B (NPM Package)
+```bash
+pnpm add @fleet-ui/core @fleet-ui/components
+```
+Entry: `import '@fleet-ui/core/unistyles'`
+Import: `import { Button } from '@fleet-ui/components'`
+
+### Dependencies
+```bash
+pnpm add react-native-unistyles react-native-reanimated react-native-gesture-handler react-native-worklets
+```
+
+---
+
+## Styling Pattern
+
+```tsx
+import { StyleSheet, useStyles } from 'react-native-unistyles';
+
+const stylesheet = StyleSheet.create((theme) => ({
+  container: {
+    backgroundColor: theme.colors.neutral.content_1,
+    borderRadius: theme.rounded.md,
+    padding: theme.spacing[4],
+  },
+}));
+
+function MyComponent() {
+  const { styles } = useStyles(stylesheet);
+  return <View style={styles.container}>...</View>;
+}
+```
+
+---
+
+## Variant System
+
+- **colorScheme**: primary, neutral, error, success, warning, info
+- **variant**: filled, outlined, flat, ghost, faded
+- **size**: sm, md, lg, xl
+
+---
+
+## Components Reference
+
+### Accordion
+
+'Accordion' is a component that shows multiple sections with "collapse/expand" functionality. Choose behavior model with 'type="single" | "multiple"', and compose UI with 'Accordion.Item / Header / Content' compound structure.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/accordion
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**State Model Based on `type` (Important)**
+- **single**: Only one opens
+- uncontrolled: `defaultValue?: string`
+- controlled: `value?: string`, `onValueChange?: (value: string) => void`
+- **multiple**: Multiple can open simultaneously
+- uncontrolled: `defaultValue?: string[]`
+**`Accordion.Item`'s `value` is "State Key"**
+- Both controlled/uncontrolled calculate "is open" based on `value`.
+- In `type="multiple"`, judged by whether included in "array of open values."
+**Header Icon/Slots: `leftIcon`, `rightIcon`**
+- Renders left slot with `leftIcon`
+- If no `rightIcon`, renders default icon (ChevronDown) that rotates based on open state
+- Can hide default icon with `rightIcon={false}`
+
+```tsx
+import { Accordion } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Accordion type="single" defaultValue="item-1" collapsible>
+      <Accordion.Item value="item-1">
+        <Accordion.Header>Shipping Info</Accordion.Header>
+        <Accordion.Content>Shipping takes 2-3 days.</Accordion.Content>
+      </Accordion.Item>
+
+      <Accordion.Item value="item-2">
+        <Accordion.Header>Refund Policy</Accordion.Header>
+        <Accordion.Content>Refund is available within 7 days of purchase.</Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+```
+
+#### State & Animation
+**State Model:**
+- Values managed at Root (`Accordion`):
+- `expandedValues: string[]` (list of currently open item values)
+- `toggleItem(value: string)` (toggle open/close)
+- Values derived at Item (`Accordion.Item`):
+- `isExpanded: boolean` (whether own `value` is included in `expandedValues`)
+- `isDisabled: boolean` (`Accordion.Item`'s `disabled`)
+
+**Animation:**
+- **Header**: press-in/out scale/opacity + Chevron rotation
+- `rotation` shared value transitions 0↔180 degrees with `withTiming`.
+- **Content**: After measuring content height, animates `height` with `withTiming`
+- Stores measured `animatedHeight` via `onLayout`, and transitions `height/opacity` with time animation based on `isExpanded`.
+
+#### Accessibility
+`Accordion.Header` basically serves button role.
+- Default role: `accessibilityRole="button"`
+- Label rules:
+- If `accessibilityLabel` exists, use it
+- If not and `children` is string, use `children` as label
+- State passed:
+- `accessibilityState: { expanded, disabled }`
+
+#### Props
+**Accordion (Root)**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `type` | `'single' \| 'multiple'` | Yes | - | Expansion mode selection | State type differs |
+| `collapsible` | `boolean` | No | `false` | Allow "close all" in single mode | Meaningless in multiple (always closable) |
+| `defaultValue` | `string` or `string[]` | No | - | Uncontrolled mode initial value | Type determined by `type` |
+| `value` | `string` or `string[]` | No | - | Controlled mode value | Type determined by `type` |
+| `onValueChange` | `(value: string) => void` or `(value: string[]) => void` | No | - | Value change callback | In single, closed can be `''` |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | Demo available in Playground |
+| `variant` | `'ghost' \| 'outlined' \| 'flat' \| 'faded'` | No | `'ghost'` | Visual style | Demo available in Playground |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size/density | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Corner radius | |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Gap between items | |
+| `children` | `ReactNode` | Yes | - | `Accordion.Item` and other child elements | |
+
+**Accordion Item**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `value` | `string` | Yes | - | Item unique key | State identifier |
+| `disabled` | `boolean` | No | `false` | Disabled state | Header press block + a11y disabled |
+| `headerContentGap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | - | Gap between Header and Content | Affects style/rounded/shadow application |
+| `children` | `ReactNode` | Yes | - | `Accordion.Header`, `Accordion.Content` | |
+
+**Accordion Header**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `leftIcon` | `ReactNode` | No | - | Left icon slot | |
+| `rightIcon` | `ReactNode \| false` | No | - | Right icon slot (default Chevron) / `false` to hide | |
+| `children` | `ReactNode` | Yes | - | Header content (usually title string) | String also used as a11y label |
+
+**Accordion Content**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | Content | String is wrapped with `Text` internally (line break/display may vary by children type) |
+
+#### Example
+```tsx
+import { Accordion } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Accordion type="single" defaultValue="item-1" collapsible>
+      <Accordion.Item value="item-1">
+        <Accordion.Header>Shipping Info</Accordion.Header>
+        <Accordion.Content>Shipping takes 2-3 days.</Accordion.Content>
+      </Accordion.Item>
+
+      <Accordion.Item value="item-2">
+        <Accordion.Header>Refund Policy</Accordion.Header>
+        <Accordion.Content>Refund is available within 7 days of purchase.</Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  );
+}
+```
+
+---
+
+### ActionButton
+
+'ActionButton' is an action button with "icon/image-like content + (optional) title" structure. It's well-suited for creating card-type actions like "square content area + caption title" rather than regular text buttons ('Button'), and provides press interaction (spring scale) and accessibility label rules by default.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/actionbutton
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**`title` and `accessibilityLabel` (Important)**
+- No `title` and
+- No `accessibilityLabel`
+**Layout/Customization Points**
+- `extend`: Use for action buttons that "expand" horizontally in parent layout (e.g., even distribution in grid/row layouts).
+- `rootStyle` / `contentStyle` / `textStyle`: Points for overriding root/content/title styles. (Array styles also supported.)
+
+```tsx
+import { ActionButton } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 24, height: 24 }} />;
+}
+
+export function Example() {
+  return (
+    <ActionButton title="New Post" onPress={() => {}}>
+      <DemoIcon />
+    </ActionButton>
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- `isDisabled = Boolean(disabled)`
+- `accessibilityState = { disabled: isDisabled }`
+
+**Animation:**
+- press-in: `scale = 0.86` spring animation
+- press-out: `scale = 1` return
+- If disabled, ignores press-in and blocks press with `preventDefault()`.
+
+#### Accessibility
+- Default role: `accessibilityRole="button"`
+- Label: `accessibilityLabel || title`
+- State passed: `accessibilityState: { disabled }`
+- When there's no on-screen text (`title`), providing `accessibilityLabel` is recommended.
+
+#### Props
+**> Reference: `ActionButtonProps` from `packages/components/src/ActionButton/ActionButton.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | Check general styles in Playground |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'faded'` | No | `'flat'` | Visual style | Check general styles in Playground |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size/density | |
+| `extend` | `boolean` | No | `false` | Horizontal expand (flex: 1) | Affects layout container policy |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset (applied to content container) | |
+| `containerRounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | Root container rounded | |
+| `contentRounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | Content container rounded | |
+| `title` | `string` | No | - | Title text below content | If absent, `accessibilityLabel` recommended |
+| `children` | `ReactNode` | No | - | Content area (icon/image, etc.) | |
+| `rootStyle` | `StyleProp<ViewStyle>` | No | - | Root container style override | |
+| `contentStyle` | `StyleProp<ViewStyle>` | No | - | Content container style override | |
+| `textStyle` | `StyleProp<TextStyle>` | No | - | Title text style override | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label (especially needed when no title) | |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### Example
+```tsx
+import { ActionButton } from '@fleet-ui/components';
+import { View } from 'react-native';
+
+function DemoIcon() {
+  return <View style={{ width: 24, height: 24 }} />;
+}
+
+export function Example() {
+  return (
+    <ActionButton title="New Post" onPress={() => {}}>
+      <DemoIcon />
+    </ActionButton>
+  );
+}
+```
+
+---
+
+### BottomSheetModal
+
+'BottomSheetModal' is a compound component that provides a modal (bottom sheet) rising from the bottom of the screen. Root controls visibility state with 'visible', and internal subcomponents ('Header/Body/BodyDescription/Action/Footer') compose the layout.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/bottom-sheet-modal
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+>
+**`visible` + `onDismiss`: External Control Model (Important)**
+- When `visible=true`, `present()` is called internally.
+- When `visible=false`, dismiss is attempted internally.
+- In `onDismiss`, you **must set state to false**.
+> Caution: `onDismiss` is closer to a **contract that must be called for the modal to be properly released** based on type/annotations, rather than just "close event notification." So `visible` and `onDismiss` must be operated as a pair.
+**Compound Subcomponents**
+- `BottomSheetModal.Header`: Configure header with `title/subtitle/actionIcon` or `children`
+- `BottomSheetModal.Body`: Body container (padding/size preset)
+- `BottomSheetModal.BodyDescription`: Center-aligned description text preset
+- `BottomSheetModal.Action`: Primary/Secondary button area (close then dismiss on press)
+- `BottomSheetModal.Footer`: Custom bottom area
+**Backdrop / Background Customization**
+- `backdropComponent?: (props) => ReactElement | null`
+- `backgroundComponent?: (props) => ReactElement | null`
+
+```tsx
+import { useState } from 'react';
+import { View, Text } from 'react-native';
+import { BottomSheetModal, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <View>
+      <Button onPress={() => setOpen(true)}>Open Bottom Sheet</Button>
+
+      <BottomSheetModal
+        visible={open}
+        onDismiss={() => setOpen(false)}
+        size="lg"
+```
+
+#### State & Animation
+**State Model:**
+- External: `visible` (state) and `onDismiss` (setter role)
+- Internal: `useEffect` calls `present()` / `dismiss()` based on `visible` changes
+- Internal context: `InnerContext.close()` calls `onDismiss()` then performs dismiss
+
+**Animation:**
+- Verify Reanimated/gesture-handler setup is properly applied in project
+- When composing UI where scroll/gesture conflicts inside modal (e.g., horizontal swipe + bottom sheet drag), check gesture priority
+
+#### Accessibility
+- `accessibilityViewIsModal`
+- `importantForAccessibility="yes"`
+- Internal content container also has `accessible` + `accessibilityViewIsModal`
+- Close button (or cancel action) should be clear for screen reader users, so specify button label when using `BottomSheetModal.Action`.
+- When using icon-only `actionIcon`, provide appropriate accessibility label for that icon element.
+
+#### Props
+**BottomSheetModal (Root)  (alias: `BottomSheetModalRootProps`)**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `visible` | `boolean` | Yes | `false` | Modal visibility state | External control required |
+| `onDismiss` | `() => void` | Yes | - | Called on close (change external state to false) | Required contract |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'lg'` | Content container width preset | sm=80%, md=90%, lg=100% |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'overlay'` | No | `'md'` | Shadow preset | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Corner radius | |
+| `detached` | `boolean` | No | `true` | Detached mode from bottom of screen | Use with `bottomInset` |
+| `bottomInset` | `number` | No | `12` | Detached mode bottom margin (added to safe area) | Safe area + offset |
+| `backdropComponent` | `(props: BottomSheetBackdropProps) => ReactElement \| null` | No | - | Custom backdrop | |
+| `backgroundComponent` | `(props: BottomSheetBackgroundProps) => ReactElement \| null` | No | - | Custom background | |
+| `children` | `ReactNode` | Yes | - | Modal content | |
+
+**Header**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Header preset size | |
+| `title` | `string` | No | - | Header title | |
+| `subtitle` | `string` | No | - | Header subtitle | |
+| `alignment` | `'center' \| 'start' \| 'end'` | No | `'start'` | Text/icon alignment | |
+| `actionIcon` | `ReactNode` | No | - | Top action icon | Label recommended if icon-only |
+| `children` | `ReactNode` | No | - | Custom header content (used instead of title/subtitle when provided) | |
+| `titleStyle` | `StyleProp<TextStyle>` | No | - | Title style | |
+| `subtitleStyle` | `StyleProp<TextStyle>` | No | - | Subtitle style | |
+| `iconWrapperStyle` | `StyleProp<ViewStyle>` | No | - | Icon wrapper style | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+
+**Body**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Body padding preset |
+| `children` | `ReactNode` | Yes | - | Body content |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style |
+
+**BodyDescription**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Typo preset |
+| `children` | `ReactNode` | Yes | - | Description text |
+| `style` | `StyleProp<TextStyle>` | No | - | Text style |
+
+**Action**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `size` | `ButtonSize` | No | - | Internal Button size | |
+| `primaryButtonProps` | `Partial<ButtonProps>` | No | - | Primary button props | close + dismiss on press |
+| `secondaryButtonProps` | `Partial<ButtonProps>` | No | - | Secondary button props | close + dismiss on press |
+| `layout` | `'horizontal' \| 'vertical'` | No | `'horizontal'` | Button layout direction | |
+| `showPrimary` | `boolean` | No | `true` | Show Primary | |
+| `showSecondary` | `boolean` | No | `false` | Show Secondary | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+
+**Footer**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Bottom padding preset |
+| `children` | `ReactNode` | Yes | - | Bottom content |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style |
+
+#### Example
+```tsx
+import { useState } from 'react';
+import { View, Text } from 'react-native';
+import { BottomSheetModal, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <View>
+      <Button onPress={() => setOpen(true)}>Open Bottom Sheet</Button>
+
+      <BottomSheetModal
+        visible={open}
+        onDismiss={() => setOpen(false)}
+        size="lg"
+        detached
+      >
+        <BottomSheetModal.Header title="Title" subtitle="Description" />
+        <BottomSheetModal.Body>
+          <Text>Content area</Text>
+        </BottomSheetModal.Body>
+        <BottomSheetModal.Action
+          layout="horizontal"
+          showPrimary
+          showSecondary
+          primaryButtonProps={{ children: 'Confirm' }}
+          secondaryButtonProps={{ children: 'Cancel' }}
+        />
+      </BottomSheetModal>
+    </View>
+  );
+}
+```
+
+---
+
+### Button
+
+'Button' is the basic interaction component for triggering user actions. It's designed to safely combine feature/state-centered props like 'leftIcon / rightIcon', 'loading', 'fullWidth'.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/button
+
+#### Core Features
+**### 1) Basic Usage**
+**2) Icon Slots: `leftIcon` / `rightIcon`**
+- Use to attach icons to text buttons for clearer "meaning/direction."
+- When `loading=true`, **leftIcon area is replaced with loader**.
+**3) Loading: `loading` (Important)**
+- Click is blocked (disabled behavior)
+- `ActivityIndicator` is displayed in left area
+- `busy: true` is passed to accessibility state
+**4) Full Width: `fullWidth`**
+
+```tsx
+import { Button } from '@fleet-ui/components';
+
+export function Example() {
+  return <Button onPress={() => console.log('pressed')}>Continue</Button>;
+}
+```
+
+#### Accessibility
+- Default role: `accessibilityRole="button"`
+- Label resolution priority:
+- `aria-label` → `accessibilityLabel` (PressableProps) → `children` (if string)
+- State passed:
+- `accessibilityState: { disabled, busy }`
+When rendering only an icon, provide `aria-label` for screen readers/web.
+<Button aria-label="Favorite" onPress={() => {}}>
+
+#### Props
+**> Reference: `ButtonProps` from `packages/components/src/Button/Button.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Semantic color role | Check general styles in Playground |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'ghost' \| 'faded'` | No | `'filled'` | Button visual style | Check general styles in Playground |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size/density | Check general styles in Playground |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset | Check general styles in Playground |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Round preset | Check general styles in Playground |
+| `fullWidth` | `boolean` | No | `false` | Expand to width 100% | Use with container per layout policy |
+| `loading` | `boolean` | No | `false` | Loading state + block interaction | `accessibilityState.busy=true` |
+| `leftIcon` | `ReactNode` | No | - | Left icon slot | Replaced by loader when `loading=true` |
+| `rightIcon` | `ReactNode` | No | - | Right icon slot | Hidden when `loading=true` |
+| `children` | `ReactNode` | No | - | Button label (text/element) | String can also be used as auto-label |
+| `aria-label` | `string` | Cond. | - | Accessibility label for icon-only buttons | Especially important on Web |
+| `testID` | `string` | No | - | Test identifier | Maps to `data-testid` on Web |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style override | Composited with animation style |
+
+#### Example
+```tsx
+import { Button } from '@fleet-ui/components';
+
+export function Example() {
+  return <Button onPress={() => console.log('pressed')}>Continue</Button>;
+}
+```
+
+---
+
+### Checkbox
+
+'Checkbox' is the basic input component for expressing/toggling boolean selection state. It works with 'checked' (controlled) or 'defaultChecked' (uncontrolled), and animates press interaction and check icon transition with Reanimated.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/checkbox
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Controlled Pattern**
+> When both `onPress` and `onCheckedChange` are provided, internally `onPress` is called first, then `onCheckedChange(newChecked)` is called.
+
+```tsx
+import { Checkbox } from '@fleet-ui/components';
+
+export function Example() {
+  return <Checkbox defaultChecked onCheckedChange={(v) => console.log(v)} />;
+}
+```
+
+#### State & Animation
+**State Model:**
+- If `checked` is provided, operates in controlled mode.
+- Otherwise uses internal state initialized with `defaultChecked`.
+- Prevents event with `preventDefault()` and doesn't change state on press.
+
+**Animation:**
+- Press interaction: `scale` shared value for press-in/out spring
+- press-in: `scale = 0.7`
+- press-out: `scale = 1`
+- Check icon transition: `progress` derived value (0↔1) for icon scale/opacity animation
+
+#### Accessibility
+- Default role: `accessibilityRole="checkbox"`
+- State passed: `accessibilityState: { checked, disabled }`
+- Providing `accessibilityLabel` is recommended where possible (especially when checkbox is placed standalone).
+> Note: This implementation doesn't provide `mixed` (indeterminate) state as a public prop.
+
+#### Props
+**> Reference: `CheckboxProps` from `packages/components/src/Checkbox/Checkbox.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color scheme | |
+| `variant` | `'filled' \| 'flat' \| 'outlined'` | No | `'filled'` | Style variant | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'sm'` | Corner radius | |
+| `checked` | `boolean` | No | - | Check state (controlled) | |
+| `defaultChecked` | `boolean` | No | `false` | Initial check (uncontrolled) | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | Check change callback | |
+| `disabled` | `boolean` | No | `false` | Disabled | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style override | |
+
+#### Example
+```tsx
+import { Checkbox } from '@fleet-ui/components';
+
+export function Example() {
+  return <Checkbox defaultChecked onCheckedChange={(v) => console.log(v)} />;
+}
+```
+
+---
+
+### CheckboxCard
+
+'CheckboxCard' is a selection UI where "the entire card acts like a checkbox." For single cards, it works with 'checked/defaultChecked/onCheckedChange', and in groups, 'CheckboxCardGroup' context manages multiple selection based on 'value'.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/checkbox-card
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example: Single)**
+**Group Usage: `CheckboxCardGroup` + `value`**
+>
+**Style Changes Based on Selection State (Selected props)**
+- `selectedColorScheme`: Change colorScheme on selection
+- `selectedVariant`: Change card variant on selection
+- `indicatorSelectedVariant`: Change checkbox indicator variant on selection
+
+```tsx
+import { CheckboxCard } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <CheckboxCard
+      title="Save as default address"
+      description="Use this as default shipping address for future orders."
+      defaultChecked={false}
+      onCheckedChange={(checked) => console.log({ checked })}
+    />
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- Card's own `disabled`
+- Group `disabled`
+- When using group: If `max` is reached and current card is unselected (= cannot add selection), treated as disabled
+
+**Animation:**
+- press-in: Spring animation `scale` to 0.96, `opacity` to 0.7
+- press-out: `scale/opacity` return to 1
+- On selection state change: Transition background/border color with animation spring
+
+#### Accessibility
+- Default role: `accessibilityRole="checkbox"`
+- Label: `accessibilityLabel || title`
+- State passed: `accessibilityState: { checked, disabled }`
+- When composing custom header/slot where `title` isn't visible on screen, specifying `accessibilityLabel` is recommended.
+
+#### Props
+**CheckboxCard**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | Yes | - | Card title (default label) | a11y label default |
+| `description` | `string` | No | - | Card description | |
+| `header` | `ReactNode` | No | - | Header custom area | |
+| `footer` | `ReactNode` | No | - | Footer custom area | |
+| `media` | `ReactNode` | No | - | Media/icon before title | |
+| `left` | `ReactNode` | No | - | Content left slot | |
+| `right` | `ReactNode` | No | - | Content right slot | |
+| `checked` | `boolean` | No | - | Check state (controlled) | May be ignored when using group |
+| `defaultChecked` | `boolean` | No | `false` | Initial check (uncontrolled) | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | Check change callback | Not called directly when using group (use group change) |
+| `value` | `string` | No | - | Identifier within group | Used in `CheckboxCardGroup` |
+| `colorScheme` | `ItemColorScheme` | No | `'neutral'` | Card color scheme (Item-based) | |
+| `variant` | `ItemVariant` | No | `'outlined'` | Card variant (Item-based) | |
+| `size` | `ItemSize` | No | `'md'` | Card size (Item-based) | |
+| `rounded` | `ItemRounded` | No | `'md'` | Corner radius (Item-based) | |
+| `shadow` | `ItemShadow` | No | `'none'` | Shadow (Item-based) | |
+| `indicatorPosition` | `'start' \| 'end'` | No | `'end'` | Checkbox indicator position | |
+| `indicatorVariant` | `CheckboxVariant` | No | `'filled'` | Indicator variant | |
+| `indicatorRounded` | `CheckboxRounded` | No | `'sm'` | Indicator rounded | |
+| `indicatorSelectedVariant` | `CheckboxVariant` | No | `'flat'` | Indicator variant on selection | |
+| `selectedColorScheme` | `ItemColorScheme` | No | - | colorScheme override on selection | |
+| `selectedVariant` | `ItemVariant` | No | - | Card variant override on selection | |
+| `disabled` | `boolean` | No | `false` | Disabled | Combined with group max/min policy |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | Replaces title |
+| `testID` | `string` | No | - | Test identifier | |
+
+**CheckboxCardGroup**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `values` | `string[]` | No | - | Selected values (controlled) | |
+| `defaultValues` | `string[]` | No | `[]` | Initial selected values (uncontrolled) | |
+| `onValuesChange` | `(values: string[]) => void` | No | - | Selection change callback | |
+| `max` | `number` | No | - | Maximum selection count | Unselected cards become disabled when reached |
+| `min` | `number` | No | `0` | Minimum selection count | Cannot deselect below this |
+| `disabled` | `boolean` | No | `false` | Disable all | |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Gap between cards | |
+| `children` | `ReactNode` | No | - | Cards in group | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+
+#### Example
+```tsx
+import { CheckboxCard } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <CheckboxCard
+      title="Save as default address"
+      description="Use this as default shipping address for future orders."
+      defaultChecked={false}
+      onCheckedChange={(checked) => console.log({ checked })}
+    />
+  );
+}
+```
+
+---
+
+### Chip
+
+'Chip' is a component for displaying short labels/states, or creating clickable "filter/tag" style actions. Press animation is only applied when 'onPress' exists, and when 'onClose' is provided, a close button is shown on the right to support "deletable chip" pattern.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/chip
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Closable Chip: `onClose`**
+> Close button press uses `event.stopPropagation()` to block parent press. This is designed so pressing close doesn't trigger `onPress`.
+**Icon-only: `iconOnly`**
+
+```tsx
+import { Chip } from '@fleet-ui/components';
+
+export function Example() {
+  return <Chip onPress={() => {}}>Recommended</Chip>;
+}
+```
+
+#### State & Animation
+**State Model:**
+- `isDisabled = Boolean(disabled || loading)` (interaction blocked during loading)
+- `isInteractive = Boolean(onPress)` (treated as "non-clickable chip" if no onPress)
+
+**Animation:**
+- press-in: `scale = 0.95`, `opacity = 0.6` (spring)
+- press-out: `scale/opacity = 1` return
+
+#### Accessibility
+- Default role: `accessibilityRole="button"` (when `onPress` exists)
+- Label determination priority:
+- `'aria-label'` → `accessibilityLabel` (PressableProps) → string `children`
+- State passed:
+- `accessibilityState: { disabled, busy }`
+- When `iconOnly=true`, providing `aria-label` (web) or `accessibilityLabel` is recommended.
+- Close button internally provides `accessibilityLabel="Close"`. For app internationalization, consider wrapping or replacing the component.
+
+#### Props
+**> Reference: `ChipProps` from `packages/components/src/Chip/Chip.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'ghost' \| 'faded'` | No | `'filled'` | Visual style | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size/density | |
+| `shadow` | `ChipShadow` | No | `'none'` | Shadow preset | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'full'` | Corner radius | |
+| `inverted` | `boolean` | No | `false` | Style inversion (useful for selection states) | |
+| `loading` | `boolean` | No | `false` | Loading state (blocks interaction) | `busy=true` |
+| `iconOnly` | `boolean` | No | `false` | Render only icon without text | Label required (recommended) |
+| `leftIcon` | `ReactNode` | No | - | Left icon | Ignored if `iconOnly` |
+| `rightIcon` | `ReactNode` | No | - | Right icon | Ignored if `onClose` exists |
+| `children` | `ReactNode` | No | - | Chip content | If string, can be used as label |
+| `onClose` | `() => void` | No | - | Shows close button + callback | Separate from `onPress` |
+| `aria-label` | `string` | No | - | Accessibility label (needed for icon-only) | Especially important on Web |
+| `testID` | `string` | No | - | Test identifier | close is <code>&#36;&#123;testID&#125;-close</code> |
+| `style` | `PressableProps['style']` | No | - | Container style override | |
+
+#### Example
+```tsx
+import { Chip } from '@fleet-ui/components';
+
+export function Example() {
+  return <Chip onPress={() => {}}>Recommended</Chip>;
+}
+```
+
+---
+
+### ContextHeader
+
+'ContextHeader' is a custom header component that can replace native navigation header on mobile screens. It provides 3-area structure: left (back/custom), center (title), right (action), and supports screen layout options like safe area inclusion/fixed positioning.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/context-header
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Left Area: `left` vs Default BackButton**
+- When `left` is provided, **replaces default BackButton**.
+- When no `left` and `showBackButton=true`, default BackButton is displayed.
+- When default BackButton is pressed, `onBackPress()` is called.
+**Title Alignment: `titleAlign` Auto Rule**
+- If left content exists (= `left` exists or `showBackButton=true`), default is `'center'`
+- If no left content, default is `'left'`
+**Safe Area/Fixed Positioning**
+- `includeSafeAreaTop=true`: Adds paddingTop equal to top safe area inset.
+- `fixed=true`: Fixes header to top with `position: 'absolute'`.
+> Caution: When using `fixed=true`, body content can go behind header, so typically you need to secure top padding/margin separately in screen container.
+
+```tsx
+import { ContextHeader } from '@fleet-ui/components';
+
+export function Example() {
+  return <ContextHeader title="Details" onBackPress={() => {}} />;
+}
+```
+
+#### Accessibility
+- Title text renders with `accessibilityRole="header"`.
+- Default BackButton:
+- `accessibilityRole="button"`
+- `accessibilityLabel="Go back"`
+- When putting icon-only buttons in `left/right`, provide `aria-label`/`accessibilityLabel` for those buttons.
+
+#### Props
+**> Reference: `ContextHeaderProps` from `packages/components/src/ContextHeader/ContextHeader.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | No | - | Header title | Title has a11y header role |
+| `left` | `ReactNode` | No | - | Left custom content | Replaces default back button when provided |
+| `right` | `ReactNode` | No | - | Right custom content | Action button area |
+| `showBackButton` | `boolean` | No | `true` | Show default back button | Meaningless if `left` exists |
+| `onBackPress` | `() => void` | No | - | Default back button callback | |
+| `includeSafeAreaTop` | `boolean` | No | `false` | Include top safe area | |
+| `fixed` | `boolean` | No | `false` | Absolute fixed positioning | Layout caution |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Height/typo preset | |
+| `paddingHorizontal` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Left/right padding preset | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow preset | |
+| `titleAlign` | `'left' \| 'center'` | No | `'center'`(with left content) / `'left'`(without) | Title alignment | Auto-determination rule exists |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+| `titleStyle` | `StyleProp<TextStyle>` | No | - | Title style | |
+| `testID` | `string` | No | - | Test identifier | back is <code>&#36;&#123;testID&#125;-back-button</code> |
+
+#### Example
+```tsx
+import { ContextHeader } from '@fleet-ui/components';
+
+export function Example() {
+  return <ContextHeader title="Details" onBackPress={() => {}} />;
+}
+```
+
+---
+
+### Divider
+
+'Divider' is a horizontal separator component that visually divides content areas. It provides thin line ('variant="line"') and thick divider for section separation ('variant="thick"'), and layout margins can be adjusted with 'horizontalMargin/verticalMargin'.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/divider
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Section Separation: `variant="thick"`**
+**Left/Right Margin: `horizontalMargin`**
+
+```tsx
+import { Divider } from '@fleet-ui/components';
+
+export function Example() {
+  return <Divider />;
+}
+```
+
+#### Accessibility
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+- `accessibilityRole="none"`
+- `importantForAccessibility="no"`
+
+#### Props
+**> Reference: `DividerProps` from `packages/components/src/Divider/Divider.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'line' \| 'thick'` | No | `'line'` | Divider style | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Thickness preset | Actual px varies by variant |
+| `horizontalMargin` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Left/right margin | If not `none`, width switches to auto |
+| `colorScheme` | `'base' \| 'inverted'` | No | `'base'` | Theme inversion (ScopedTheme) | |
+| `verticalMargin` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'none'` | Top/bottom margin | |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### Example
+```tsx
+import { Divider } from '@fleet-ui/components';
+
+export function Example() {
+  return <Divider />;
+}
+```
+
+---
+
+### Icon
+
+'Icon' is a wrapper component that renders 'lucide-react-native' icons with Fleet UI tokens (colorScheme/size). It provides consistent icon styling with 'icon' (component as prop) + 'size/colorScheme', and passes meaning to accessibility tree via 'accessibilityLabel'.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/icon
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**`colorScheme` vs `color`**
+- `colorScheme` selects color from theme tokens.
+- When `color` is specified, it **takes priority over `colorScheme`** and renders with that color.
+
+```tsx
+import { Icon } from '@fleet-ui/components';
+import { Heart } from 'lucide-react-native';
+
+export function Example() {
+  return <Icon icon={Heart} accessibilityLabel="Like" />;
+}
+```
+
+#### Accessibility
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+- For **meaning-conveying icons** (state/warning/standalone element of meaningful button), provide `accessibilityLabel`.
+
+#### Props
+**> Reference: `IconProps` from `packages/components/src/Icon/Icon.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `icon` | `LucideIcon` | Yes | - | Lucide icon component (Component as Prop) | `lucide-react-native` required |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info' \| 'secondary'` | No | `'neutral'` | Token-based color selection | |
+| `size` | `'_2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| '_2xl' \| '_3xl' \| '_4xl'` | No | `'md'` | Icon size preset | Maps to px via internal SIZE_MAP |
+| `color` | `string` | No | - | Custom color (takes priority over `colorScheme`) | |
+| `strokeWidth` | `number` | No | `2` | Stroke width | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label (recommended) | Provide recommended for meaningful icons |
+
+#### Example
+```tsx
+import { Icon } from '@fleet-ui/components';
+import { Heart } from 'lucide-react-native';
+
+export function Example() {
+  return <Icon icon={Heart} accessibilityLabel="Like" />;
+}
+```
+
+---
+
+### IconButton
+
+'IconButton' is a button that triggers actions with only an icon (or image). It provides content via 'icon' (ReactNode) or 'src' (image), and offers press interaction animation, 'loading'/'disabled' states, and icon-only accessibility label rules by default.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/icon-button
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Image Icon: `src`**
+**`icon` vs `src` Priority**
+- If `loading=true`, loader is displayed with highest priority.
+- Then if `src` exists, renders image.
+- Then if `icon` exists, renders icon.
+> In dev mode, outputs warning log when both `icon` and `src` are provided simultaneously (guide to clarify usage intent).
+
+```tsx
+import { IconButton } from '@fleet-ui/components';
+import { Heart } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <IconButton
+      icon={<Heart />}
+      aria-label="Like"
+      onPress={() => {}}
+    />
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- `isDisabled = Boolean(disabled || loading)`
+- `accessibilityState = { disabled: isDisabled, busy: loading }`
+
+**Animation:**
+- press-in: `scale = 1.2`, `opacity = 0.6` (spring)
+- press-out: `scale/opacity = 1` return
+
+#### Accessibility
+- Default role: `accessibilityRole="button"`
+- Label priority: `aria-label` → `accessibilityLabel`
+- State passed: `accessibilityState: { disabled, busy }`
+- Since it's an icon-only button, **always providing a label is recommended** (`aria-label` recommended).
+- Even when `loading=true`, label should be maintained, and screen readers receive the `busy` state.
+
+#### Props
+**> Reference: `IconButtonProps` from `packages/components/src/IconButton/IconButton.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'ghost'` | No | `'filled'` | Visual style | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Size preset | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'full'` | Corner radius | |
+| `src` | `string \| ImageSource` | No | - | Image source (higher priority) | `expo-image` required |
+| `icon` | `ReactNode` | No | - | Icon node | May be ignored if `src` exists |
+| `iconSize` | `number` | No | - | Icon size (px) | Calculated from size preset if not specified |
+| `iconColor` | `string` | No | - | Icon color (commented out in current implementation) | Consider extending if needed |
+| `loading` | `boolean` | No | `false` | Loading display + block interaction | `busy=true` |
+| `aria-label` | `string` | No | - | Accessibility label (required recommended) | Especially important on Web |
+| `testID` | `string` | No | - | Test identifier | loader is <code>&#36;&#123;testID&#125;-loader</code> |
+| `style` | `PressableProps['style']` | No | - | Container style | |
+
+#### Example
+```tsx
+import { IconButton } from '@fleet-ui/components';
+import { Heart } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <IconButton
+      icon={<Heart />}
+      aria-label="Like"
+      onPress={() => {}}
+    />
+  );
+}
+```
+
+---
+
+### ImageCard
+
+'ImageCard' is a card component that places blur/gradient overlay on a background image, with text/action/footer slots on top. Choose content area direction with 'variant="vertical" | "horizontal"', and fine-tune layout ratio with 'aspectRatio'/'contentRatio'.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/image-card
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Layout: `variant` + `contentRatio`**
+- `variant="vertical"`: Content positioned at bottom (vertical card)
+- `variant="horizontal"`: Content positioned on right (horizontal card)
+- vertical: Height-based ratio (e.g., 0.34 → bottom 34%)
+- horizontal: Width-based ratio (e.g., 0.44 → right 44%)
+**Slot Structure (Top/Action/Footer)**
+- `topContent`: Positioned absolute at image top (badge/tag)
+- `action`: Action area for buttons/icons
+- `footer`: Bottom footer (stats/additional actions)
+
+```tsx
+import { ImageCard } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <ImageCard
+      source={{ uri: 'https://example.com/image.jpg' }}
+      title="Title"
+      description="Description"
+      width={320}
+      aspectRatio="16:9"
+      accessibilityLabel="Promotion card"
+    />
+  );
+}
+```
+
+#### Accessibility
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+- If card is a "meaningful content group," provide `accessibilityLabel` (e.g., "Promotion card: 50% off").
+- If there are button/icon actions inside card, provide separate labels for each action.
+
+#### Props
+**> Reference: `ImageCardProps` from `packages/components/src/ImageCard/ImageCard.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `source` | `ImageSource` | Yes | - | Background image source (expo-image) | `expo-image` required |
+| `contentFit` | `ImageContentFit` | No | `'cover'` | Image resize mode | |
+| `imageProps` | `Omit<ExpoImageProps, 'source' \| 'contentFit'>` | No | - | expo-image additional props | |
+| `variant` | `'vertical' \| 'horizontal'` | No | `'vertical'` | Layout direction | |
+| `aspectRatio` | `number \| string` | No | - | Card aspect ratio | String is `'w:h'` format |
+| `contentRatio` | `number` | No | `0.42`(vertical) / `0.5`(horizontal) | Content area ratio (0~1) | Actual implementation default follows internal constant |
+| `width` | <code>number &#124; &#96;&#36;&#123;number&#125;%&#96;</code> | No | - | Card width | |
+| `height` | `number` | No | - | Card height | Usually aspectRatio recommended |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'`(types) / impl default may be `'lg'` | Shadow preset | Note difference between impl default and type annotation |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | Round preset | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Typo scale | |
+| `topContent` | `ReactNode` | No | - | Top slot (absolute) | |
+| `title` | `string` | No | - | Title text | |
+| `description` | `string` | No | - | Description text | |
+| `action` | `ReactNode` | No | - | Action slot | |
+| `footer` | `ReactNode` | No | - | Footer slot | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | image is <code>&#36;&#123;testID&#125;-image</code> |
+| `textColorInverted` | `boolean` | No | `false` | Text color inversion | Current implementation uses fixed dark scope |
+
+#### Example
+```tsx
+import { ImageCard } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <ImageCard
+      source={{ uri: 'https://example.com/image.jpg' }}
+      title="Title"
+      description="Description"
+      width={320}
+      aspectRatio="16:9"
+      accessibilityLabel="Promotion card"
+    />
+  );
+}
+```
+
+---
+
+### Input
+
+'Input' is the basic form component for text input. It supports 'value/onChangeText' (controlled) or 'defaultValue' (uncontrolled) patterns, and provides "form UX"-centered props like 'description/errorMessage', 'startContent/endContent', 'isClearable'.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/input
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Controlled Pattern**
+**Error/Validation: `errorMessage`, `isInvalid`**
+- When `errorMessage` is provided, error text is displayed.
+- When `isInvalid=true`, the input wrapper runs a **shake animation** (left-right wobble).
+**Slots: `startContent` / `endContent` + Clear Button**
+- Use `startContent` / `endContent` to place icons/buttons at input start/end.
+- When `isClearable=true` and there's a value, and not `isDisabled/isReadOnly`, clear button (X) appears.
+- When clear button is pressed, value is set to `''` internally and `onClear()` is called.
+
+```tsx
+import { Input } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Input
+      label="Email"
+      placeholder="name@example.com"
+      description="Enter the email you'll use to sign in."
+    />
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- Controlled check: If `value` is provided, it's controlled; otherwise uses internal state based on `defaultValue`
+- `editable = !isDisabled && !isReadOnly`
+- Error color role: `evaluatedColorScheme = isInvalid ? 'error' : colorScheme`
+
+**Animation:**
+- `underlineScale`: Animation where underline bar expands on focus for `variant="underlined"`
+- Shake animation wobbling input wrapper left-right when `isInvalid`
+- Wrapper background/border color transitions with `withTiming` to variant color values
+
+#### Accessibility
+- Even with visual `label`, verify screen readers hear it clearly (`accessibilityLabel` or `label`/`placeholder` combination).
+- In error state, `errorMessage` is visible on screen; reinforce with `accessibilityHint` for "error reason/next action" if needed.
+- If using icon-only endContent (e.g., clear button), verify screen reader label isn't missing.
+
+#### Props
+**> Reference: `InputProps` from `packages/components/src/Input/Input.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `variant` | `'filled' \| 'flat' \| 'bordered' \| 'underlined' \| 'faded'` | No | `'bordered'` | Input style variant | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | May evaluate to error if `isInvalid` |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Height/typo scale | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'inner'` | No | `'none'` | Shadow preset | |
+| `radius` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Corner radius | |
+| `label` | `string` | No | - | Label text | |
+| `labelPlacement` | `'inside' \| 'outside' \| 'outside-left'` | No | `'inside'` | Label position | Branching may be limited in current implementation |
+| `description` | `string` | No | - | Bottom description text | Hidden when `errorMessage` exists |
+| `errorMessage` | `string` | No | - | Bottom error text | Used for invalid UX when provided |
+| `startContent` | `ReactNode` | No | - | Input start slot | |
+| `endContent` | `ReactNode` | No | - | Input end slot | |
+| `isClearable` | `boolean` | No | `false`(types) | Show clear button | Implementation default may be `true` |
+| `isInvalid` | `boolean` | No | `false` | Invalid state | shake/color transition |
+| `isDisabled` | `boolean` | No | `false` | Disabled | `editable=false` |
+| `isReadOnly` | `boolean` | No | `false` | Read-only | `editable=false` |
+| `fullWidth` | `boolean` | No | `true` | Whether width 100% | |
+| `onClear` | `() => void` | No | - | Clear button callback | |
+
+#### Example
+```tsx
+import { Input } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Input
+      label="Email"
+      placeholder="name@example.com"
+      description="Enter the email you'll use to sign in."
+    />
+  );
+}
+```
+
+---
+
+### Item
+
+'Item' is a "row-unit layout" component commonly used in list/settings screens. It divides structure with compound subcomponents like 'ItemMedia / ItemContent / ItemActions', and provides card-like press interaction (scale/opacity).
+
+**Docs**: https://fleet-ui.vercel.app/en/components/item
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Media Alignment: `ItemMedia.verticalAlign`**
+- `top`: Top aligned
+- `center`: Center aligned (default)
+- `bottom`: Bottom aligned
+**Action Area: `ItemActions`**
+
+```tsx
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+  IconButton,
+} from '@fleet-ui/components';
+import { ChevronRight, User } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <Item onPress={() => {}}>
+      <ItemMedia mediaType="icon">
+```
+
+#### State & Animation
+
+**Animation:**
+- press-in: `scale = 0.96`, `opacity = 0.7` (spring)
+- press-out: `scale/opacity = 1` return
+
+#### Accessibility
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+- If entire row is clickable, provide `accessibilityRole="button"` and label.
+- If separate buttons are in right `ItemActions`, provide `aria-label`/`accessibilityLabel` for each button.
+
+#### Props
+**Item**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | Color theme | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'fade'` | No | `'flat'` | Visual style | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | padding/density preset | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Corner radius | |
+| `shadow` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'none'` | Shadow preset | |
+| `children` | `ReactNode` | No | - | Internal content | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style override | |
+
+**ItemMedia**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `ItemVariant` | No | `'filled'` | Media background/style preset |
+| `size` | `ItemSize` | No | `'md'` | Media size preset |
+| `mediaType` | `'icon' \| 'image'` | No | `'icon'` | Icon/image layout difference |
+| `verticalAlign` | `'top' \| 'center' \| 'bottom'` | No | `'center'` | Vertical alignment relative to body |
+| `children` | `ReactNode` | No | - | Media content |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override |
+
+**ItemContent**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | Usually `ItemTitle/ItemDescription` |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override |
+
+**ItemTitle**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | Title |
+| `size` | `ItemSize` | No | `'md'` | Typo scale |
+| `style` | `StyleProp<TextStyle>` | No | - | Style override |
+
+**ItemDescription**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | No | - | Description |
+| `size` | `ItemSize` | No | `'md'` | Typo scale |
+| `style` | `StyleProp<TextStyle>` | No | - | Style override |
+
+#### Example
+```tsx
+import {
+  Item,
+  ItemMedia,
+  ItemContent,
+  ItemTitle,
+  ItemDescription,
+  ItemActions,
+  IconButton,
+} from '@fleet-ui/components';
+import { ChevronRight, User } from 'lucide-react-native';
+
+export function Example() {
+  return (
+    <Item onPress={() => {}}>
+      <ItemMedia mediaType="icon">
+        <User />
+      </ItemMedia>
+
+      <ItemContent>
+        <ItemTitle>Account</ItemTitle>
+        <ItemDescription>Profile/security settings</ItemDescription>
+      </ItemContent>
+
+      <ItemActions>
+        <IconButton icon={<ChevronRight />} aria-label="Navigate" onPress={() => {}} />
+      </ItemActions>
+    </Item>
+  );
+}
+```
+
+---
+
+### LayoutTop
+
+'LayoutTop' is a component that layouts "title/subtitle/asset/right action" at the top of the screen in a consistent manner. It unifies title typography with size presets, and adjusts top section layout with 'paddingTop/paddingBottom' (token or number) and 'rightAlignment'.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/layout-top
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Asset/Right Action: `asset`, `right`**
+**Padding: Preset vs Number**
+- Preset: `'none' | 'sm' | 'md' | 'lg'`
+- Number: Arbitrary px value (number)
+
+```tsx
+import { LayoutTop } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <LayoutTop
+      size="md"
+      paddingTop="md"
+      paddingBottom="md"
+      title={<LayoutTop.TitleTypo>Payment</LayoutTop.TitleTypo>}
+      subtitleBottom={
+        <LayoutTop.SubtitleTypo>Please confirm your payment info.</LayoutTop.SubtitleTypo>
+      }
+    />
+  );
+}
+```
+
+#### Accessibility
+- (Web) Verify keyboard/focus navigation is natural.
+- (Common) Verify state changes are sufficiently conveyed to screen readers.
+- If it's actual page title, use text with `accessibilityRole="header"` in `title` area (or assign header role at parent).
+- If putting icon-only button in `right`, provide `aria-label`/`accessibilityLabel`.
+
+#### Props
+**LayoutTop**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `asset` | `ReactNode` | No | - | Top asset area | |
+| `subtitleTop` | `ReactNode` | No | - | Subtitle above title | |
+| `title` | `ReactNode` | No | - | Main title | Usually `LayoutTop.TitleTypo` recommended |
+| `subtitleBottom` | `ReactNode` | No | - | Subtitle below title | |
+| `right` | `ReactNode` | No | - | Right action area | |
+| `rightAlignment` | `'start' \| 'center' \| 'end'` | No | `'end'`(types) / impl default may be `'center'` | Right vertical alignment | Note difference between impl default and type annotation |
+| `paddingTop` | `'none' \| 'sm' \| 'md' \| 'lg' \| number` | No | `'none'` | Top padding | If number, px |
+| `paddingBottom` | `'none' \| 'sm' \| 'md' \| 'lg' \| number` | No | `'md'` | Bottom padding | If number, px |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Default typo scale | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style | |
+
+#### Example
+```tsx
+import { LayoutTop } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <LayoutTop
+      size="md"
+      paddingTop="md"
+      paddingBottom="md"
+      title={<LayoutTop.TitleTypo>Payment</LayoutTop.TitleTypo>}
+      subtitleBottom={
+        <LayoutTop.SubtitleTypo>Please confirm your payment info.</LayoutTop.SubtitleTypo>
+      }
+    />
+  );
+}
+```
+
+---
+
+### Menu
+
+'Menu' is a compound component that shows a dropdown when pressing a trigger (button, etc.), and provides item selection/check functionality. 'Menu.Trigger' manages open state (controlled/uncontrolled), outside click close, and close on select, while 'Menu.Dropdown/DropdownItem/DropdownCheckItem' compose the menu UI.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/menu
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+>
+**CheckItem: `Menu.DropdownCheckItem`**
+>
+**Close Policy**
+- `closeOnOutsidePress`: Close when pressing overlay (outside area) (default true)
+- `closeOnSelect`: Close on item selection (default true)
+
+```tsx
+import { Menu, Button } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Menu.Trigger
+      dropdown={
+        <Menu.Dropdown header={<Menu.Header>Sort</Menu.Header>}>
+          <Menu.DropdownItem onPress={() => {}}>Latest</Menu.DropdownItem>
+          <Menu.DropdownItem onPress={() => {}}>Popular</Menu.DropdownItem>
+        </Menu.Dropdown>
+      }
+    >
+      <Button>Open Menu</Button>
+    </Menu.Trigger>
+  );
+```
+
+#### State & Animation
+**State Model:**
+- controlled: If `open` exists, `isOpen = open`
+- uncontrolled: Start internal state with `defaultOpen`, toggle internally with `setInternalOpen`
+
+**Animation:**
+- `opacity`: 0 → 1 (open), 1 → 0 (close)
+- `scaleX/scaleY`: 0 → 1 transition (with delay)
+
+#### Accessibility
+- Dropdown container: `accessibilityRole="menu"` (`Menu.Dropdown`)
+- Menu items: `accessibilityRole="menuitem"` (`Menu.DropdownItem/DropdownCheckItem`)
+- Trigger modal scope:
+- `accessibilityViewIsModal`
+- `importantForAccessibility="yes"`
+- Close support via `onAccessibilityEscape`
+- If item text is string, it's automatically used as label, but provide `accessibilityLabel` when using custom children.
+
+#### Props
+**Menu.Trigger**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `open` | `boolean` | No | - | Open state (controlled) | |
+| `defaultOpen` | `boolean` | No | `false` | Initial open (uncontrolled) | |
+| `onOpen` | `() => void` | No | - | Open callback | |
+| `onClose` | `() => void` | No | - | Close callback | |
+| `children` | `ReactNode` | Yes | - | Trigger element (button, etc.) | onPress can be injected internally |
+| `dropdown` | `ReactNode` | Yes | - | Dropdown (`Menu.Dropdown`) | |
+| `placement` | `MenuPlacement` | No | `'bottom-start'` | Placement position | Includes screen boundary correction |
+| `closeOnOutsidePress` | `boolean` | No | `true` | Close on outside click | |
+| `closeOnSelect` | `boolean` | No | `true` | Close on item selection | Passed via context |
+
+**Menu.Dropdown**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `header` | `ReactNode` | No | - | Header (`Menu.Header` recommended) |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Dropdown size |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Rounded |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Shadow |
+| `children` | `ReactNode` | Yes | - | Items |
+
+**Menu.DropdownItem**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | No | - | Left slot |
+| `right` | `ReactNode` | No | - | Right slot (`Menu.DropdownIcon` recommended) |
+| `children` | `ReactNode` | Yes | - | Text/content |
+
+**Menu.DropdownCheckItem**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | No | - | Left slot | |
+| `right` | `ReactNode` | No | - | Right slot | |
+| `checked` | `boolean` | No | `false` | Check state | |
+| `onCheckedChange` | `(checked: boolean) => void` | No | - | Check change callback | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color on check | |
+| `children` | `ReactNode` | Yes | - | Text/content | |
+
+#### Example
+```tsx
+import { Menu, Button } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Menu.Trigger
+      dropdown={
+        <Menu.Dropdown header={<Menu.Header>Sort</Menu.Header>}>
+          <Menu.DropdownItem onPress={() => {}}>Latest</Menu.DropdownItem>
+          <Menu.DropdownItem onPress={() => {}}>Popular</Menu.DropdownItem>
+        </Menu.Dropdown>
+      }
+    >
+      <Button>Open Menu</Button>
+    </Menu.Trigger>
+  );
+}
+```
+
+---
+
+### Modal
+
+'Modal' is an overlay modal component that appears at the center of the screen. It controls visibility state externally with 'visible'/'onClose', and content is composed with 'Modal.Header/Body/Description/Footer' compound structure. "Close paths" like backdrop click/swipe/Android back button are controlled with 'closable' and related props.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/modal
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Close Policy: `closable`, `swipeToDismiss`**
+- When `closable=true`:
+- Closes on backdrop click
+- (Optional) Closes on swipe down
+- Closes on Android hardware back button
+- When `closable=false`:
+**Swipe Dismiss Details: `swipeThreshold`**
+- Drag distance (`translationY`) exceeds `swipeThreshold`, or
+- `velocityY > 500`
+
+```tsx
+import { useState } from 'react';
+import { Text } from 'react-native';
+import { Modal, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onPress={() => setOpen(true)}>Open</Button>
+
+      <Modal visible={open} onClose={() => setOpen(false)}>
+        <Modal.Header title="Notice" />
+        <Modal.Description content="There's an important notice." />
+        <Modal.Body>
+```
+
+#### State & Animation
+
+**Animation:**
+- Backdrop `opacity` (withTiming)
+- Content `translateY` (withTiming / withSpring)
+- Sync backdrop opacity with swipe progress (interpolate)
+
+#### Accessibility
+- Modal overlay sets modal scope with `accessibilityViewIsModal` + `importantForAccessibility="yes"`.
+- Handles screen reader "close" gesture with `onAccessibilityEscape` (when closable).
+- `Modal.Header` close button should have `accessibilityRole="button"` + `accessibilityLabel="Close modal"`.
+- Close button label can be customized with app i18n policy via custom header.
+- (Web) Verify ESC/focus navigation is natural for keyboard users.
+
+#### Props
+**Modal (Root)**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `visible` | `boolean` | Yes | - | Modal visibility state | External control |
+| `onClose` | `() => void` | Yes | - | Close callback (change external state to false) | Required |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Content max width/padding preset | |
+| `colorScheme` | `'base' \| 'inverted'` | No | `'base'` | Color theme | |
+| `rounded` | `'none' \| '_2xs' \| 'xs' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Round preset | |
+| `closable` | `boolean` | No | `true` | Allow close via backdrop/swipe/back button | |
+| `swipeToDismiss` | `boolean` | No | `true` | Enable swipe dismiss | Works with `closable` |
+| `swipeThreshold` | `number` | No | `100` | Swipe dismiss threshold (px) | |
+| `backdropOpacity` | `number` | No | `0.5`(types) / impl default may be `0.3` | Backdrop opacity | Note difference between impl default and type annotation |
+| `useBackdropBlur` | `boolean` | No | `true` | Use backdrop blur | `expo-blur` required |
+| `backdropBlurIntensity` | `number` | No | `50` | Blur intensity (0~100) | |
+| `backdropBlurTint` | `'light' \| 'dark'` | No | `'light'` | Blur tint | |
+| `modalProps` | `Omit<RNModalProps, 'visible' \| 'children' \| 'transparent' \| 'animationType'>` | No | - | RN Modal props override | Some props are fixed internally |
+| `contentStyle` | `StyleProp<ViewStyle>` | No | - | Content style override | |
+| `backdropStyle` | `StyleProp<ViewStyle>` | No | - | Backdrop style override | |
+| `onShow` | `() => void` | No | - | Show callback | |
+| `onDismiss` | `() => void` | No | - | Dismiss callback | |
+| `children` | `ReactNode` | Yes | - | Modal content | |
+
+#### Example
+```tsx
+import { useState } from 'react';
+import { Text } from 'react-native';
+import { Modal, Button } from '@fleet-ui/components';
+
+export function Example() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button onPress={() => setOpen(true)}>Open</Button>
+
+      <Modal visible={open} onClose={() => setOpen(false)}>
+        <Modal.Header title="Notice" />
+        <Modal.Description content="There's an important notice." />
+        <Modal.Body>
+          <Text>Body content</Text>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="ghost" onPress={() => setOpen(false)}>Close</Button>
+          <Button onPress={() => setOpen(false)}>Confirm</Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+}
+```
+
+---
+
+### OTPInput
+
+'OTPInput' is a component that receives verification code (One-Time Password) input via "slot UI." Actual input is handled by invisible 'TextInput', and 'OTPSlot's are rendered on screen. It provides paste/pattern validation/completion callback ('onComplete'), and you can use 'useOTPInput' hook to separate the same logic.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/otp-input
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Pattern Validation: `pattern`**
+**Paste Handling: `pasteTransformer`**
+**Custom Render: `render`**
+
+```tsx
+import { OTPInput } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <OTPInput
+      maxLength={6}
+      onComplete={(code) => console.log('complete', code)}
+      accessibilityLabel="Verification code input"
+    />
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- `value`: Current OTP string
+- `prevValue`: Previous frame value (for slot animation trigger)
+- `isFocused`: Overall focus state
+- Input is truncated to `maxLength` and stored.
+- If `pattern` exists, checks regex pass.
+- When length becomes `maxLength`, calls `onComplete(value)`.
+- `slots[index]` contains `char/prevChar/placeholderChar/isActive/hasFakeCaret`, etc.
+
+**Animation:**
+- Typing bounce (on new character input): scale + translateY sequence
+- Focus display:
+- `bordered/faded` uses borderWidth 1↔2
+- `underlined` uses underlineScale 0↔1
+- Color transition: Transition background/border color with spring (error color on error)
+
+#### Accessibility
+- Slot container (`Pressable`) is hidden with `accessible={false}`
+- Actual `TextInput` is `accessible` with:
+- `accessibilityRole="text"`
+- `accessibilityState={{ disabled }}`
+- Default label: <code>OTP input with &#36;&#123;maxLength&#125; digits</code>
+- Default hint: `Enter your verification code`
+
+#### Props
+**OTPInput**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `maxLength` | `number` | Yes | - | OTP length (slot count) | |
+| `defaultValue` | `string` | No | `''` | Initial value | |
+| `onChangeText` | `(value: string) => void` | No | - | Value change callback | |
+| `onComplete` | `(value: string) => void` | No | - | All input complete callback | |
+| `pattern` | `string \| RegExp` | No | - | Input validation regex | Ignores update on mismatch |
+| `placeholder` | `string` | No | - | Per-slot placeholder string | |
+| `pasteTransformer` | `(pasted: string) => string` | No | - | Paste transform function | Default transformer provided |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Slot focus/color scheme | |
+| `variant` | `'flat' \| 'bordered' \| 'underlined' \| 'faded'` | No | `'bordered'` | Slot style variant | |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Slot size/spacing/typo | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Rounded | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow | |
+| `isDisabled` | `boolean` | No | `false` | Disabled | |
+| `isInvalid` | `boolean` | No | `false` | Error state | Slot color transition |
+| `gap` | `number` | No | - | Gap between slots (theme.spacing index) | Can be auto-determined by size |
+| `containerStyle` | `StyleProp<ViewStyle>` | No | - | Root container style | |
+| `slotStyle` | `StyleProp<ViewStyle>` | No | - | Slot style override | |
+| `slotTextStyle` | `StyleProp<TextStyle>` | No | - | Slot text style | |
+| `caretStyle` | `StyleProp<ViewStyle>` | No | - | Caret style | |
+| `render` | `(props: OTPRenderProps) => ReactNode` | No | - | Custom render function | Replaces default OTPSlot |
+
+#### Example
+```tsx
+import { OTPInput } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <OTPInput
+      maxLength={6}
+      onComplete={(code) => console.log('complete', code)}
+      accessibilityLabel="Verification code input"
+    />
+  );
+}
+```
+
+---
+
+### Progress
+
+'Progress' is a component that displays "step-based progress." Based on 'step' (total steps) and 'activeStep' (current step, 1-based), it renders track/thumb, and when 'interactive=true', users can tap specific steps to change progress.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/progress
+
+#### Core Features
+**#### D-1. Most Common Scenario (Minimal Example)**
+**Thumb Mode vs Track-only Mode**
+- `thumbVariant="circle" | "number"`: Renders Thumb (marker) for each step, connected by Track.
+- `thumbVariant="none"`: Renders **only step count Tracks** without Thumb to display steps themselves.
+**Interactive Mode**
+
+```tsx
+import { Progress } from '@fleet-ui/components';
+
+export function Example() {
+  return <Progress step={5} activeStep={2} />;
+}
+```
+
+#### State & Animation
+**State Model:**
+- `step` is clamped to 1~100.
+- `activeStep` is clamped to **0~step** range.
+- `0`: No step is active
+- `1..step`: Progressed to that step
+- If `activeStep` is provided, controlled
+- Otherwise starts internal state with `defaultActiveStep`, and updates internal state in `interactive`
+
+**Animation:**
+- Uses `activeStepSV` (`SharedValue<number>`) to sync progress state animation-based.
+- When `animated=true`, transitions `activeStepSV` with `withTiming`.
+- Track/Thumb internally calculates "complete/active" state as derived value, and animates fill opacity/scale, etc.
+
+#### Accessibility
+- Root: `accessibilityRole="progressbar"`
+- `accessibilityValue: { min: 0, max: step, now: activeStep }`
+- `accessibilityLabel` default is <code>Progress: &#36;&#123;percentage&#125;%</code> format (overridable)
+- Each thumb/track has `accessibilityRole="button"` + `accessibilityLabel="Step N(: label)"`.
+
+#### Props
+**> Reference: `ProgressProps` from `packages/components/src/Progress/Progress.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `step` | `number` | Yes | - | Total step count (1~100) | Clamped internally |
+| `activeStep` | `number` | No | - | Current step (1-based, 0 is inactive) | controlled |
+| `defaultActiveStep` | `number` | No | `1` | Initial step | uncontrolled |
+| `onStepChange` | `(step: number) => void` | No | - | Step change callback | Useful in interactive |
+| `trackVariant` | `'lined' \| 'flat'` | No | `'flat'` | Track style | |
+| `thumbVariant` | `'circle' \| 'number' \| 'none'` | No | `'none'` | Thumb (marker) style | none is track-only |
+| `thumbGap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | thumb-track gap | |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color theme | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size preset | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Rounded | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow | |
+| `interactive` | `boolean` | No | `false` | Enable step tap | |
+| `onStepPress` | `(step: number) => void` | No | - | Step tap callback (1-based) | Meaningful only in interactive |
+| `animated` | `boolean` | No | `true` | Use animation | |
+| `animationDuration` | `number` | No | `300` | Animation duration (ms) | |
+| `labels` | `{ stepIndex: number; label: string }[]` | No | - | Per-step labels (0-based) | |
+| `showLabels` | `boolean` | No | `false` | Show labels | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### Example
+```tsx
+import { Progress } from '@fleet-ui/components';
+
+export function Example() {
+  return <Progress step={5} activeStep={2} />;
+}
+```
+
+---
+
+### Radio
+
+'Radio' is a radio button component expressing single selection ("already selected value is maintained"). It supports controlled/uncontrolled with 'selected/defaultSelected', and enforces "radio semantics" where 'onSelect(true)' is only called from unselected state.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/radio
+
+#### Core Features
+**#### D-1. Most Common Scenario (Controlled Usage in Group)**
+**"Not Toggle" Radio Rule**
+- Selected → press again: No change, `onSelect` not called
+- Not selected → press: Selected, `onSelect(true)` called
+
+```tsx
+import { useState } from 'react';
+import { View, Text } from 'react-native';
+import { Radio } from '@fleet-ui/components';
+
+export function Example() {
+  const [value, setValue] = useState<'a' | 'b'>('a');
+
+  return (
+    <View style={{ gap: 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Radio
+          selected={value === 'a'}
+          onSelect={() => setValue('a')}
+          accessibilityLabel="Option A"
+        />
+```
+
+#### State & Animation
+**State Model:**
+- controlled: If `selected` is provided, use that value as-is
+- uncontrolled: Start with `defaultSelected`, set internal state to `true` on selection (no deselection)
+
+**Animation:**
+- `progress = withTiming(selected ? 1 : 0)` animates inner circle's `scale/opacity`.
+- Container background/border uses `useAnimatedVariantColor` to get variants result color and transitions with `withTiming`.
+
+#### Accessibility
+- `accessibilityRole="radio"`
+- `accessibilityState={{ checked: selected, disabled }}`
+- `accessibilityLabel` is passed via prop (strongly recommended if label text is separate)
+> Note: RN doesn't automatically compose radio group (`radiogroup`), so actual group UX (labels/descriptions/focus navigation) is responsibility of screen composition level.
+
+#### Props
+**> Reference: `RadioProps` from `packages/components/src/Radio/Radio.types.ts`.**
+| Prop | Type | Required | Default | Description | Platform notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color theme | |
+| `variant` | `'filled' \| 'flat' \| 'outlined'` | No | `'filled'` | Style variant | |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow | |
+| `selected` | `boolean` | No | - | Selected state (controlled) | Deselection handled externally |
+| `defaultSelected` | `boolean` | No | `false` | Initial selection (uncontrolled) | No deselection |
+| `onSelect` | `(selected: boolean) => void` | No | - | Selection callback (always `true`) | Only called on false→true |
+| `disabled` | `boolean` | No | `false` | Disabled | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | Recommended |
+| `testID` | `string` | No | - | Test identifier | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override | |
+
+#### Example
+```tsx
+import { useState } from 'react';
+import { View, Text } from 'react-native';
+import { Radio } from '@fleet-ui/components';
+
+export function Example() {
+  const [value, setValue] = useState<'a' | 'b'>('a');
+
+  return (
+    <View style={{ gap: 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Radio
+          selected={value === 'a'}
+          onSelect={() => setValue('a')}
+          accessibilityLabel="Option A"
+        />
+        <Text>Option A</Text>
+      </View>
+
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <Radio
+          selected={value === 'b'}
+          onSelect={() => setValue('b')}
+          accessibilityLabel="Option B"
+        />
+        <Text>Option B</Text>
+      </View>
+    </View>
+  );
+}
+```
+
+---
+
+### RadioCard
+
+'RadioCard' is a selectable card component providing "radio selection UI + card layout" in one. Used standalone, selection toggle (like checkbox) is possible, and when used inside 'RadioCardGroup', it operates with single selection (radio semantics).
+
+**Docs**: https://fleet-ui.vercel.app/en/components/radio-card
+
+#### Core Features
+**#### D-1. Group Usage (Recommended): Single Selection**
+>
+- Pressing same card again doesn't deselect (radio).
+- Selection is managed by `value` string and passed via `RadioCardGroup.onValueChange(value)`.
+**Standalone Usage: Selection Toggle (Caution)**
+**Layout Slots**
+- `header`: Card top header area
+- `footer`: Card bottom footer area
+- `media`: Icon/image to left of title
+- `left`/`right`: Body (content) left/right slots
+**Style Override on Selection**
+- `selectedColorScheme`: Change color scheme only when selected
+- `selectedVariant`: Change card variant only when selected
+
+```tsx
+import { RadioCard, RadioCardGroup } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <RadioCardGroup
+      name="Shipping Method"
+      defaultValue="standard"
+      onValueChange={(v) => console.log(v)}
+      gap="md"
+    >
+      <RadioCard
+        value="standard"
+        title="Standard Delivery"
+        description="3-5 days"
+      />
+```
+
+#### State & Animation
+**State Model:**
+- controlled: Control with `value`
+- uncontrolled: `defaultValue` + internal `internalValue`
+
+**Animation:**
+- press-in/out: Scale/opacity spring (`0.98/0.8` ↔ `1/1`)
+- Color transition: Gets background/border/title/description from variant-based colors and transitions with spring
+
+#### Accessibility
+- `RadioCardGroup` uses `accessibilityRole="radiogroup"`.
+- Provides group label with `name` or `accessibilityLabel`.
+- `RadioCard` is `accessibilityRole="radio"`
+- `accessibilityState={{ checked, disabled }}`
+- Default label is `accessibilityLabel || title`
+
+#### Props
+**RadioCard**
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `title` | `string` | Yes | - | Card title | Also used as accessibility default label |
+| `description` | `string` | No | - | Description text | |
+| `header` | `ReactNode` | No | - | Top header slot | |
+| `footer` | `ReactNode` | No | - | Bottom footer slot | |
+| `media` | `ReactNode` | No | - | Media to left of title | |
+| `left` | `ReactNode` | No | - | Body left slot | |
+| `right` | `ReactNode` | No | - | Body right slot | |
+| `value` | `string` | Yes | - | Group selection identifier | Required in group |
+| `selected` | `boolean` | No | - | Selection state (controlled, standalone) | Ignored inside group |
+| `defaultSelected` | `boolean` | No | `false` | Initial selection (uncontrolled, standalone) | Ignored inside group |
+| `onSelect` | `(selected: boolean) => void` | No | - | Selection toggle callback (standalone) | Ignored inside group |
+| `colorScheme` | `ItemColorScheme` | No | `'neutral'` | Card color scheme | |
+| `variant` | `ItemVariant` | No | `'outlined'` | Card variant | |
+| `size` | `ItemSize` | No | `'md'` | Card size | |
+| `rounded` | `ItemRounded` | No | `'md'` | Rounded | |
+| `shadow` | `ItemShadow` | No | `'none'` | Shadow | |
+| `indicatorPosition` | `'start' \| 'end'` | No | `'end'` | Radio position | |
+| `indicatorVariant` | `RadioVariant` | No | `'filled'` | Radio variant | |
+| `selectedColorScheme` | `ItemColorScheme` | No | - | Selection color scheme override | |
+| `selectedVariant` | `ItemVariant` | No | - | Selection variant override | |
+| `disabled` | `boolean` | No | `false` | Disabled | OR'd with group disabled |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | Default: title |
+| `testID` | `string` | No | - | Test identifier | |
+
+**RadioCardGroup**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `value` | `string` | No | - | Selection value (controlled) |
+| `defaultValue` | `string` | No | - | Initial selection value (uncontrolled) |
+| `onValueChange` | `(value: string) => void` | No | - | Selection change callback |
+| `name` | `string` | No | - | Group name (a11y) |
+| `disabled` | `boolean` | No | `false` | Group disabled |
+| `children` | `ReactNode` | No | - | `RadioCard` children |
+| `style` | `ViewProps['style']` | No | - | Container style |
+| `gap` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Card gap |
+
+#### Example
+```tsx
+import { RadioCard, RadioCardGroup } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <RadioCardGroup
+      name="Shipping Method"
+      defaultValue="standard"
+      onValueChange={(v) => console.log(v)}
+      gap="md"
+    >
+      <RadioCard
+        value="standard"
+        title="Standard Delivery"
+        description="3-5 days"
+      />
+      <RadioCard
+        value="express"
+        title="Express Delivery"
+        description="Next day arrival"
+        selectedVariant="filled"
+        selectedColorScheme="primary"
+      />
+    </RadioCardGroup>
+  );
+}
+```
+
+---
+
+### Section
+
+'Section' is a layout component that divides the screen into "header (title/subtitle/right action) + body." It groups information in block units on document/settings/list screens, and provides right actions (text/icon) in a consistent pattern.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/section
+
+#### Core Features
+**#### D-1. Basic Pattern (Composing with String Props Only)**
+>
+**Right Action: Text vs Icon**
+- Text action: `Section.RightTypo`
+- Icon action: `Section.RightIcon` (when interactive, `aria-label` or `accessibilityLabel` required)
+**Layout Control: `titleRatio`, `subtitlePosition`**
+- `titleRatio`: Ratio (0-100) that title area occupies in header. Right area uses remaining ratio.
+- `subtitlePosition`: Position subtitle above title (`top`) or below (`bottom`, default)
+
+```tsx
+import { Section, Button } from '@fleet-ui/components';
+import { View, Text } from 'react-native';
+
+export function Example() {
+  return (
+    <Section
+      title="Payment Method"
+      subtitle="Please select your default payment method."
+      right={<Section.RightTypo onPress={() => {}}>Change</Section.RightTypo>}
+    >
+      <View>
+        <Text>Content</Text>
+      </View>
+    </Section>
+  );
+```
+
+#### Accessibility
+- `Section.RightTypo`:
+- If interactive, sets `accessibilityRole="button"` and `accessibilityState.disabled`.
+- `Section.RightIcon`:
+- If interactive, sets `accessibilityRole="button"` + `accessibilityLabel`.
+- In dev mode, outputs warning if interactive but missing label.
+
+#### Props
+**Section**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `ReactNode` | No | - | Header title |
+| `subtitle` | `ReactNode` | No | - | Header subtitle |
+| `right` | `ReactNode` | No | - | Header right area (priority) |
+| `rightIcon` | `ReactNode` | No | - | Header right icon (used only when no `right`) |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size preset |
+| `gap` | `keyof FleetTheme['spacing'] \| number` | No | `3` | Vertical gap between header internal elements |
+| `padding` | `keyof FleetTheme['spacing'] \| number` | No | `0` | Header/body common horizontal padding |
+| `contentSpacing` | `keyof FleetTheme['spacing'] \| number` | No | `5` | Header-body gap and body top padding |
+| `titleRatio` | `number` | No | `70` | Title area ratio in header |
+| `subtitlePosition` | `'top' \| 'bottom'` | No | `'bottom'` | Subtitle position |
+| `headerStyle` | `ViewProps['style']` | No | - | Header style |
+| `contentStyle` | `ViewProps['style']` | No | - | Body style |
+| `children` | `ReactNode` | No | - | Body content |
+| `testID` | `string` | No | - | Test identifier |
+
+#### Example
+```tsx
+import { Section, Button } from '@fleet-ui/components';
+import { View, Text } from 'react-native';
+
+export function Example() {
+  return (
+    <Section
+      title="Payment Method"
+      subtitle="Please select your default payment method."
+      right={<Section.RightTypo onPress={() => {}}>Change</Section.RightTypo>}
+    >
+      <View>
+        <Text>Content</Text>
+      </View>
+    </Section>
+  );
+}
+```
+
+---
+
+### Slider
+
+'Slider' is a component for adjusting values by dragging one (or two) Thumbs. 'thumbCount=1' is a regular slider, 'thumbCount=2' is a range slider, and 'thumbCount=0' can be used as "progress bar mode" without thumb.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/slider
+
+#### Core Features
+**#### D-1. Single Thumb Slider**
+**Range Slider (Two Thumbs)**
+**Thumb Hidden (Progress Bar-like)**
+
+```tsx
+import { Slider } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Slider
+      thumbCount={1}
+      min={0}
+      max={100}
+      step={1}
+      defaultValue={[30]}
+      onValueChange={(v) => console.log(v)} // [number]
+    />
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- Value is maintained as `number[]` array.
+- `thumbCount=1` → `[value0]`
+- `thumbCount=2` → `[value0, value1]`
+- If no `defaultValue`:
+- dual thumb: `[0, 100]`
+- single thumb: `[min]`
+- Updates during drag are throttled by `throttleMs` (`updateValue`)
+- Final value on drag end is always committed (`commitValue`) and `onValueChange` is called without throttle.
+
+**Animation:**
+- Thumb drag: Calculates position based on translationX with `Gesture.Pan()`
+- Snaps to `step` units in `positionToValueWorklet`
+- Visual effects during drag:
+- trackScale/ thumbScale spring
+- velocity-based inertiaOffset gives feeling of track slightly following
+- In dual thumb mode, minimum distance restriction based on `minStepsBetweenThumbs`
+
+#### Accessibility
+- `accessibilityRole="adjustable"`
+- `accessibilityValue={{ min, max, now: internalValue[0] }}`
+- `accessibilityState={{ disabled }}`
+- `accessibilityLabel` default is `'Slider'` (override recommended)
+> Note: Current implementation only exposes first value to `accessibilityValue.now`. For range slider (2 thumbs), providing "current range" with auxiliary text/labels at app level is recommended.
+
+#### Props
+**> Reference: `SliderProps` from `packages/components/src/Slider/Slider.types.ts`.**
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | |
+| `trackVariant` | `'lined' \| 'flat'` | No | `'flat'` | Track style | |
+| `thumbVariant` | `'circle' \| 'oval' \| 'line'` | No | `'circle'` | Thumb style | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md'` | No | `'md'` | Track rounded | |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size (track/Thumb size) | |
+| `thumbShadow` | `'md' \| 'lg'` | No | `'md'` | Thumb shadow | |
+| `trackShadow` | `'none' \| 'base'` | No | `'base'` | Track inner shadow | |
+| `thumbCount` | `0 \| 1 \| 2` | No | `1` | Thumb count | 0 hides thumb |
+| `defaultValue` | `number[]` | No | single: `[min]`, dual: `[0, 100]` | Initial value | Array-based |
+| `min` | `number` | No | `0` | Minimum value | |
+| `max` | `number` | No | `100` | Maximum value | |
+| `step` | `number` | No | `1` | Step unit | Snap interval |
+| `minStepsBetweenThumbs` | `number` | No | `0` | Minimum step gap between two thumbs | range mode |
+| `throttleMs` | `number` | No | `200` | Drag callback throttle (ms) | |
+| `disabled` | `boolean` | No | `false` | Disabled | |
+| `onValueChange` | `(value: number[]) => void` | No | - | Value change callback | Called both during drag + end |
+| `trackLength` | `number` | No | - | Track length (px) | 100% if not specified |
+| `accessibilityLabel` | `string` | No | `'Slider'` | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### Example
+```tsx
+import { Slider } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Slider
+      thumbCount={1}
+      min={0}
+      max={100}
+      step={1}
+      defaultValue={[30]}
+      onValueChange={(v) => console.log(v)} // [number]
+    />
+  );
+}
+```
+
+---
+
+### State
+
+'State' is a component that shows "result state" like success/error/warning in a single screen block. It provides default icon/title/description/action button, and when needed, 'asset/title/description/button' can be replaced with custom nodes.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/state
+
+#### Core Features
+**#### D-1. Basic Usage (Recommended Pattern)**
+**Custom asset/title/description**
+
+```tsx
+import { State } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <State
+      variant="success"
+      title="Complete"
+      description="Request has been processed successfully."
+      button={<State.Button onPress={() => {}}>Go to Home</State.Button>}
+    />
+  );
+}
+```
+
+#### Accessibility
+- Root: `accessibilityRole="summary"` (state summary block)
+- Title (when string): `accessibilityRole="header"`
+- Button: `accessibilityRole="button"`, `accessibilityState={{ disabled, busy }}`
+- `busy` is true when `loading=true`
+
+#### Props
+**State**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `'error' \| 'warning' \| 'info' \| 'success' \| 'neutral' \| 'ghost'` | No | `'neutral'` | State variant |
+| `asset` | `ReactNode` | No | - | Top visual (icon/image, etc.) |
+| `title` | `ReactNode` | No | - | Title |
+| `description` | `ReactNode` | No | - | Description |
+| `button` | `ReactNode` | No | - | Bottom action (usually `State.Button`) |
+| `style` | `StyleProp<ViewStyle>` | No | - | Container style |
+| `titleStyle` | `StyleProp<TextStyle>` | No | - | Title style override |
+| `descriptionStyle` | `StyleProp<TextStyle>` | No | - | Description style override |
+
+**State.Button**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | Button label |
+| `onPress` | `() => void` | No | - | Click handler |
+| `disabled` | `boolean` | No | `false` | Disabled |
+| `loading` | `boolean` | No | `false` | Loading state (= disabled + busy) |
+| `style` | `StyleProp<ViewStyle>` | No | - | Style override |
+| `testID` | `string` | No | - | Test identifier |
+
+#### Example
+```tsx
+import { State } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <State
+      variant="success"
+      title="Complete"
+      description="Request has been processed successfully."
+      button={<State.Button onPress={() => {}}>Go to Home</State.Button>}
+    />
+  );
+}
+```
+
+---
+
+### StepIndicator
+
+**Docs**: https://fleet-ui.vercel.app/en/components/step-indicator
+
+#### Core Features
+**#### D-1. Basic Usage**
+**Interactive Mode**
+
+```tsx
+import { StepIndicator } from '@fleet-ui/components';
+
+export function Example() {
+  return <StepIndicator step={5} activeStep={2} />;
+}
+```
+
+#### State & Animation
+**State Model:**
+- `step` is clamped to the range 1–100.
+- `activeStep` is clamped to the range 0–(step-1).
+- **Controlled vs. Uncontrolled**:
+- **Controlled**: Provide `activeStep`
+- **Uncontrolled**: Use `defaultActiveStep` to initialize internal state; interactive mode updates internal state automatically
+
+**Animation:**
+- Uses `activeStepSV` (`SharedValue<number>`) to synchronize the current step with animations.
+- Each dot calculates derived values:
+- `isActive`: whether it's the current step
+- `isCompleted`: whether it precedes the current step
+- The active dot expands in width (pill-like), and fill opacity transitions to 1 for active/completed states.
+
+#### Accessibility
+- Root element: `accessibilityRole="progressbar"`
+- `accessibilityValue: { min: 0, max: step-1, now: activeStep }`
+- Default `accessibilityLabel`: `Step {activeStep+1} of {step}`
+- Each dot has `accessibilityRole="button"` and uses `accessibilityState.selected` to convey selection status.
+
+#### Props
+**> Reference: `StepIndicatorProps` from `packages/components/src/StepIndicator/StepIndicator.types.ts`.**
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `step` | `number` | Yes | - | Total number of steps | Clamped 1–100 |
+| `activeStep` | `number` | No | - | Current step (0-based) | Controlled |
+| `defaultActiveStep` | `number` | No | `0` | Initial step (0-based) | Uncontrolled |
+| `onStepChange` | `(step: number) => void` | No | - | Step change callback (0-based) | Useful in interactive mode |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` (types) / `'neutral'` (implementation) | Color theme | Note default discrepancy |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `interactive` | `boolean` | No | `false` | Enable tap-to-change step | |
+| `onStepPress` | `(stepIndex: number) => void` | No | - | Tap callback (0-based) | Only meaningful when interactive |
+| `animated` | `boolean` | No | `true` | Enable animations | |
+| `gap` | `number` | No | Size-based calculation | Gap between dots (px) | |
+| `accessibilityLabel` | `string` | No | `Step {activeStep+1} of {step}` | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |
+
+#### Example
+```tsx
+import { StepIndicator } from '@fleet-ui/components';
+
+export function Example() {
+  return <StepIndicator step={5} activeStep={2} />;
+}
+```
+
+---
+
+### Swiper
+
+**Docs**: https://fleet-ui.vercel.app/en/components/swiper
+
+#### Core Features
+**#### D-1. Basic Usage**
+**Gradient Variant**
+
+```tsx
+import { Swiper } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Swiper
+      placeholder="Swipe right to confirm"
+      actionTitle="Done!"
+      onSwipeSuccess={() => console.log('success')}
+      onSwipeCancel={() => console.log('cancel')}
+    />
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- `translateX` (SharedValue): thumb's horizontal translation
+- `isCompleting`: guard during completion animation (prevents duplicate completion)
+- `isDragging`: whether dragging is in progress (used for thumb scale, etc.)
+- `thresholdValue`: completion threshold clamped to 0–1
+
+#### Accessibility
+- `accessibilityActions={[{ name: 'activate' }]}`
+- `onAccessibilityAction`: if "activate", performs best-effort completion animation and calls success callback
+- Label priority:
+- `aria-label` (web) → `accessibilityLabel` → `placeholder` (string)
+
+#### Props
+**> Reference: `SwiperProps` from `packages/components/src/Swiper/Swiper.types.ts`.**
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | Color theme | |
+| `variant` | `'filled' \| 'outlined' \| 'flat' \| 'gradient'` | No | `'filled'` | Style variant | gradient requires expo-linear-gradient |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full'` | No | `'md'` | Border radius | |
+| `thumbShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Thumb shadow | |
+| `disabled` | `boolean` | No | `false` | Disable interaction | |
+| `placeholder` | `string` | No | - | Center guidance text | |
+| `actionTitle` | `string` | No | `'Action!'` | Text over progress background | |
+| `icon` | `ReactNode` | No | - | Thumb icon | Default: chevrons icon |
+| `threshold` | `number` | No | `0.7` | Completion threshold (0–1) | Clamped internally |
+| `onSwipeSuccess` | `() => void \| Promise<void>` | No | - | Completion callback | |
+| `onSwipeStart` | `() => void` | No | - | Start callback | |
+| `onSwipeCancel` | `() => void` | No | - | Cancel callback | |
+| `customGradient` | `{ colors: [string, string, ...string[]]; locations?: [number, number, ...number[]] }` | No | - | Custom gradient | For gradient variant |
+| `aria-label` | `string` | No | - | Accessibility label (web) | |
+| `testID` | `string` | No | - | Test identifier | data-testid on web |
+
+#### Example
+```tsx
+import { Swiper } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <Swiper
+      placeholder="Swipe right to confirm"
+      actionTitle="Done!"
+      onSwipeSuccess={() => console.log('success')}
+      onSwipeCancel={() => console.log('cancel')}
+    />
+  );
+}
+```
+
+---
+
+### Switch
+
+'Switch' is a component for expressing and changing on/off toggle state. It supports controlled/uncontrolled with 'checked/defaultChecked', and provides Reanimated-based thumb movement/scale animation and background color transition.
+
+**Docs**: https://fleet-ui.vercel.app/en/components/switch
+
+#### Core Features
+**#### D-1. Controlled Pattern (Recommended)**
+**Uncontrolled Pattern**
+
+```tsx
+import { useState } from 'react';
+import { Switch } from '@fleet-ui/components';
+
+export function Example() {
+  const [checked, setChecked] = useState(false);
+  return (
+    <Switch
+      checked={checked}
+      onCheckedChange={setChecked}
+      accessibilityLabel="Enable notifications"
+    />
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- controlled: If `checked` is provided, use that value
+- uncontrolled: Start with `defaultChecked` for internal state, toggle internal state on tap
+- If disabled, block event and exit
+- Calculate new value `newValue = !checked`
+- If uncontrolled, update internal state
+- Call `onPress`, then call `onCheckedChange(newValue)`
+
+**Animation:**
+- `progress = withTiming(checked ? 1 : 0)` controls thumb movement/scale.
+- Background color uses `useAnimatedVariantColor` to get variant result color and transitions with `withTiming`.
+- Thumb movement distance is calculated from size/shape/padding.
+
+#### Accessibility
+- `accessibilityRole="switch"`
+- `accessibilityState={{ checked, disabled }}`
+- `accessibilityLabel` is passed via prop (provide if label text is separate)
+
+#### Props
+**> Reference: `SwitchProps` from `packages/components/src/Switch/Switch.types.ts`.**
+| Prop | Type | Required | Default | Description | Notes |
+| --- | --- | --- | --- | --- | --- |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'`(types) / impl default may be `'success'` | Color theme | Note default difference |
+| `variant` | `'lined' \| 'filled' \| 'flat'` | No | `'filled'` | Style variant | filled has inner shadow |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md'` | No | `'md'` | Rounded | |
+| `thumbShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Thumb shadow | |
+| `thumbShape` | `'oval' \| 'circle'` | No | `'oval'` | Thumb shape | |
+| `thumbPadding` | `number` | No | size-based | Thumb internal padding (px) | Number (px) |
+| `checked` | `boolean` | No | - | Current state (controlled) | |
+| `defaultChecked` | `boolean` | No | `false` | Initial state (uncontrolled) | |
+| `onCheckedChange` | `(value: boolean) => void` | No | - | State change callback | |
+| `disabled` | `boolean` | No | `false` | Disabled | |
+| `accessibilityLabel` | `string` | No | - | Accessibility label | |
+| `testID` | `string` | No | - | Test identifier | |
+| `style` | `StyleProp<ViewStyle>` | No | - | Root style override | |
+| `thumbStyle` | `StyleProp<ViewStyle>` | No | - | Thumb style override | |
+
+#### Example
+```tsx
+import { useState } from 'react';
+import { Switch } from '@fleet-ui/components';
+
+export function Example() {
+  const [checked, setChecked] = useState(false);
+  return (
+    <Switch
+      checked={checked}
+      onCheckedChange={setChecked}
+      accessibilityLabel="Enable notifications"
+    />
+  );
+}
+```
+
+---
+
+### TabBar
+
+**Docs**: https://fleet-ui.vercel.app/en/components/tabbar
+
+#### Core Features
+**#### D-1. Basic Usage**
+**Disabled Tabs**
+- `disabledIndices`: disable specific indices
+- `isItemDisabled(item, index)`: compute disabled state based on item
+**Custom Accessibility Labels**
+- `accessibilityLabels[index]` (highest priority)
+- `getItemAccessibilityLabel(item, index)`
+
+```tsx
+import { useState } from 'react';
+import { TabBar } from '@fleet-ui/components';
+
+export function Example() {
+  const [page, setPage] = useState(0);
+
+  return (
+    <TabBar
+      selectedPage={page}
+      items={['Home', 'Search', 'Saved', 'Settings']}
+      onSelect={setPage}
+    />
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- On UI thread: `dragProgress = withSpring(index)` moves the indicator first
+- On JS thread: `onSelect(index)` is called so external state follows
+- A guard (~800ms) prevents immediate `selectedPage` updates from overwriting the spring animation
+
+#### Accessibility
+- `accessibilityRole="tab"`
+- `accessibilityState={{ selected, disabled }}`
+- `accessibilityLabel` is passed from the parent
+> Note: The root doesn't explicitly have `tablist` role. If needed, add a container role at the screen level.
+
+#### Props
+**> Reference: `TabBarProps` from `packages/components/src/TabBar/TabBar.types.ts`.**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `selectedPage` | `number` | Yes | - | Current selection index (controlled) |
+| `items` | `(string \| ReactNode)[]` | Yes | - | Tab items |
+| `onSelect` | `(index: number) => void` | No | - | Tab selection callback |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'primary'` | Color theme |
+| `variant` | `'underlined' \| 'filled' \| 'faded' \| 'flat' \| 'ghost'` | No | `'filled'` | Style variant |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Border radius |
+| `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow |
+| `indicatorShadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Indicator shadow |
+| `indicatorPadding` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'md'` | Visual padding between indicator and container |
+| `getItemAccessibilityLabel` | `(item, index) => string \| undefined` | No | - | Compute item accessibility label |
+| `accessibilityLabels` | `(string \| undefined)[]` | No | - | Item accessibility labels array (highest priority) |
+| `hitSlop` | `PressableProps['hitSlop']` | No | - | Override default tab hitSlop |
+| `disabledIndices` | `number[]` | No | - | List of disabled indices |
+| `isItemDisabled` | `(item, index) => boolean` | No | - | Compute disabled state function |
+
+#### Example
+```tsx
+import { useState } from 'react';
+import { TabBar } from '@fleet-ui/components';
+
+export function Example() {
+  const [page, setPage] = useState(0);
+
+  return (
+    <TabBar
+      selectedPage={page}
+      items={['Home', 'Search', 'Saved', 'Settings']}
+      onSelect={setPage}
+    />
+  );
+}
+```
+
+---
+
+### TableRow
+
+**Docs**: https://fleet-ui.vercel.app/en/components/table-row
+
+#### Core Features
+**#### D-1. Basic Usage (Key-Value)**
+**align='left' + leftRatio**
+**Custom Nodes and Disabling Default Typography**
+
+```tsx
+import { TableRow } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <>
+      <TableRow left="Email" right="user@example.com" />
+      <TableRow left="Plan" right="Pro" highlightRight />
+    </>
+  );
+}
+```
+
+#### Accessibility
+- (Web) Ensure keyboard/focus navigation is natural
+- (General) Verify state changes are properly conveyed to screen readers
+- If the right value is an interactive element (button/link), assign appropriate `accessibilityRole`/label to that element.
+
+#### Props
+**TableRow**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `left` | `ReactNode` | Yes | - | Left label/title |
+| `right` | `ReactNode` | Yes | - | Right value/data |
+| `align` | `'left' \| 'space-between'` | No | `'space-between'` | Alignment mode |
+| `leftRatio` | `number` | No | - | Left width ratio (0–100), only meaningful with align='left' |
+| `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'warning' \| 'success' \| 'info'` | No | `'neutral'` | Color theme |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size |
+| `leftVariant` | `'outlined' \| 'flat' \| 'ghost'` | No | `'ghost'` | Left container variant |
+| `rightVariant` | `'outlined' \| 'flat' \| 'ghost'` | No | `'ghost'` | Right container variant |
+| `highlightLeft` | `boolean` | No | `false` | Highlight left text (bold) |
+| `highlightRight` | `boolean` | No | `false` | Highlight right text (bold) |
+| `style` | `StyleProp<ViewStyle>` | No | - | Root style |
+| `leftStyle` | `StyleProp<ViewStyle>` | No | - | Left container style |
+| `rightStyle` | `StyleProp<ViewStyle>` | No | - | Right container style |
+| `leftTextStyle` | `StyleProp<TextStyle>` | No | - | Left text style (for string/number) |
+| `rightTextStyle` | `StyleProp<TextStyle>` | No | - | Right text style (for string/number) |
+| `disableLeftTextStyle` | `boolean` | No | `false` | Disable default left text style |
+| `disableRightTextStyle` | `boolean` | No | `false` | Disable default right text style |
+
+#### Example
+```tsx
+import { TableRow } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <>
+      <TableRow left="Email" right="user@example.com" />
+      <TableRow left="Plan" right="Pro" highlightRight />
+    </>
+  );
+}
+```
+
+---
+
+### Toast
+
+'Toast' is an overlay component that briefly shows short feedback messages at the top/bottom of the screen. 'ToastProvider' manages single toast state and timer, and display/hide can be triggered with 'useToast()' or global controller ('toast/showToast').
+
+**Docs**: https://fleet-ui.vercel.app/en/components/toast
+
+#### Core Features
+**#### D-1. Provider Installation (Required)**
+**Hook Usage: `useToast()`**
+>
+**Global Call: `toast/showToast`**
+> Caution: Global controller only works after Provider is mounted and handler is connected.
+**Message Templates (Success/Failure/Warning)**
+- **Success**: What was completed + what to do next (if any)
+- Example: `title="Saved"`, `description="Changes have been applied."`
+- **Failure/Error**: What failed + reason (if known) + next action
+- Example: `title="Save failed"`, `description="Check your network and try again."`
+- **Warning**: Impact + options (if needed)
+
+```tsx
+import { ToastProvider } from '@fleet-ui/components';
+
+export function AppRoot() {
+  return (
+    <ToastProvider defaultPosition="top" defaultDuration={4000}>
+      {/* ... app ... */}
+    </ToastProvider>
+  );
+}
+```
+
+#### State & Animation
+**State Model:**
+- Provider internal state is `toast: ToastInternalState | null` single slot.
+- `show(options)` creates new id (<code>toast-&#36;&#123;Date.now()&#125;</code>), clears existing timer, then overwrites state with new toast.
+- If `duration > 0`, auto-close is scheduled with `setTimeout(() => hide(id), duration)`.
+- `hide(id?)` ignores if id differs to prevent "accidentally closing different toast."
+
+**Animation:**
+- enter/exit: translateY (opposite direction), opacity, scale
+- When dragToDismiss=true, `Gesture.Pan()` reduces opacity/scale based on vertical drag progress,
+- If `displacement > closeThreshold` or `velocity > 500`, judged as close.
+
+#### Accessibility
+- Toast card: `accessibilityRole="alert"` (read as important notification)
+- Close button should have `IconButton`'s `aria-label="Close toast"` (web accessibility)
+- Provide clear `title/description` for important errors/warnings.
+- If user can resolve immediately, provide action with immediately executable measure via `action`.
+
+#### Props
+**ToastProvider**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `children` | `ReactNode` | Yes | - | App content |
+| `defaultPosition` | `'top' \| 'bottom'` | No | `'top'` | Default position |
+| `defaultDuration` | `number` | No | `4000` | Default duration (ms) |
+
+**Toast content  (passed to show)**
+| Option | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `title` | `string` | No | - | Title |
+| `description` | `string` | No | - | Description |
+| `icon` | `ReactNode` | No | - | Icon |
+| `colorScheme` | `'neutral' \| 'primary' \| 'success' \| 'warning' \| 'error' \| 'info'` | No | - | Color theme |
+| `variant` | `'filled' \| 'flat' \| 'faded'` | No | - | Style variant |
+| `size` | `'sm' \| 'md' \| 'lg'` | No | - | Size |
+| `rounded` | `'none' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | - | Rounded |
+| `position` | `'top' \| 'bottom'` | No | provider default | Display position |
+| `insets` | `number \| { top?: number; bottom?: number; horizontal?: number }` | No | - | Margin (added to safe area) |
+| `safeArea` | `boolean` | No | `true` | Use safe area |
+| `duration` | `number` | No | provider default | Auto-close (ms), 0/falsey keeps showing |
+| `closable` | `boolean` | No | - | Show close button |
+| `dragToDismiss` | `boolean` | No | `true` | Drag to close |
+| `closeThreshold` | `number` | No | `48` | Drag threshold (px) |
+| `onPress` | `() => void` | No | - | Toast body click |
+| `action` | `{ label: string; onPress: () => void }` | No | - | Action button |
+| `onShow` | `() => void` | No | - | Show callback |
+| `onClose` | `() => void` | No | - | Close callback |
+| `testID` | `string` | No | - | Test identifier |
+
+#### Example
+```tsx
+import { ToastProvider } from '@fleet-ui/components';
+
+export function AppRoot() {
+  return (
+    <ToastProvider defaultPosition="top" defaultDuration={4000}>
+      {/* ... app ... */}
+    </ToastProvider>
+  );
+}
+```
+
+---
+
+### Typo
+
+**Docs**: https://fleet-ui.vercel.app/en/components/typo
+
+#### Core Features
+**#### D-1. Basic Usage**
+**`extend`: Expand Width to Parent**
+
+```tsx
+import { Typo } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <>
+      <Typo variant="h3Strong">Title</Typo>
+      <Typo variant="body2" colorScheme="neutral" colorWeight={3}>
+        Body description text
+      </Typo>
+    </>
+  );
+}
+```
+
+#### Accessibility
+- (Web) Ensure keyboard/focus navigation is natural
+- (General) Verify state changes are properly conveyed to screen readers
+- Examples: `accessibilityRole="header"` (section title), `accessibilityLabel`, `numberOfLines`, `ellipsizeMode`, etc.
+
+#### Props
+**> Reference: `TypoProps` from `packages/components/src/Typo/Typo.types.ts`.**
+| Prop | Type | Required | Default | Description |
+| --- | --- | --- | --- | --- |
+| `variant` | `keyof SemanticTypography` | No | `'body2'` | Typography variant (token key) |
+| `extend` | `boolean` | No | `false` | Expand width to fill parent |
+| `colorScheme` | `'neutral' \| 'primary' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color scheme |
+| `colorWeight` | `1 \| 2 \| 3 \| 4` | No | `1` | Text color intensity (palette text_1–text_4) |
+| `children` | `ReactNode` | Yes | - | Text content |
+
+#### Example
+```tsx
+import { Typo } from '@fleet-ui/components';
+
+export function Example() {
+  return (
+    <>
+      <Typo variant="h3Strong">Title</Typo>
+      <Typo variant="body2" colorScheme="neutral" colorWeight={3}>
+        Body description text
+      </Typo>
+    </>
+  );
+}
+```
+
+---
+
+## Documentation
+
+- [Introduction](https://fleet-ui.vercel.app/en/introduce)
+- [Installation](https://fleet-ui.vercel.app/en/getting-started/install)
+- [Token Architecture](https://fleet-ui.vercel.app/en/fundamental/token-architecture)
+- [Theming](https://fleet-ui.vercel.app/en/fundamental/theming)
+- [Components](https://fleet-ui.vercel.app/en/components)

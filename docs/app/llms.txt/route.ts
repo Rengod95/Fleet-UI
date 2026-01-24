@@ -1,39 +1,33 @@
-function getSiteUrl() {
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.SITE_URL ||
-    // fallback for local dev
-    'http://localhost:3000'
-  ).replace(/\/$/, '');
-}
+import fs from 'node:fs';
+import path from 'node:path';
 
 export async function GET() {
-  const base = getSiteUrl();
+  const llmsPath = path.join(process.cwd(), 'public/llms.txt');
 
-  const body = [
-    '# Fleet UI Docs',
+  // Check if static file exists
+  if (fs.existsSync(llmsPath)) {
+    const content = fs.readFileSync(llmsPath, 'utf8');
+    return new Response(content, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+      },
+    });
+  }
+
+  // Fallback if file doesn't exist
+  const fallback = [
+    '# Fleet UI',
     '',
-    'Fleet UI 디자인 시스템/컴포넌트 문서입니다.',
+    '> React Native UI SDK with theming + animation + components',
     '',
-    '## Entry points',
-    `- ${base}/en/introduce`,
-    `- ${base}/ko/introduce`,
-    `- ${base}/en/components`,
-    `- ${base}/ko/components`,
-    '',
-    '## Sitemaps',
-    `- ${base}/sitemap.xml`,
-    '',
-    '## Notes',
-    '- 컴포넌트 문서는 /{locale}/components/{slug} 형태입니다.',
-    '- locale은 en, ko를 지원합니다.',
+    'llms.txt is being generated. Please run `pnpm gen:llms` or `pnpm build`.',
     '',
   ].join('\n');
 
-  return new Response(body, {
+  return new Response(fallback, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
     },
   });
 }
-
