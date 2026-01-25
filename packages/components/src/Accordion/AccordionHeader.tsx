@@ -1,6 +1,18 @@
 import { ChevronDown } from 'lucide-react-native';
-import { forwardRef, isValidElement, useCallback, useEffect, useMemo } from 'react';
-import { type GestureResponderEvent, Pressable, Text, View } from 'react-native';
+import {
+	forwardRef,
+	isValidElement,
+	useCallback,
+	useEffect,
+	useMemo,
+} from 'react';
+import {
+	type GestureResponderEvent,
+	Platform,
+	Pressable,
+	Text,
+	View,
+} from 'react-native';
 import Animated, {
 	Easing,
 	useAnimatedStyle,
@@ -9,12 +21,12 @@ import Animated, {
 	withTiming,
 } from 'react-native-reanimated';
 import { StyleSheet } from 'react-native-unistyles';
+import { useAnimatedVariantColor } from 'react-native-unistyles/reanimated';
 import {
 	useAccordionContext,
 	useAccordionItemContext,
 } from './Accordion.context';
 import type { AccordionHeaderProps } from './Accordion.types';
-import { useAnimatedVariantColor } from 'react-native-unistyles/reanimated';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -24,6 +36,24 @@ export const accordionHeaderStyles = StyleSheet.create((theme) => {
 			flexDirection: 'row',
 			alignItems: 'center',
 			justifyContent: 'space-between',
+			_web: {
+				transitionProperty:
+					'background-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.92)',
+					opacity: 0.84,
+				},
+				_hover: {
+					scale: 1.02,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {
@@ -183,6 +213,7 @@ export const AccordionHeader = forwardRef<View, AccordionHeaderProps>(
 		const { toggleItem, variant, colorScheme, shadow, size, rounded } =
 			useAccordionContext();
 		const { value, isExpanded, isDisabled } = useAccordionItemContext();
+		const isWeb = Platform.OS === 'web';
 
 		accordionHeaderStyles.useVariants({
 			colorScheme,
@@ -199,9 +230,15 @@ export const AccordionHeader = forwardRef<View, AccordionHeaderProps>(
 		const scale = useSharedValue(1);
 		const opacity = useSharedValue(1);
 
-		const iconColor = useAnimatedVariantColor(accordionHeaderStyles.text, 'color');
+		const iconColor = useAnimatedVariantColor(
+			accordionHeaderStyles.text,
+			'color'
+		);
 		// Icon size based on accordion size
-		const iconSize = useMemo(() => size === 'sm' ? 16 : size === 'lg' ? 24 : 20, [size]);
+		const iconSize = useMemo(
+			() => (size === 'sm' ? 16 : size === 'lg' ? 24 : 20),
+			[size]
+		);
 
 		const resolvedAccessibilityLabel =
 			accessibilityLabel ??
@@ -241,24 +278,26 @@ export const AccordionHeader = forwardRef<View, AccordionHeaderProps>(
 
 		const handlePressIn = useCallback(
 			(event: GestureResponderEvent) => {
-				if (!isDisabled) {
-					scale.value = withSpring(0.92, SPRING_CONFIG)
-					opacity.value = withSpring(0.84, SPRING_CONFIG)
+				// Skip Reanimated animations on web - CSS :active handles it
+				if (!isDisabled && !isWeb) {
+					scale.value = withSpring(0.92, SPRING_CONFIG);
+					opacity.value = withSpring(0.84, SPRING_CONFIG);
 				}
 				onPressIn?.(event);
 			},
-			[isDisabled, onPressIn]
+			[isDisabled, isWeb, scale, opacity, onPressIn]
 		);
 
 		const handlePressOut = useCallback(
 			(event: GestureResponderEvent) => {
-				if (!isDisabled) {
-					scale.value = withSpring(1, SPRING_CONFIG)
-					opacity.value = withSpring(1, SPRING_CONFIG)
+				// Skip Reanimated animations on web - CSS :active handles it
+				if (!isDisabled && !isWeb) {
+					scale.value = withSpring(1, SPRING_CONFIG);
+					opacity.value = withSpring(1, SPRING_CONFIG);
 				}
 				onPressOut?.(event);
 			},
-			[isDisabled, onPressOut]
+			[isDisabled, isWeb, scale, opacity, onPressOut]
 		);
 
 		// Render right icon (default: ChevronDown with rotation)
@@ -277,10 +316,14 @@ export const AccordionHeader = forwardRef<View, AccordionHeaderProps>(
 				<Animated.View
 					style={[accordionHeaderStyles.iconContainer, chevronAnimatedStyle]}
 				>
-					<ChevronDown size={iconSize} color={iconColor.value} strokeWidth={2} />
+					<ChevronDown
+						size={iconSize}
+						color={iconColor.value}
+						strokeWidth={2}
+					/>
 				</Animated.View>
 			);
-		}, [rightIcon, iconSize, iconColor.value]);
+		}, [rightIcon, iconSize, iconColor.value, chevronAnimatedStyle]);
 
 		// Render children - wrap string in Text
 		const renderContent = () => {
@@ -302,14 +345,14 @@ export const AccordionHeader = forwardRef<View, AccordionHeaderProps>(
 		// Chevron rotation animation
 		useEffect(() => {
 			rotation.value = withTiming(isExpanded ? 180 : 0, TIMING_CONFIG);
-		}, [isExpanded]);
+		}, [isExpanded, rotation]);
 
 		return (
 			<AnimatedPressable
 				ref={ref}
 				style={[
 					accordionHeaderStyles.container,
-					containerAnimatedStyle,
+					!isWeb && containerAnimatedStyle,
 					style,
 				]}
 				onPressIn={handlePressIn}

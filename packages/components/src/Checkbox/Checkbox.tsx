@@ -2,6 +2,7 @@ import { CheckIcon } from 'lucide-react-native';
 import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import {
 	type GestureResponderEvent,
+	Platform,
 	type View,
 	Pressable,
 	Text,
@@ -108,6 +109,20 @@ export const checkboxStyles = StyleSheet.create((theme, _rt) => {
 			alignItems: 'center',
 			borderWidth: 1,
 			borderCurve: 'continuous',
+			_web: {
+				transitionProperty:
+					'background-color, border-color, box-shadow, transform, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.7)',
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {
@@ -260,6 +275,7 @@ export const Checkbox = forwardRef<View, CheckboxProps>((props, ref) => {
 	} = props;
 
 	const { theme } = useUnistyles();
+	const isWeb = Platform.OS === 'web';
 
 	const [internalChecked, setInternalChecked] = useState(defaultChecked);
 	const isControlled = checkedProp !== undefined;
@@ -332,14 +348,20 @@ export const Checkbox = forwardRef<View, CheckboxProps>((props, ref) => {
 	);
 
 	const handlePressIn = useCallback((event: GestureResponderEvent) => {
-		scale.value = withSpring(0.7, SPRING_CONFIG);
+		// Skip Reanimated animations on web - CSS :active handles it
+		if (!isWeb) {
+			scale.value = withSpring(0.7, SPRING_CONFIG);
+		}
 		onPressIn?.(event);
-	}, [onPressIn]);
+	}, [isWeb, scale, onPressIn]);
 
 	const handlePressOut = useCallback((event: GestureResponderEvent) => {
-		scale.value = withSpring(1, SPRING_CONFIG);
+		// Skip Reanimated animations on web - CSS :active handles it
+		if (!isWeb) {
+			scale.value = withSpring(1, SPRING_CONFIG);
+		}
 		onPressOut?.(event);
-	}, [onPressOut]);
+	}, [isWeb, scale, onPressOut]);
 
 	return (
 		<Pressable
@@ -364,7 +386,7 @@ export const Checkbox = forwardRef<View, CheckboxProps>((props, ref) => {
 			<Animated.View
 				style={[
 					checkboxStyles.container,
-					containerAnimatedStyle,
+					!isWeb && containerAnimatedStyle,
 					style,
 				]}
 			>
