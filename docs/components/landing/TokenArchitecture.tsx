@@ -107,9 +107,9 @@ export function TokenArchitecture() {
   return (
     <section className="relative overflow-hidden px-6 py-24 sm:py-32">
       {/* Background accents */}
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/2 top-0 h-[520px] w-[520px] -translate-x-1/2 rounded-full bg-linear-to-br from-primary/18 via-primary/10 to-transparent blur-[120px] z-10 overflow-visible" />
-        <div className="absolute bottom-[-100px] right-1/3 h-[420px] w-[520px] rounded-full bg-linear-to-tr from-primary/14 via-primary/8 to-transparent blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute left-1/2 top-0 h-[280px] w-[280px] sm:h-[400px] sm:w-[400px] lg:h-[520px] lg:w-[520px] -translate-x-1/2 rounded-full bg-linear-to-br from-primary/18 via-primary/10 to-transparent blur-[80px] sm:blur-[100px] lg:blur-[120px] z-10" />
+        <div className="absolute bottom-[-50px] sm:bottom-[-100px] right-1/4 sm:right-1/3 h-[280px] w-[280px] sm:h-[350px] sm:w-[400px] lg:h-[420px] lg:w-[520px] rounded-full bg-linear-to-tr from-primary/14 via-primary/8 to-transparent blur-3xl" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.06),transparent_55%)]" />
       </div>
 

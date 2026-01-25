@@ -100,37 +100,40 @@ export const sampleCode = `
 
 				<Section title="Color schemes">
 					<View style={[commonStyles.column]}>
-							<Text style={commonStyles.label}>ColorSchems of Tabbar affects the only variants filled and underlined. other variants are affected on just item's text color.</Text>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="filled"
-								colorScheme={'primary'}
-							/>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="flat"
-								colorScheme={'primary'}
-							/>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="faded"
-								colorScheme={'primary'}
-							/>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="ghost"
-								colorScheme={'primary'}
-							/>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="underlined"
-								colorScheme={'primary'}
-							/>
+						<Text style={commonStyles.label}>
+							ColorSchems of Tabbar affects the only variants filled and
+							underlined. other variants are affected on just item's text color.
+						</Text>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="filled"
+							colorScheme={'primary'}
+						/>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="flat"
+							colorScheme={'primary'}
+						/>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="faded"
+							colorScheme={'primary'}
+						/>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="ghost"
+							colorScheme={'primary'}
+						/>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="underlined"
+							colorScheme={'primary'}
+						/>
 					</View>
 				</Section>
 
@@ -158,13 +161,16 @@ export const sampleCode = `
 							colorScheme="neutral"
 						/>
 
-						<Text style={commonStyles.label}>If you should adjust the TabBar height by custom item's dynamic height or something like that, you can use the style prop</Text>
+						<Text style={commonStyles.label}>
+							If you should adjust the TabBar height by custom item's dynamic
+							height or something like that, you can use the style prop
+						</Text>
 						<TabBar
 							selectedPage={0}
 							items={CUSTOM_ITEMS}
 							variant="underlined"
 							colorScheme="neutral"
-							style={{height:60}}
+							style={{ height: 60 }}
 						/>
 					</View>
 				</Section>
@@ -187,9 +193,7 @@ export const sampleCode = `
 								size="sm"
 								variant="outlined"
 								colorScheme="neutral"
-								onPress={() =>
-									setSelectedPage((prev) => Math.max(prev - 1, 0))
-								}
+								onPress={() => setSelectedPage((prev) => Math.max(prev - 1, 0))}
 							>
 								Prev
 							</Button>
@@ -212,15 +216,16 @@ export const sampleCode = `
 				<Section title="Disabled Indicies">
 					<View style={[commonStyles.column]}>
 						<Text style={commonStyles.label}>
-							Indices are the default values to disabled items on initializing TabBar.
+							Indices are the default values to disabled items on initializing
+							TabBar.
 						</Text>
 						<TabBar
 							selectedPage={0}
 							items={CUSTOM_ITEMS}
 							variant="underlined"
 							colorScheme="neutral"
-							style={{height:60}}
-							disabledIndices={[0,1]}
+							style={{ height: 60 }}
+							disabledIndices={[0, 1]}
 						/>
 					</View>
 				</Section>
@@ -228,7 +233,8 @@ export const sampleCode = `
 				<Section title="isItemDisabled Function">
 					<View style={[commonStyles.column]}>
 						<Text style={commonStyles.label}>
-							You can also use the isItemDisabled(Callback Function) to disable items dynamically.
+							You can also use the isItemDisabled(Callback Function) to disable
+							items dynamically.
 						</Text>
 						<Text style={commonStyles.label}>
 							The Below example is disabled the first and second items.
@@ -238,12 +244,11 @@ export const sampleCode = `
 							items={CUSTOM_ITEMS}
 							variant="underlined"
 							colorScheme="neutral"
-							style={{height:60}}
-							isItemDisabled={(item, index) => index === 0 || index === 1}
+							style={{ height: 60 }}
+							isItemDisabled={(_item, index) => index === 0 || index === 1}
 						/>
 					</View>
 				</Section>
-
 
 				<Section title="Combinations">
 					<View style={[commonStyles.column]}>
@@ -278,7 +283,7 @@ export const sampleCode = `
 							colorScheme="info"
 							size="md"
 							rounded="md"
-							style={{height:64}}
+							style={{ height: 64 }}
 						/>
 					</View>
 				</Section>
@@ -383,37 +388,40 @@ export const sampleCodeHtml = `<pre data-theme="fleet" tabindex="0"><code data-t
 <span class="line" data-line></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> title</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Color schemes"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{[commonStyles.column]}></span></span>
-<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{commonStyles.label}>ColorSchems of Tabbar affects the only variants filled and underlined. other variants are affected on just item's text color.&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"filled"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							/></span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"flat"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							/></span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"faded"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							/></span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"ghost"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							/></span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"underlined"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							/></span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{commonStyles.label}></span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							ColorSchems of Tabbar affects the only variants filled and</span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							underlined. other variants are affected on just item's text color.</span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"filled"</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"flat"</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"faded"</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"ghost"</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">SAMPLE_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"underlined"</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">'primary'</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line></span>
@@ -441,13 +449,16 @@ export const sampleCodeHtml = `<pre data-theme="fleet" tabindex="0"><code data-t
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"neutral"</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
 <span class="line" data-line></span>
-<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{commonStyles.label}>If you should adjust the TabBar height by custom item's dynamic height or something like that, you can use the style prop&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{commonStyles.label}></span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							If you should adjust the TabBar height by custom item's dynamic</span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							height or something like that, you can use the style prop</span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">CUSTOM_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"underlined"</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"neutral"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{{height:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">60</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{{ height: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">60</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
@@ -470,9 +481,7 @@ export const sampleCodeHtml = `<pre data-theme="fleet" tabindex="0"><code data-t
 <span class="line" data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								size</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"sm"</span></span>
 <span class="line" data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"outlined"</span></span>
 <span class="line" data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"neutral"</span></span>
-<span class="line" data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								onPress</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{() </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=></span></span>
-<span class="line" data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">									setSelectedPage</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">((</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">prev</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">) </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=></span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> Math.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">max</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(prev </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">-</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">))</span></span>
-<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">								}</span></span>
+<span class="line" data-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">								onPress</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{() </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=></span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> setSelectedPage</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">((</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">prev</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">) </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=></span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> Math.</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">max</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">(prev </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">-</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">))}</span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">								Prev</span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Button</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
@@ -495,15 +504,16 @@ export const sampleCodeHtml = `<pre data-theme="fleet" tabindex="0"><code data-t
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> title</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Disabled Indicies"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{[commonStyles.column]}></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{commonStyles.label}></span></span>
-<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							Indices are the default values to disabled items on initializing TabBar.</span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							Indices are the default values to disabled items on initializing</span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							TabBar.</span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">TabBar</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							selectedPage</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">CUSTOM_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"underlined"</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"neutral"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{{height:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">60</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							disabledIndices</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{[</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">,</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{{ height: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">60</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							disabledIndices</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{[</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">0</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">]}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
@@ -511,7 +521,8 @@ export const sampleCodeHtml = `<pre data-theme="fleet" tabindex="0"><code data-t
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> title</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"isItemDisabled Function"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{[commonStyles.column]}></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{commonStyles.label}></span></span>
-<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							You can also use the isItemDisabled(Callback Function) to disable items dynamically.</span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							You can also use the isItemDisabled(Callback Function) to disable</span></span>
+<span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							items dynamically.</span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Text</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{commonStyles.label}></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">							The Below example is disabled the first and second items.</span></span>
@@ -521,12 +532,11 @@ export const sampleCodeHtml = `<pre data-theme="fleet" tabindex="0"><code data-t
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							items</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">CUSTOM_ITEMS</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							variant</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"underlined"</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"neutral"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{{height:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">60</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}}</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							isItemDisabled</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">item</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">index</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">) </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=></span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> index </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">===</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> ||</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> index </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">===</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{{ height: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">60</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							isItemDisabled</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{(</span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">_item</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">, </span><span style="--shiki-light:#E36209;--shiki-dark:#FFAB70">index</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">) </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=></span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> index </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">===</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583"> ||</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> index </span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">===</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
-<span class="line" data-line></span>
 <span class="line" data-line></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> title</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"Combinations"</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0"> style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{[commonStyles.column]}></span></span>
@@ -561,7 +571,7 @@ export const sampleCodeHtml = `<pre data-theme="fleet" tabindex="0"><code data-t
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							colorScheme</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"info"</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							size</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"md"</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							rounded</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#032F62;--shiki-dark:#9ECBFF">"md"</span></span>
-<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{{height:</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">64</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">}}</span></span>
+<span class="line" data-line data-highlighted-line><span style="--shiki-light:#6F42C1;--shiki-dark:#B392F0">							style</span><span style="--shiki-light:#D73A49;--shiki-dark:#F97583">=</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">{{ height: </span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">64</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8"> }}</span></span>
 <span class="line" data-line data-highlighted-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">						/></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">					&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">View</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
 <span class="line" data-line><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">				&#x3C;/</span><span style="--shiki-light:#005CC5;--shiki-dark:#79B8FF">Section</span><span style="--shiki-light:#24292E;--shiki-dark:#E1E4E8">></span></span>
