@@ -50,7 +50,6 @@ export function Example() {
       thumbCount={1}
       min={0}
       max={100}
-      step={1}
       defaultValue={[30]}
       onValueChange={(v) => console.log(v)} // [number]
     />
@@ -69,7 +68,6 @@ export function Example() {
       thumbCount={2}
       min={0}
       max={100}
-      step={5}
       minStepsBetweenThumbs={1}
       defaultValue={[20, 80]}
       onValueChange={(v) => console.log(v)} // [min, max]
@@ -155,7 +153,6 @@ export function Example() {
 | `defaultValue` | `number[]` | No | single: `[min]`, dual: `[0, 100]` | 초기 값 | 배열 기반 |
 | `min` | `number` | No | `0` | 최소 값 | |
 | `max` | `number` | No | `100` | 최대 값 | |
-| `step` | `number` | No | `1` | 스텝 단위 | 스냅 간격 |
 | `minStepsBetweenThumbs` | `number` | No | `0` | 두 thumb 간 최소 step 간격 | range 모드 |
 | `throttleMs` | `number` | No | `200` | 드래그 중 콜백 스로틀(ms) | |
 | `disabled` | `boolean` | No | `false` | 비활성화 | |

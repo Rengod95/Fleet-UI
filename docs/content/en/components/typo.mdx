@@ -1,7 +1,7 @@
 ### (A) One-Line Summary
 
-**`Typo` is a text component that directly maps Fleet UI's semantic typography tokens (`theme.typography`) for rendering.**  
-Select the typography scale with `variant`, and specify text color token-based using `colorScheme + colorWeight`.
+**`Typo` is a text component that directly maps Fleet UI's semantic typography tokens (`theme.typography`) for rendering.**
+Select the typography scale with `variant`. Text color can be customized via the `style` prop.
 
 ---
 
@@ -40,7 +40,7 @@ export function Example() {
   return (
     <>
       <Typo variant="h3Strong">Title</Typo>
-      <Typo variant="body2" colorScheme="neutral" colorWeight={3}>
+      <Typo variant="body2">
         Body description text
       </Typo>
     </>
@@ -82,8 +82,6 @@ Recommended practices:
 | --- | --- | --- | --- | --- |
 | `variant` | `keyof SemanticTypography` | No | `'body2'` | Typography variant (token key) |
 | `extend` | `boolean` | No | `false` | Expand width to fill parent |
-| `colorScheme` | `'neutral' \| 'primary' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color scheme |
-| `colorWeight` | `1 \| 2 \| 3 \| 4` | No | `1` | Text color intensity (palette text_1–text_4) |
 | `children` | `ReactNode` | Yes | - | Text content |
 
 `TypoProps` extends `TextProps`. (e.g., `numberOfLines`, `ellipsizeMode`, `selectable`, `accessibilityRole`, etc.)

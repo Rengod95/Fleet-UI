@@ -50,7 +50,6 @@ export function Example() {
       thumbCount={1}
       min={0}
       max={100}
-      step={1}
       defaultValue={[30]}
       onValueChange={(v) => console.log(v)} // [number]
     />
@@ -69,7 +68,6 @@ export function Example() {
       thumbCount={2}
       min={0}
       max={100}
-      step={5}
       minStepsBetweenThumbs={1}
       defaultValue={[20, 80]}
       onValueChange={(v) => console.log(v)} // [min, max]
@@ -155,7 +153,6 @@ Root sets:
 | `defaultValue` | `number[]` | No | single: `[min]`, dual: `[0, 100]` | Initial value | Array-based |
 | `min` | `number` | No | `0` | Minimum value | |
 | `max` | `number` | No | `100` | Maximum value | |
-| `step` | `number` | No | `1` | Step unit | Snap interval |
 | `minStepsBetweenThumbs` | `number` | No | `0` | Minimum step gap between two thumbs | range mode |
 | `throttleMs` | `number` | No | `200` | Drag callback throttle (ms) | |
 | `disabled` | `boolean` | No | `false` | Disabled | |

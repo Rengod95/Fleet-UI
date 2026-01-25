@@ -104,9 +104,10 @@ However, when right actions (`RightTypo`, `RightIcon`) are "interactive" (= when
 | `right` | `ReactNode` | No | - | Header right area (priority) |
 | `rightIcon` | `ReactNode` | No | - | Header right icon (used only when no `right`) |
 | `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size preset |
-| `gap` | `keyof FleetTheme['spacing'] \| number` | No | `3` | Vertical gap between header internal elements |
-| `padding` | `keyof FleetTheme['spacing'] \| number` | No | `0` | Header/body common horizontal padding |
-| `contentSpacing` | `keyof FleetTheme['spacing'] \| number` | No | `5` | Header-body gap and body top padding |
+| `contentGap` | `keyof FleetTheme['spacing'] \| number` | No | `8` | Vertical gap between elements inside the content |
+| `contentPaddingVertical` | `keyof FleetTheme['spacing'] \| number` | No | `0` | Vertical padding for content |
+| `contentPaddingHorizontal` | `keyof FleetTheme['spacing'] \| number` | No | `0` | Horizontal padding for content |
+| `contentTopMargin` | `keyof FleetTheme['spacing'] \| number` | No | `12` | Top margin of the content |
 | `titleRatio` | `number` | No | `70` | Title area ratio in header |
 | `subtitlePosition` | `'top' \| 'bottom'` | No | `'bottom'` | Subtitle position |
 | `headerStyle` | `ViewProps['style']` | No | - | Header style |
