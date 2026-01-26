@@ -577,6 +577,8 @@ export function Example() {
 **> Reference: `CheckboxProps` from `packages/components/src/Checkbox/Checkbox.types.ts`.**
 | Prop | Type | Required | Default | Description | Platform notes |
 | --- | --- | --- | --- | --- | --- |
+| `label` | `ReactNode` | No | - | Label content | |
+| `labelPosition` | `'left' \| 'right'` | No | `'right'` | Label position | |
 | `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'primary'` | Color scheme | |
 | `variant` | `'filled' \| 'flat' \| 'outlined'` | No | `'filled'` | Style variant | |
 | `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Size | |
@@ -589,6 +591,7 @@ export function Example() {
 | `accessibilityLabel` | `string` | No | - | Accessibility label | |
 | `testID` | `string` | No | - | Test identifier | |
 | `style` | `StyleProp<ViewStyle>` | No | - | Container style override | |
+| `labelStyle` | `StyleProp<TextStyle>` | No | - | Label style override | |
 
 #### Example
 ```tsx
@@ -876,7 +879,7 @@ export function Example() {
 | `variant` | `'line' \| 'thick'` | No | `'line'` | Divider style | |
 | `size` | `'sm' \| 'md' \| 'lg'` | No | `'md'` | Thickness preset | Actual px varies by variant |
 | `horizontalMargin` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Left/right margin | If not `none`, width switches to auto |
-| `colorScheme` | `'base' \| 'inverted'` | No | `'base'` | Theme inversion (ScopedTheme) | |
+| `inverted` | `boolean` | No | `false` | Theme inversion (true: inverted, false: base neutral color) | |
 | `verticalMargin` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'none'` | Top/bottom margin | |
 | `testID` | `string` | No | - | Test identifier | |
 
@@ -1161,7 +1164,7 @@ export function Example() {
 | `colorScheme` | `'primary' \| 'neutral' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color theme | May evaluate to error if `isInvalid` |
 | `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Height/typo scale | |
 | `shadow` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'xl' \| 'inner'` | No | `'none'` | Shadow preset | |
-| `radius` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Corner radius | |
+| `rounded` | `'none' \| 'sm' \| 'md' \| 'lg' \| 'full'` | No | `'md'` | Corner radius | |
 | `label` | `string` | No | - | Label text | |
 | `labelPlacement` | `'inside' \| 'outside' \| 'outside-left'` | No | `'inside'` | Label position | Branching may be limited in current implementation |
 | `description` | `string` | No | - | Bottom description text | Hidden when `errorMessage` exists |
@@ -1672,7 +1675,7 @@ export function Example() {
 | `shadow` | `'none' \| 'sm' \| 'md' \| 'lg'` | No | `'none'` | Shadow | |
 | `isDisabled` | `boolean` | No | `false` | Disabled | |
 | `isInvalid` | `boolean` | No | `false` | Error state | Slot color transition |
-| `gap` | `number` | No | - | Gap between slots (theme.spacing index) | Can be auto-determined by size |
+| `gap` | `'sm' \| 'md' \| 'lg' \| 'xl' \| number` | No | - | Gap between slots | Can be auto-determined by size |
 | `containerStyle` | `StyleProp<ViewStyle>` | No | - | Root container style | |
 | `slotStyle` | `StyleProp<ViewStyle>` | No | - | Slot style override | |
 | `slotTextStyle` | `StyleProp<TextStyle>` | No | - | Slot text style | |
@@ -1832,6 +1835,9 @@ export function Example() {
 | `accessibilityLabel` | `string` | No | - | Accessibility label | Recommended |
 | `testID` | `string` | No | - | Test identifier | |
 | `style` | `StyleProp<ViewStyle>` | No | - | Style override | |
+| `label` | `string` | No | - | Label text | |
+| `labelPosition` | `'left' \| 'right'` | No | - | Label position | |
+| `labelStyle` | `StyleProp<TextStyle>` | No | - | Label style override | |
 
 #### Example
 ```tsx
@@ -2045,9 +2051,10 @@ export function Example() {
 | `right` | `ReactNode` | No | - | Header right area (priority) |
 | `rightIcon` | `ReactNode` | No | - | Header right icon (used only when no `right`) |
 | `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | Size preset |
-| `gap` | `keyof FleetTheme['spacing'] \| number` | No | `3` | Vertical gap between header internal elements |
-| `padding` | `keyof FleetTheme['spacing'] \| number` | No | `0` | Header/body common horizontal padding |
-| `contentSpacing` | `keyof FleetTheme['spacing'] \| number` | No | `5` | Header-body gap and body top padding |
+| `contentGap` | `keyof FleetTheme['spacing'] \| number` | No | `8` | Vertical gap between elements inside the content |
+| `contentPaddingVertical` | `keyof FleetTheme['spacing'] \| number` | No | `0` | Vertical padding for content |
+| `contentPaddingHorizontal` | `keyof FleetTheme['spacing'] \| number` | No | `0` | Horizontal padding for content |
+| `contentTopMargin` | `keyof FleetTheme['spacing'] \| number` | No | `12` | Top margin of the content |
 | `titleRatio` | `number` | No | `70` | Title area ratio in header |
 | `subtitlePosition` | `'top' \| 'bottom'` | No | `'bottom'` | Subtitle position |
 | `headerStyle` | `ViewProps['style']` | No | - | Header style |
@@ -2097,7 +2104,6 @@ export function Example() {
       thumbCount={1}
       min={0}
       max={100}
-      step={1}
       defaultValue={[30]}
       onValueChange={(v) => console.log(v)} // [number]
     />
@@ -2146,7 +2152,6 @@ export function Example() {
 | `defaultValue` | `number[]` | No | single: `[min]`, dual: `[0, 100]` | Initial value | Array-based |
 | `min` | `number` | No | `0` | Minimum value | |
 | `max` | `number` | No | `100` | Maximum value | |
-| `step` | `number` | No | `1` | Step unit | Snap interval |
 | `minStepsBetweenThumbs` | `number` | No | `0` | Minimum step gap between two thumbs | range mode |
 | `throttleMs` | `number` | No | `200` | Drag callback throttle (ms) | |
 | `disabled` | `boolean` | No | `false` | Disabled | |
@@ -2165,7 +2170,6 @@ export function Example() {
       thumbCount={1}
       min={0}
       max={100}
-      step={1}
       defaultValue={[30]}
       onValueChange={(v) => console.log(v)} // [number]
     />
@@ -2728,7 +2732,7 @@ export function Example() {
   return (
     <>
       <Typo variant="h3Strong">Title</Typo>
-      <Typo variant="body2" colorScheme="neutral" colorWeight={3}>
+      <Typo variant="body2">
         Body description text
       </Typo>
     </>
@@ -2747,8 +2751,6 @@ export function Example() {
 | --- | --- | --- | --- | --- |
 | `variant` | `keyof SemanticTypography` | No | `'body2'` | Typography variant (token key) |
 | `extend` | `boolean` | No | `false` | Expand width to fill parent |
-| `colorScheme` | `'neutral' \| 'primary' \| 'error' \| 'success' \| 'warning' \| 'info'` | No | `'neutral'` | Color scheme |
-| `colorWeight` | `1 \| 2 \| 3 \| 4` | No | `1` | Text color intensity (palette text_1–text_4) |
 | `children` | `ReactNode` | Yes | - | Text content |
 
 #### Example
@@ -2759,7 +2761,7 @@ export function Example() {
   return (
     <>
       <Typo variant="h3Strong">Title</Typo>
-      <Typo variant="body2" colorScheme="neutral" colorWeight={3}>
+      <Typo variant="body2">
         Body description text
       </Typo>
     </>

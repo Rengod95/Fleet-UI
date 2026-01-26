@@ -1,5 +1,6 @@
 import { forwardRef, useCallback } from 'react';
 import {
+	Platform,
 	Pressable,
 	Text,
 	View,
@@ -52,6 +53,8 @@ export const Item = forwardRef<View, ItemProps>((props, ref) => {
 		...restProps
 	} = props;
 
+	const isWeb = Platform.OS === 'web';
+
 	itemStyles.useVariants({ colorScheme, variant, rounded, shadow, size });
 
 	const scale = useSharedValue(1);
@@ -68,20 +71,26 @@ export const Item = forwardRef<View, ItemProps>((props, ref) => {
 
 	const handlePressIn = useCallback(
 		(event: any) => {
-			scale.value = withSpring(0.96, SPRING_CONFIG);
-			opacity.value = withSpring(0.7, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(0.96, SPRING_CONFIG);
+				opacity.value = withSpring(0.7, SPRING_CONFIG);
+			}
 			externalOnPressIn?.(event);
 		},
-		[scale, externalOnPressIn]
+		[isWeb, scale, opacity, externalOnPressIn]
 	);
 
 	const handlePressOut = useCallback(
 		(event: any) => {
-			scale.value = withSpring(1, SPRING_CONFIG);
-			opacity.value = withSpring(1, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(1, SPRING_CONFIG);
+				opacity.value = withSpring(1, SPRING_CONFIG);
+			}
 			externalOnPressOut?.(event);
 		},
-		[scale, externalOnPressOut]
+		[isWeb, scale, opacity, externalOnPressOut]
 	);
 
 	return (
@@ -93,7 +102,7 @@ export const Item = forwardRef<View, ItemProps>((props, ref) => {
 			disabled={disabled}
 			{...restProps}
 		>
-			<Animated.View style={[itemStyles.container, animatedStyle, style]}>
+			<Animated.View style={[itemStyles.container, !isWeb && animatedStyle, style]}>
 				{children}
 			</Animated.View>
 		</Pressable>
@@ -288,6 +297,21 @@ export const itemStyles = StyleSheet.create((theme, _rt) => {
 			alignItems: 'center',
 			backgroundColor: 'transparent',
 			borderCurve: 'continuous',
+			_web: {
+				transitionProperty:
+					'background-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.96)',
+					opacity: 0.7,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {

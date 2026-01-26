@@ -45,12 +45,13 @@ export function BentoCard({
         className={cn(
           // Base styles
           'group relative overflow-hidden rounded-2xl',
-          'border border-border/70 bg-muted-foreground/5',
+          'border border-border/50 bg-card/30',
           'backdrop-blur-sm',
           // Transitions
-          'transition-all duration-300 ease-out',
-          'hover:bg-card/40',
-          'hover:shadow-lg',
+          'transition-all duration-500 ease-out',
+          'hover:border-border/80',
+          'hover:bg-card/50',
+          'hover:shadow-xl hover:shadow-primary/5',
           // Grid spanning
           wide && 'md:col-span-2',
           tall && 'md:row-span-2',
@@ -60,8 +61,8 @@ export function BentoCard({
         )}
       >
         {/* Subtle gradient overlay on hover */}
-        <div className="absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-          <div className="absolute inset-0 bg-linear-to-br from-card/20 to-transparent" />
+        <div className="absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+          <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-transparent" />
         </div>
         {children}
       </div>
@@ -114,8 +115,8 @@ export function BentoIcon({ children, accent = 'neutral' }: BentoIconProps) {
   return (
     <div
       className={cn(
-        'mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl',
-        'transition-colors duration-300',
+        'inline-flex h-11 w-11 items-center justify-center rounded-lg',
+        'transition-all duration-300',
         iconAccentStyles[accent]
       )}
     >
@@ -126,7 +127,7 @@ export function BentoIcon({ children, accent = 'neutral' }: BentoIconProps) {
 
 export function BentoTitle({ children }: { children: ReactNode }) {
   return (
-    <h3 className="mb-2 text-2xl font-medium text-muted-foreground sm:text-2xl leading-11">
+    <h3 className="mb-3 text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
       {children}
     </h3>
   );
@@ -134,7 +135,7 @@ export function BentoTitle({ children }: { children: ReactNode }) {
 
 export function BentoDescription({ children }: { children: ReactNode }) {
   return (
-    <p className="text-sm leading-relaxed text-muted-foreground/60 sm:text-base">
+    <p className="text-sm leading-relaxed text-muted-foreground/70 sm:text-base">
       {children}
     </p>
   );

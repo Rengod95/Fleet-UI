@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { type GestureResponderEvent, Pressable, Text, View } from 'react-native';
+import { type GestureResponderEvent, Platform, Pressable, Text, View } from 'react-native';
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -35,6 +35,21 @@ const styles = StyleSheet.create((theme) => {
 			gap: theme.spacing[4],
 			borderCurve: 'continuous',
 			borderRadius: theme.rounded.md,
+			_web: {
+				transitionProperty:
+					'background-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.96)',
+					opacity: 0.7,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {
@@ -118,6 +133,7 @@ export const MenuDropdownCheckItem = ({
 	const context = useMenuContext();
 	const [pressed, setPressed] = useState(false);
 	const isDisabled = disabled ?? false;
+	const isWeb = Platform.OS === 'web';
 
 	// Animation values
 	const scale = useSharedValue(1);
@@ -143,25 +159,31 @@ export const MenuDropdownCheckItem = ({
 			event: GestureResponderEvent
 		) => {
 		if (!isDisabled) {
-			scale.value = withSpring(0.96, PRESS_SPRING_CONFIG);
-			opacity.value = withSpring(0.7, PRESS_SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(0.96, PRESS_SPRING_CONFIG);
+				opacity.value = withSpring(0.7, PRESS_SPRING_CONFIG);
+			}
 			setPressed(true);
 		}
 		onPressIn?.(event);
 	},
-	[isDisabled, onPressIn, scale, opacity]
+	[isDisabled, isWeb, onPressIn, scale, opacity]
 	);
 
 	const handlePressOut = useCallback(
 		(
 			event: GestureResponderEvent
 		) => {
-		scale.value = withSpring(1, PRESS_SPRING_CONFIG);
-		opacity.value = withSpring(1, PRESS_SPRING_CONFIG);
+		// Skip Reanimated animations on web - CSS :active handles it
+		if (!isWeb) {
+			scale.value = withSpring(1, PRESS_SPRING_CONFIG);
+			opacity.value = withSpring(1, PRESS_SPRING_CONFIG);
+		}
 		setPressed(false);
 		onPressOut?.(event);
 	},
-	[onPressOut, scale, opacity]
+	[isWeb, onPressOut, scale, opacity]
 	);
 
 	const handlePress = useCallback(
@@ -183,16 +205,17 @@ export const MenuDropdownCheckItem = ({
 	);
 
 	// Reanimated's Animated Style is overriding all included style attributes, so the opacity attribute is not working as expected.
+	// Skip on web since CSS handles disabled state.
 	useEffect(() => {
-		if(isDisabled) {
+		if(isDisabled && !isWeb) {
 			opacity.value = 0.4;
 		}
-	}, [isDisabled]);
+	}, [isDisabled, isWeb, opacity]);
 
 	return (
 		<AnimatedPressable
 			{...pressableProps}
-			style={[styles.container, animatedStyle, style]}
+			style={[styles.container, !isWeb && animatedStyle, style]}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
 			onPress={handlePress}

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { forwardRef, isValidElement, useCallback, useEffect, useMemo } from 'react';
 import {
 	type GestureResponderEvent,
+	Platform,
 	Pressable,
 	type StyleProp,
 	Text,
@@ -241,6 +242,21 @@ export const chipStyles = StyleSheet.create((theme, _rt) => {
 			borderWidth: 0,
 			margin: 0,
 			backgroundColor: 'transparent',
+			_web: {
+				transitionProperty:
+					'background-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.95)',
+					opacity: 0.6,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {
@@ -521,6 +537,7 @@ export const Chip = forwardRef<View, ChipProps>((props, ref) => {
 
 	const label = getContentLabel(children, ariaLabel, accessibilityLabel);
 	const isDisabled = useMemo(() => Boolean(disabled || loading), [disabled, loading]);
+	const isWeb = Platform.OS === 'web';
 	// Determine if chip is interactive
 	const isInteractive = useMemo(() => Boolean(onPress), [onPress]);
 
@@ -554,22 +571,26 @@ export const Chip = forwardRef<View, ChipProps>((props, ref) => {
 		(event: GestureResponderEvent) => {
 			if (isDisabled) return;
 			// Only animate if onPress is provided
-			if (isInteractive) {
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (isInteractive && !isWeb) {
 				scale.value = withSpring(0.95, SPRING_CONFIG);
 				opacity.value = withSpring(0.6, SPRING_CONFIG);
 			}
 			onPressIn?.(event);
 		},
-		[isDisabled, isInteractive, onPressIn, scale, opacity]
+		[isDisabled, isInteractive, isWeb, onPressIn, scale, opacity]
 	);
 
 	const handlePressOut = useCallback(
 		(event: GestureResponderEvent) => {
-			scale.value = withSpring(1, SPRING_CONFIG);
-			opacity.value = withSpring(1, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(1, SPRING_CONFIG);
+				opacity.value = withSpring(1, SPRING_CONFIG);
+			}
 			onPressOut?.(event);
 		},
-		[onPressOut, scale, opacity]
+		[isWeb, onPressOut, scale, opacity]
 	);
 
 	const handlePress = useCallback(
@@ -638,12 +659,12 @@ export const Chip = forwardRef<View, ChipProps>((props, ref) => {
 	}), [isDisabled, loading]);
 
 	// Reanimated's Animated Style is overriding all included style attributes, so the opacity attribute is not working as expected.
-	// So we need to set the opacity manually.
+	// So we need to set the opacity manually. Skip on web since CSS handles disabled state.
 	useEffect(() => {
-		if (isDisabled) {
+		if (isDisabled && !isWeb) {
 			opacity.value = 0.4
 		}
-	}, [isDisabled]);
+	}, [isDisabled, isWeb, opacity]);
 
 
 	if (__DEV__ && iconOnly && typeof children === 'string') {
@@ -674,7 +695,7 @@ export const Chip = forwardRef<View, ChipProps>((props, ref) => {
 			<Animated.View
 				style={[
 					chipStyles.container,
-					animatedStyle,
+					!isWeb && animatedStyle,
 					style as StyleProp<ViewStyle>,
 				]}
 			>

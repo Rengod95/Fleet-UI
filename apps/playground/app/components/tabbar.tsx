@@ -1,11 +1,11 @@
-import { Button, Icon, TabBar, Typo, type TabBarItem } from '@fleet-ui/components';
-import { useMemo, useState } from 'react';
+import { Button, Icon, TabBar, Typo } from '@fleet-ui/components';
+import { Home, Search, User } from 'lucide-react-native';
+import { useState } from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
-import { commonStyles, DemoIcon, PageHeader, Section } from '../../common/views';
-import { Home, Search, User } from 'lucide-react-native';
+import { commonStyles, PageHeader, Section } from '../../common/views';
 
-const COLOR_SCHEMES = [
+const _COLOR_SCHEMES = [
 	'primary',
 	'neutral',
 	'error',
@@ -26,22 +26,22 @@ const SAMPLE_ITEMS = [
 	'Profile',
 	'Something Long Title',
 ];
-const CUSTOM_ITEM_LABELS = ['Home', 'Explore', 'Profile'];
+const _CUSTOM_ITEM_LABELS = ['Home', 'Explore', 'Profile'];
 
 const CUSTOM_ITEMS = [
-	<View style={{flexDirection:'row',gap : 12}}>
+	<View style={{ flexDirection: 'row', gap: 12 }}>
 		<Icon icon={Home} />
 		<Typo>Home</Typo>
 	</View>,
-	<View style={{flexDirection:'row',gap : 12}}>
+	<View style={{ flexDirection: 'row', gap: 12 }}>
 		<Icon icon={Search} />
 		<Typo>Explore</Typo>
 	</View>,
-	<View style={{flexDirection:'row',gap : 12}}>
+	<View style={{ flexDirection: 'row', gap: 12 }}>
 		<Icon icon={User} />
 		<Typo>Profile</Typo>
 	</View>,
-]
+];
 
 export default function TabBarScreen() {
 	useUnistyles();
@@ -146,37 +146,40 @@ export default function TabBarScreen() {
 
 				<Section title="Color schemes">
 					<View style={[commonStyles.column]}>
-							<Text style={commonStyles.label}>ColorSchems of Tabbar affects the only variants filled and underlined. other variants are affected on just item's text color.</Text>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="filled"
-								colorScheme={'primary'}
-							/>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="flat"
-								colorScheme={'primary'}
-							/>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="faded"
-								colorScheme={'primary'}
-							/>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="ghost"
-								colorScheme={'primary'}
-							/>
-							<TabBar
-								selectedPage={0}
-								items={SAMPLE_ITEMS}
-								variant="underlined"
-								colorScheme={'primary'}
-							/>
+						<Text style={commonStyles.label}>
+							ColorSchems of Tabbar affects the only variants filled and
+							underlined. other variants are affected on just item's text color.
+						</Text>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="filled"
+							colorScheme={'primary'}
+						/>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="flat"
+							colorScheme={'primary'}
+						/>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="faded"
+							colorScheme={'primary'}
+						/>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="ghost"
+							colorScheme={'primary'}
+						/>
+						<TabBar
+							selectedPage={0}
+							items={SAMPLE_ITEMS}
+							variant="underlined"
+							colorScheme={'primary'}
+						/>
 					</View>
 				</Section>
 
@@ -204,13 +207,16 @@ export default function TabBarScreen() {
 							colorScheme="neutral"
 						/>
 
-						<Text style={commonStyles.label}>If you should adjust the TabBar height by custom item's dynamic height or something like that, you can use the style prop</Text>
+						<Text style={commonStyles.label}>
+							If you should adjust the TabBar height by custom item's dynamic
+							height or something like that, you can use the style prop
+						</Text>
 						<TabBar
 							selectedPage={0}
 							items={CUSTOM_ITEMS}
 							variant="underlined"
 							colorScheme="neutral"
-							style={{height:60}}
+							style={{ height: 60 }}
 						/>
 					</View>
 				</Section>
@@ -233,9 +239,7 @@ export default function TabBarScreen() {
 								size="sm"
 								variant="outlined"
 								colorScheme="neutral"
-								onPress={() =>
-									setSelectedPage((prev) => Math.max(prev - 1, 0))
-								}
+								onPress={() => setSelectedPage((prev) => Math.max(prev - 1, 0))}
 							>
 								Prev
 							</Button>
@@ -258,15 +262,16 @@ export default function TabBarScreen() {
 				<Section title="Disabled Indicies">
 					<View style={[commonStyles.column]}>
 						<Text style={commonStyles.label}>
-							Indices are the default values to disabled items on initializing TabBar.
+							Indices are the default values to disabled items on initializing
+							TabBar.
 						</Text>
 						<TabBar
 							selectedPage={0}
 							items={CUSTOM_ITEMS}
 							variant="underlined"
 							colorScheme="neutral"
-							style={{height:60}}
-							disabledIndices={[0,1]}
+							style={{ height: 60 }}
+							disabledIndices={[0, 1]}
 						/>
 					</View>
 				</Section>
@@ -274,7 +279,8 @@ export default function TabBarScreen() {
 				<Section title="isItemDisabled Function">
 					<View style={[commonStyles.column]}>
 						<Text style={commonStyles.label}>
-							You can also use the isItemDisabled(Callback Function) to disable items dynamically.
+							You can also use the isItemDisabled(Callback Function) to disable
+							items dynamically.
 						</Text>
 						<Text style={commonStyles.label}>
 							The Below example is disabled the first and second items.
@@ -284,12 +290,11 @@ export default function TabBarScreen() {
 							items={CUSTOM_ITEMS}
 							variant="underlined"
 							colorScheme="neutral"
-							style={{height:60}}
-							isItemDisabled={(item, index) => index === 0 || index === 1}
+							style={{ height: 60 }}
+							isItemDisabled={(_item, index) => index === 0 || index === 1}
 						/>
 					</View>
 				</Section>
-
 
 				<Section title="Combinations">
 					<View style={[commonStyles.column]}>
@@ -324,7 +329,7 @@ export default function TabBarScreen() {
 							colorScheme="info"
 							size="md"
 							rounded="md"
-							style={{height:64}}
+							style={{ height: 64 }}
 						/>
 					</View>
 				</Section>

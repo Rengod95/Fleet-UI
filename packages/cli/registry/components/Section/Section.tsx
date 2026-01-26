@@ -1,6 +1,7 @@
 import React, { forwardRef, useCallback, useMemo } from 'react';
 import {
 	type GestureResponderEvent,
+	Platform,
 	Pressable,
 	Text,
 	View,
@@ -86,24 +87,31 @@ const usePressFeedback = (
 ) => {
 	const scale = useSharedValue(1);
 	const opacity = useSharedValue(1);
+	const isWeb = Platform.OS === 'web';
 
 	const handlePressIn = useCallback(
 		(event: GestureResponderEvent) => {
 			if (!enabled) return;
-			scale.value = withSpring(0.8, SPRING_CONFIG);
-			opacity.value = withSpring(0.7, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(0.8, SPRING_CONFIG);
+				opacity.value = withSpring(0.7, SPRING_CONFIG);
+			}
 			onPressIn?.(event);
 		},
-		[enabled, onPressIn, opacity, scale]
+		[enabled, isWeb, onPressIn, opacity, scale]
 	);
 
 	const handlePressOut = useCallback(
 		(event: GestureResponderEvent) => {
-			scale.value = withSpring(1, SPRING_CONFIG);
-			opacity.value = withSpring(1, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(1, SPRING_CONFIG);
+				opacity.value = withSpring(1, SPRING_CONFIG);
+			}
 			onPressOut?.(event);
 		},
-		[onPressOut, opacity, scale]
+		[isWeb, onPressOut, opacity, scale]
 	);
 
 	const animatedStyle = useAnimatedStyle(() => ({
@@ -115,7 +123,7 @@ const usePressFeedback = (
 		opacity: opacity.value,
 	}));
 
-	return { animatedStyle, handlePressIn, handlePressOut };
+	return { animatedStyle, handlePressIn, handlePressOut, isWeb };
 };
 
 // ============================================
@@ -194,7 +202,7 @@ export const SectionRightTypo = forwardRef<View, SectionRightTypoProps>(
 		const isDisabled = Boolean(disabled);
 		styles.useVariants({ size });
 
-		const { animatedStyle, handlePressIn, handlePressOut } = usePressFeedback(
+		const { animatedStyle, handlePressIn, handlePressOut, isWeb } = usePressFeedback(
 			isInteractive && !isDisabled,
 			onPressIn,
 			onPressOut
@@ -212,7 +220,7 @@ export const SectionRightTypo = forwardRef<View, SectionRightTypoProps>(
 				disabled={isDisabled}
 				style={[
 					styles.rightAction,
-					isInteractive ? animatedStyle : undefined,
+					isInteractive && !isWeb ? animatedStyle : undefined,
 					containerStyle,
 				]}
 				testID={testID}
@@ -251,10 +259,10 @@ export const SectionRightIcon = forwardRef<View, SectionRightIconProps>(
 		const isInteractive = Boolean(onPress || onPressIn || onPressOut);
 		const isDisabled = Boolean(disabled);
 		const label = ariaLabel ?? accessibilityLabel;
-		
+
 		styles.useVariants({ size });
 
-		const { animatedStyle, handlePressIn, handlePressOut } = usePressFeedback(
+		const { animatedStyle, handlePressIn, handlePressOut, isWeb } = usePressFeedback(
 			isInteractive && !isDisabled,
 			onPressIn,
 			onPressOut
@@ -280,7 +288,7 @@ export const SectionRightIcon = forwardRef<View, SectionRightIconProps>(
 				disabled={isDisabled}
 				style={[
 					styles.rightAction,
-					isInteractive ? animatedStyle : undefined,
+					isInteractive && !isWeb ? animatedStyle : undefined,
 					style,
 				]}
 				testID={testID}
@@ -539,6 +547,21 @@ const styles = StyleSheet.create((theme) => {
 			alignItems: 'center',
 			justifyContent: 'flex-end',
 			flexDirection: 'row',
+			_web: {
+				transitionProperty:
+					'background-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.8)',
+					opacity: 0.7,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				size: {

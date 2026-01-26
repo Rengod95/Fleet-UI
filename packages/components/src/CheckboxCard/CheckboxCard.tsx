@@ -2,6 +2,7 @@
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import {
 	type GestureResponderEvent,
+	Platform,
 	Pressable,
 	View,
 } from 'react-native';
@@ -93,6 +94,21 @@ export const checkboxCardStyles = StyleSheet.create((theme, _rt) => {
 		container: {
 			flexDirection: 'column',
 			borderCurve: 'continuous',
+			_web: {
+				transitionProperty:
+					'background-color, border-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.96)',
+					opacity: 0.7,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {
@@ -382,6 +398,8 @@ export const CheckboxCard = forwardRef<View, CheckboxCardProps>(
 			(groupContext?.disabled ?? false) ||
 			(isInGroup && !checked && groupContext?.isMaxReached);
 
+		const isWeb = Platform.OS === 'web';
+
 		// 선택 상태에 따른 colorScheme 결정
 		const activeColorScheme =
 			checked && selectedColorScheme ? selectedColorScheme : colorScheme;
@@ -446,18 +464,24 @@ export const CheckboxCard = forwardRef<View, CheckboxCardProps>(
 		// Event Handlers
 		const handlePressIn = useCallback((event: GestureResponderEvent) => {
 			if (isDisabled) return;
-			scale.value = withSpring(0.96, SPRING_CONFIG);
-			opacity.value = withSpring(0.7, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(0.96, SPRING_CONFIG);
+				opacity.value = withSpring(0.7, SPRING_CONFIG);
+			}
 
 			onPressIn?.(event);
-		}, [isDisabled, scale, opacity]);
+		}, [isDisabled, isWeb, scale, opacity, onPressIn]);
 
 		const handlePressOut = useCallback((event: GestureResponderEvent) => {
-			scale.value = withSpring(1, SPRING_CONFIG);
-			opacity.value = withSpring(1, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(1, SPRING_CONFIG);
+				opacity.value = withSpring(1, SPRING_CONFIG);
+			}
 
 			onPressOut?.(event);
-		}, [scale, opacity, onPressOut]);
+		}, [isWeb, scale, opacity, onPressOut]);
 
 		const handlePress = useCallback(
 			(event: GestureResponderEvent) => {
@@ -512,12 +536,12 @@ export const CheckboxCard = forwardRef<View, CheckboxCardProps>(
 		);
 
 	// Reanimated's Animated Style is overriding all included style attributes, so the opacity attribute is not working as expected.
-	// So we need to set the opacity manually.
+	// So we need to set the opacity manually. Skip on web since CSS handles disabled state.
 	useEffect(() => {
-		if (isDisabled) {
+		if (isDisabled && !isWeb) {
 			opacity.value = 0.4
 		}
-	}, [isDisabled]);
+	}, [isDisabled, isWeb, opacity]);
 
 		return (
 				<Pressable
@@ -538,7 +562,7 @@ export const CheckboxCard = forwardRef<View, CheckboxCardProps>(
 					<Animated.View
 						style={[
 							checkboxCardStyles.container,
-							containerAnimatedStyle,
+							!isWeb && containerAnimatedStyle,
 							isDisabled && { opacity: 0.5 },
 							style,
 						]}

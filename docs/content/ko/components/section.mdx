@@ -104,9 +104,10 @@ export function Example() {
 | `right` | `ReactNode` | No | - | 헤더 우측 영역(우선) |
 | `rightIcon` | `ReactNode` | No | - | 헤더 우측 아이콘(`right` 없을 때만 사용) |
 | `size` | `'sm' \| 'md' \| 'lg' \| 'xl'` | No | `'md'` | 크기 프리셋 |
-| `gap` | `keyof FleetTheme['spacing'] \| number` | No | `3` | 헤더 내부 요소 간 세로 간격 |
-| `padding` | `keyof FleetTheme['spacing'] \| number` | No | `0` | 헤더/본문 공통 수평 패딩 |
-| `contentSpacing` | `keyof FleetTheme['spacing'] \| number` | No | `5` | 헤더-본문 간격 및 본문 top padding |
+| `contentGap` | `keyof FleetTheme['spacing'] \| number` | No | `8` | 콘텐츠 내부 요소 간 세로 간격 |
+| `contentPaddingVertical` | `keyof FleetTheme['spacing'] \| number` | No | `0` | 콘텐츠 세로 패딩 |
+| `contentPaddingHorizontal` | `keyof FleetTheme['spacing'] \| number` | No | `0` | 콘텐츠 가로 패딩 |
+| `contentTopMargin` | `keyof FleetTheme['spacing'] \| number` | No | `12` | 콘텐츠 상단 마진 |
 | `titleRatio` | `number` | No | `70` | 헤더에서 타이틀 영역 비율 |
 | `subtitlePosition` | `'top' \| 'bottom'` | No | `'bottom'` | 부제 위치 |
 | `headerStyle` | `ViewProps['style']` | No | - | 헤더 스타일 |

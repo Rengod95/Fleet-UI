@@ -1,8 +1,15 @@
 import type { ReactNode } from 'react';
-import { forwardRef, isValidElement, useCallback, useEffect, useMemo } from 'react';
+import {
+	forwardRef,
+	isValidElement,
+	useCallback,
+	useEffect,
+	useMemo,
+} from 'react';
 import {
 	ActivityIndicator,
 	type GestureResponderEvent,
+	Platform,
 	Pressable,
 	Text,
 	View,
@@ -130,17 +137,21 @@ export const buttonStyles = StyleSheet.create((theme, _rt) => {
 			borderWidth: 0,
 			margin: 0,
 			backgroundColor: 'transparent',
-			// _web: {
-			// 	transitionProperty:
-			// 		'background-color, box-shadow, transform, opacity, outline-color',
-			// 	transitionDuration: '150ms',
-			// 	transitionTimingFunction: 'ease-out',
-			// 	_focusVisible: {
-			// 		outlineStyle: 'solid',
-			// 		outlineWidth: 2,
-			// 		outlineColor: theme.colors.neutral.border_default,
-			// 	},
-			// },
+			_web: {
+				transitionProperty:
+					'background-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.94)',
+					opacity: 0.86,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {
@@ -433,6 +444,7 @@ export const Button = forwardRef<View, ButtonProps>((props, ref) => {
 	} = props;
 
 	const isDisabled = Boolean(disabled || loading);
+	const isWeb = Platform.OS === 'web';
 	const label = getContentLabel(children, ariaLabel, accessibilityLabel);
 
 	const scale = useSharedValue(1);
@@ -450,10 +462,13 @@ export const Button = forwardRef<View, ButtonProps>((props, ref) => {
 
 	const textColor = useAnimatedVariantColor(buttonStyles.buttonText, 'color');
 
-	const accessibilityState = useMemo(() => ({
-		disabled: isDisabled,
-		busy: loading,
-	}), [isDisabled, loading]);
+	const accessibilityState = useMemo(
+		() => ({
+			disabled: isDisabled,
+			busy: loading,
+		}),
+		[isDisabled, loading]
+	);
 
 	const animatedStyle = useAnimatedStyle(() => ({
 		transform: [
@@ -467,31 +482,42 @@ export const Button = forwardRef<View, ButtonProps>((props, ref) => {
 	const handlePressIn = useCallback(
 		(event: GestureResponderEvent) => {
 			if (isDisabled) return;
-			scale.value = withSpring(0.94, SPRING_CONFIG);
-			opacity.value = withSpring(0.86, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(0.94, SPRING_CONFIG);
+				opacity.value = withSpring(0.86, SPRING_CONFIG);
+			} else {
+				scale.value = 0.94;
+				opacity.value = 0.86;
+			}
 			onPressIn?.(event);
 		},
-		[isDisabled, onPressIn, opacity, scale]
+		[isDisabled, isWeb, onPressIn, opacity, scale]
 	);
 
 	const handlePressOut = useCallback(
 		(event: GestureResponderEvent) => {
-			scale.value = withSpring(1, SPRING_CONFIG);
-			opacity.value = withSpring(1, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(1, SPRING_CONFIG);
+				opacity.value = withSpring(1, SPRING_CONFIG);
+			}
 			onPressOut?.(event);
 		},
-		[onPressOut, opacity, scale]
+		[isWeb, onPressOut, opacity, scale]
 	);
 
 	const handlePress = useCallback(
 		(event: GestureResponderEvent) => {
 			if (isDisabled) {
 				event.preventDefault();
+				scale.value = withSpring(0.94, SPRING_CONFIG);
+				opacity.value = withSpring(0.86, SPRING_CONFIG);
 				return;
 			}
 			onPress?.(event);
 		},
-		[isDisabled, onPress]
+		[isDisabled, onPress, scale, opacity]
 	);
 
 	const renderLeftIcon = useCallback(() => {
@@ -511,19 +537,15 @@ export const Button = forwardRef<View, ButtonProps>((props, ref) => {
 			return null;
 		}
 
-		return (
-			<View style={buttonStyles.leftIcon(size)}>{leftIcon}</View>
-		);
-	}, [loading, leftIcon, size]);
+		return <View style={buttonStyles.leftIcon(size)}>{leftIcon}</View>;
+	}, [loading, leftIcon, size, textColor.value, testID]);
 
 	const renderRightIcon = useCallback(() => {
 		if (loading || !rightIcon) {
 			return null;
 		}
 
-		return (
-			<View style={buttonStyles.rightIcon(size)}>{rightIcon}</View>
-		);
+		return <View style={buttonStyles.rightIcon(size)}>{rightIcon}</View>;
 	}, [loading, rightIcon, size]);
 
 	const resolvedChildren = isValidElement(children) ? (
@@ -539,12 +561,12 @@ export const Button = forwardRef<View, ButtonProps>((props, ref) => {
 	) : null;
 
 	// Reanimated's Animated Style is overriding all included style attributes, so the opacity attribute is not working as expected.
-	// So we need to set the opacity manually.
+	// So we need to set the opacity manually. Skip on web since CSS handles disabled state.
 	useEffect(() => {
-		if (isDisabled) {
-			opacity.value = 0.4
+		if (isDisabled && !isWeb) {
+			opacity.value = 0.4;
 		}
-	}, [isDisabled]);
+	}, [isDisabled, isWeb, opacity]);
 
 	return (
 		<AnimatedPressable
@@ -554,11 +576,7 @@ export const Button = forwardRef<View, ButtonProps>((props, ref) => {
 			accessibilityState={accessibilityState}
 			testID={testID}
 			disabled={isDisabled}
-			style={[
-				buttonStyles.container,
-				animatedStyle,
-				style,
-			]}
+			style={[buttonStyles.container, !isWeb && animatedStyle, style]}
 			onPress={handlePress}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
