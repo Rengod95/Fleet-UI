@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useState } from 'react';
 import {
 	type GestureResponderEvent,
+	Platform,
 	Pressable,
 	View,
 } from 'react-native';
@@ -93,6 +94,7 @@ export const RadioCard = forwardRef<View, RadioCardProps>((props, ref) => {
 			: internalSelected;
 
 	const isDisabled = disabled || (groupContext?.disabled ?? false);
+	const isWeb = Platform.OS === 'web';
 
 	const activeColorScheme =
 		selected && selectedColorScheme ? selectedColorScheme : colorScheme;
@@ -151,16 +153,22 @@ export const RadioCard = forwardRef<View, RadioCardProps>((props, ref) => {
 
 	const handlePressIn = useCallback((event: GestureResponderEvent) => {
 		if (isDisabled) return;
-		scale.value = withSpring(0.98, SPRING_CONFIG);
-		opacity.value = withSpring(0.8, SPRING_CONFIG);
+		// Skip Reanimated animations on web - CSS :active handles it
+		if (!isWeb) {
+			scale.value = withSpring(0.98, SPRING_CONFIG);
+			opacity.value = withSpring(0.8, SPRING_CONFIG);
+		}
 		onPressIn?.(event);
-	}, [isDisabled, scale, opacity, onPressIn]);
+	}, [isDisabled, isWeb, scale, opacity, onPressIn]);
 
 	const handlePressOut = useCallback((event: GestureResponderEvent) => {
-		scale.value = withSpring(1, SPRING_CONFIG);
-		opacity.value = withSpring(1, SPRING_CONFIG);
+		// Skip Reanimated animations on web - CSS :active handles it
+		if (!isWeb) {
+			scale.value = withSpring(1, SPRING_CONFIG);
+			opacity.value = withSpring(1, SPRING_CONFIG);
+		}
 		onPressOut?.(event);
-	}, [scale, opacity, onPressOut]);
+	}, [isWeb, scale, opacity, onPressOut]);
 
 	const handlePress = useCallback(
 		(event: GestureResponderEvent) => {
@@ -234,7 +242,7 @@ export const RadioCard = forwardRef<View, RadioCardProps>((props, ref) => {
 			<Animated.View
 				style={[
 					radioCardStyles.container,
-					containerAnimatedStyle,
+					!isWeb && containerAnimatedStyle,
 					isDisabled && { opacity: 0.3 },
 					style,
 				]}
@@ -356,6 +364,21 @@ export const radioCardStyles = StyleSheet.create((theme, _rt) => {
 		container: {
 			flexDirection: 'column',
 			borderCurve: 'continuous',
+			_web: {
+				transitionProperty:
+					'background-color, border-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.98)',
+					opacity: 0.8,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {

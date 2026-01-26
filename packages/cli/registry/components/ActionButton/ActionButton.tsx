@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useMemo } from 'react';
 import {
 	type GestureResponderEvent,
+	Platform,
 	Pressable,
 	Text,
 	View,
@@ -61,6 +62,20 @@ export const actionButtonStyles = StyleSheet.create((theme, _rt) => {
 			borderRadius: theme.rounded.md,
 			borderCurve: 'continuous',
 			backgroundColor: 'transparent',
+			_web: {
+				transitionProperty:
+					'background-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(0.86)',
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				extend: {
@@ -280,6 +295,7 @@ export const ActionButton = forwardRef<View, ActionButtonProps>(
 		} = props;
 
 		const isDisabled = Boolean(disabled);
+		const isWeb = Platform.OS === 'web';
 		const scale = useSharedValue(1);
 
 		actionButtonStyles.useVariants({
@@ -308,18 +324,24 @@ export const ActionButton = forwardRef<View, ActionButtonProps>(
 		const handlePressIn = useCallback(
 			(event: GestureResponderEvent) => {
 				if (isDisabled) return;
-				scale.value = withSpring(0.86, PRESS_IN_SPRING_CONFIG);
+				// Skip Reanimated animations on web - CSS :active handles it
+				if (!isWeb) {
+					scale.value = withSpring(0.86, PRESS_IN_SPRING_CONFIG);
+				}
 				onPressIn?.(event);
 			},
-			[isDisabled, onPressIn]
+			[isDisabled, isWeb, onPressIn, scale]
 		);
 
 		const handlePressOut = useCallback(
 			(event: GestureResponderEvent) => {
-				scale.value = withSpring(1, PRESS_OUT_SPRING_CONFIG);
+				// Skip Reanimated animations on web - CSS :active handles it
+				if (!isWeb) {
+					scale.value = withSpring(1, PRESS_OUT_SPRING_CONFIG);
+				}
 				onPressOut?.(event);
 			},
-			[onPressOut]
+			[isWeb, onPressOut, scale]
 		);
 
 		const handlePress = useCallback(
@@ -348,7 +370,7 @@ export const ActionButton = forwardRef<View, ActionButtonProps>(
 				accessibilityState={accessibilityState}
 				testID={testID}
 				disabled={isDisabled}
-				style={[actionButtonStyles.rootContainer, animatedStyle, rootStyle]}
+				style={[actionButtonStyles.rootContainer, !isWeb && animatedStyle, rootStyle]}
 				onPress={handlePress}
 				onPressIn={handlePressIn}
 				onPressOut={handlePressOut}

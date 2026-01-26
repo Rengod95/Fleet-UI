@@ -10,6 +10,7 @@ import {
 import {
 	ActivityIndicator,
 	type GestureResponderEvent,
+	Platform,
 	Pressable,
 	View,
 } from 'react-native';
@@ -125,6 +126,21 @@ export const iconButtonStyles = StyleSheet.create((theme, _rt) => {
 			borderWidth: 0,
 			borderColor: 'transparent',
 			backgroundColor: 'transparent',
+			_web: {
+				transitionProperty:
+					'background-color, box-shadow, transform, opacity, outline-color',
+				transitionDuration: '100ms',
+				transitionTimingFunction: 'ease-out',
+				_active: {
+					transform: 'scale(1.2)',
+					opacity: 0.6,
+				},
+				_focusVisible: {
+					outlineStyle: 'solid',
+					outlineWidth: 2,
+					outlineColor: theme.colors.neutral.border_default,
+				},
+			},
 
 			variants: {
 				colorScheme: {
@@ -283,6 +299,7 @@ export const IconButton = forwardRef<View, IconButtonProps>((props, ref) => {
 
 	const { theme } = useUnistyles();
 	const isDisabled = Boolean(disabled || loading);
+	const isWeb = Platform.OS === 'web';
 	const label = getContentLabel(ariaLabel, accessibilityLabel);
 
 	const accessibilityState = useMemo(() => ({
@@ -319,20 +336,26 @@ export const IconButton = forwardRef<View, IconButtonProps>((props, ref) => {
 	const handlePressIn = useCallback(
 		(event: GestureResponderEvent) => {
 			if (isDisabled) return;
-			scale.value = withSpring(1.2, SPRING_CONFIG);
-			opacity.value = withSpring(0.6, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(1.2, SPRING_CONFIG);
+				opacity.value = withSpring(0.6, SPRING_CONFIG);
+			}
 			onPressIn?.(event);
 		},
-		[isDisabled, onPressIn]
+		[isDisabled, isWeb, onPressIn, opacity, scale]
 	);
 
 	const handlePressOut = useCallback(
 		(event: GestureResponderEvent) => {
-			scale.value = withSpring(1, SPRING_CONFIG);
-			opacity.value = withSpring(1, SPRING_CONFIG);
+			// Skip Reanimated animations on web - CSS :active handles it
+			if (!isWeb) {
+				scale.value = withSpring(1, SPRING_CONFIG);
+				opacity.value = withSpring(1, SPRING_CONFIG);
+			}
 			onPressOut?.(event);
 		},
-		[onPressOut]
+		[isWeb, onPressOut, opacity, scale]
 	);
 
 	const handlePress = useCallback(
@@ -414,7 +437,7 @@ export const IconButton = forwardRef<View, IconButtonProps>((props, ref) => {
 			accessibilityState={accessibilityState}
 			testID={testID}
 			disabled={isDisabled}
-			style={[iconButtonStyles.container, animatedContainerStyle, style]}
+			style={[iconButtonStyles.container, !isWeb && animatedContainerStyle, style]}
 			onPress={handlePress}
 			onPressIn={handlePressIn}
 			onPressOut={handlePressOut}
