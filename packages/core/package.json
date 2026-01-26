@@ -1,6 +1,6 @@
 {
 	"name": "@fleet-ui/core",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "Core utilities, design tokens, types, and hooks for Fleet UI",
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
