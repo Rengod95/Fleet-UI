@@ -92,7 +92,7 @@ importers:
         version: link:../../packages/core
       '@gorhom/bottom-sheet':
         specifier: ^5.2.6
-        version: 5.2.6(@types/react@19.2.3)(react-native-gesture-handler@2.29.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.5(@babel/core@7.28.5)(react-native-worklets@0.6.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)
+        version: 5.2.6(@types/react-native@0.73.0(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(@types/react@19.2.3)(react-native-gesture-handler@2.29.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.5(@babel/core@7.28.5)(react-native-worklets@0.6.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)
       expo:
         specifier: ~54.0.23
         version: 54.0.23(@babel/core@7.28.5)(@expo/metro-runtime@6.1.2)(expo-router@6.0.14)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)
@@ -297,11 +297,11 @@ importers:
   packages/components:
     dependencies:
       '@fleet-ui/core':
-        specifier: ^0.2.1
+        specifier: ^0.2.2
         version: link:../core
       '@gorhom/bottom-sheet':
         specifier: '>=5.2.6'
-        version: 5.2.6(@types/react@19.2.3)(react-native-gesture-handler@2.29.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.5(@babel/core@7.28.5)(react-native-worklets@0.6.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)
+        version: 5.2.6(@types/react-native@0.73.0(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(@types/react@19.2.3)(react-native-gesture-handler@2.29.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.5(@babel/core@7.28.5)(react-native-worklets@0.6.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)
       expo-blur:
         specifier: '>=15.0.7'
         version: 15.0.7(expo@54.0.23)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)
@@ -2643,6 +2643,10 @@ packages:
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
       '@types/react': ^19.2.0
+
+  '@types/react-native@0.73.0':
+    resolution: {integrity: sha512-6ZRPQrYM72qYKGWidEttRe6M5DZBEV5F+MHMHqd4TTYx0tfkcdrUFGdef6CCxY0jXU7wldvd/zA/b0A/kTeJmA==}
+    deprecated: This is a stub types definition. react-native provides its own type definitions, so you do not need this installed.
 
   '@types/react@19.2.3':
     resolution: {integrity: sha512-k5dJVszUiNr1DSe8Cs+knKR6IrqhqdhpUwzqhkS8ecQTSf3THNtbfIp/umqHMpX2bv+9dkx3fwDv/86LcSfvSg==}
@@ -8193,7 +8197,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.10': {}
 
-  '@gorhom/bottom-sheet@5.2.6(@types/react@19.2.3)(react-native-gesture-handler@2.29.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.5(@babel/core@7.28.5)(react-native-worklets@0.6.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)':
+  '@gorhom/bottom-sheet@5.2.6(@types/react-native@0.73.0(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(@types/react@19.2.3)(react-native-gesture-handler@2.29.1(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native-reanimated@4.1.5(@babel/core@7.28.5)(react-native-worklets@0.6.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)':
     dependencies:
       '@gorhom/portal': 1.0.14(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)
       invariant: 2.2.4
@@ -8203,6 +8207,7 @@ snapshots:
       react-native-reanimated: 4.1.5(@babel/core@7.28.5)(react-native-worklets@0.6.1(@babel/core@7.28.5)(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0))(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)
     optionalDependencies:
       '@types/react': 19.2.3
+      '@types/react-native': 0.73.0(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0)
 
   '@gorhom/portal@1.0.14(react-native@0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0))(react@19.1.0)':
     dependencies:
@@ -9786,6 +9791,20 @@ snapshots:
   '@types/react-dom@19.2.3(@types/react@19.2.3)':
     dependencies:
       '@types/react': 19.2.3
+
+  '@types/react-native@0.73.0(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0)':
+    dependencies:
+      react-native: 0.81.5(@babel/core@7.28.5)(@types/react@19.2.3)(react@19.1.0)
+    transitivePeerDependencies:
+      - '@babel/core'
+      - '@react-native-community/cli'
+      - '@react-native/metro-config'
+      - '@types/react'
+      - bufferutil
+      - react
+      - supports-color
+      - utf-8-validate
+    optional: true
 
   '@types/react@19.2.3':
     dependencies:
